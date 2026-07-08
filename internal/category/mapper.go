@@ -1,5 +1,7 @@
 package category
 
+import "gopocket/internal/transaction/transactiontype"
+
 // ToResponse maps the database model to the public DTO.
 func ToResponse(model *Category) CategoryResponse {
 	return CategoryResponse{
@@ -17,7 +19,7 @@ func CreateRequestToModel(dto CreateCategoryRequest) Category {
 		Name:  dto.Name,
 		Color: dto.Color,
 		Icon:  dto.Icon,
-		Type:  CategoryType(dto.Type),
+		Type:  transactiontype.TransactionType(dto.Type),
 	}
 }
 
@@ -27,6 +29,6 @@ func UpdateRequestToModel(dto UpdateCategoryRequest) Category {
 		Name:  dto.Name,
 		Color: dto.Color,
 		Icon:  dto.Icon,
-		Type:  CategoryType(dto.Type),
+		Type:  transactiontype.TransactionType(dto.Type),
 	}
 }

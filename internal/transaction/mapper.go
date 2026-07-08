@@ -1,5 +1,7 @@
 package transaction
 
+import "gopocket/internal/transaction/transactiontype"
+
 // ToResponse maps the database model to the public DTO.
 func ToResponse(model *Transaction) TransactionResponse {
 	return TransactionResponse{
@@ -18,7 +20,7 @@ func CreateRequestToModel(dto CreateTransactionRequest) Transaction {
 		Title:       dto.Title,
 		Description: dto.Description,
 		Amount:      dto.Amount,
-		Type:        TransactionType(dto.Type),
+		Type:        transactiontype.TransactionType(dto.Type),
 		CategoryID:  dto.CategoryID,
 	}
 }
@@ -29,7 +31,7 @@ func UpdateRequestToModel(dto UpdateTransactionRequest) Transaction {
 		Title:       dto.Title,
 		Description: dto.Description,
 		Amount:      dto.Amount,
-		Type:        TransactionType(dto.Type),
+		Type:        transactiontype.TransactionType(dto.Type),
 		CategoryID:  dto.CategoryID,
 	}
 }

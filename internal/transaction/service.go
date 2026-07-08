@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"errors"
+	"gopocket/internal/transaction/transactiontype"
 )
 
 // Service encapsulates transaction business logic.
@@ -50,7 +51,7 @@ func (s *service) Update(id string, dto UpdateTransactionRequest) (*Transaction,
 		model.Amount = dto.Amount
 	}
 	if dto.Type != "" {
-		model.Type = TransactionType(dto.Type)
+		model.Type = transactiontype.TransactionType(dto.Type)
 	}
 	if dto.CategoryID != "" {
 		model.CategoryID = dto.CategoryID
