@@ -10,6 +10,8 @@
   --secondary-foreground: #EFE9F4;
   --tertiary: #2D82B7;
 
+  --light-gray: #d6cfe0;
+
   --transition-duration: 300ms;
 }
 
@@ -21,6 +23,7 @@
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-tertiary: var(--tertiary);
+  --color-light-gray: var(--light-gray);
   --color-base-100: var(--background);
   --color-base-200: #e7dff0;
   --color-base-300: #d6cfe0;

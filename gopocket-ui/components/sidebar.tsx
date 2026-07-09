@@ -24,7 +24,7 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="hidden w-72 shrink-0 border-r border-base-300 bg-base-100/80 p-6 lg:flex lg:flex-col">
+    <aside className="hidden w-72 shrink-0 border-r border-light-gray bg-background p-4 lg:flex lg:flex-col">
       <div className="mb-10">
         <Logo />
       </div>
@@ -38,10 +38,8 @@ export function Sidebar() {
               href={href}
               className={`flex items-center gap-3 rounded-lg px-4 py-3 transition ${
                 active
-                  ? "bg-primary text-primary-content shadow-lg"
-                  : theme === "dark"
-                    ? "text-base-200 hover:bg-base-200/10"
-                    : "text-base-content hover:bg-base-200"
+                  ? "bg-primary text-primary-foreground hover:brightness-110"
+                  : "hover:bg-light-gray"
               }`}
             >
               <Icon className="h-5 w-5" />
