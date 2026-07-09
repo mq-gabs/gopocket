@@ -9,6 +9,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { categoryService } from "@/services/category.service";
 import type { Category, CreateCategoryPayload, UpdateCategoryPayload } from "@/types/models";
 import { Button } from "@/components/button";
+import { CategoryCard } from "@/components/category-card";
 
 export default function CategoriesPage() {
   const { t } = useI18n();
@@ -103,33 +104,12 @@ export default function CategoriesPage() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {categories.map((category) => (
-          <div
+          <CategoryCard
             key={category.id}
-            className="group relative overflow-hidden rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm"
-            style={{ backgroundColor: `${category.color}20` }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: category.color }}>
-                  <span className="text-lg text-white">{category.icon}</span>
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-base-content">{category.name}</h2>
-                  <p className="text-sm text-base-content/70">{category.type}</p>
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 flex gap-2 opacity-0 transition group-hover:opacity-100">
-              <Button onClick={() => openEdit(category)}>
-                <PencilIcon className="h-4 w-4" />
-                {t("actions.edit")}
-              </Button>
-              <Button onClick={() => openDelete(category)}>
-                <TrashIcon className="h-4 w-4" />
-                {t("actions.delete")}
-              </Button>
-            </div>
-          </div>
+            category={category}
+            onEdit={() => openEdit(category)}
+            onDelete={() => openDelete(category)}
+          />
         ))}
       </div>
 

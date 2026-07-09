@@ -10,6 +10,9 @@
   --secondary-foreground: #EFE9F4;
   --tertiary: #2D82B7;
 
+  --destructive: #C3423F;
+  --destructive-foreground: #EFE9F4;
+
   --light-gray: #d6cfe0;
 
   --transition-duration: 300ms;
@@ -23,13 +26,13 @@
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-tertiary: var(--tertiary);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-light-gray: var(--light-gray);
   --color-base-100: var(--background);
   --color-base-200: #e7dff0;
   --color-base-300: #d6cfe0;
   --color-base-content: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 html[data-theme="dark"] {
