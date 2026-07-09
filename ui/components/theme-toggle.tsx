@@ -9,11 +9,11 @@ export function ThemeToggle() {
   const { t } = useI18n();
 
   return (
-    <label className="flex items-center gap-2 rounded-full border border-base-300 bg-base-100 px-3 py-2 text-sm">
+    <label className="flex items-center gap-2 rounded-full border border-base-300 bg-base-100 px-2 py-1 text-xs cursor-pointer hover:bg-foreground hover:text-background">
       <span>{t("theme.label")}</span>
       <input
         type="checkbox"
-        className="toggle toggle-sm"
+        className="toggle toggle-sm cursor-pointer"
         checked={theme === "dark"}
         onChange={() => setTheme(theme === "dark" ? "light" : "dark")}
       />
