@@ -9,6 +9,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { categoryService } from "@/services/category.service";
 import { transactionService } from "@/services/transaction.service";
 import type { Category, CreateTransactionPayload, Transaction, UpdateTransactionPayload } from "@/types/models";
+import { Button } from "@/components/button";
 
 export default function TransactionsPage() {
   const { t } = useI18n();
@@ -92,10 +93,10 @@ export default function TransactionsPage() {
           <h1 className="text-3xl font-semibold text-base-content">{t("transactions.title")}</h1>
           <p className="mt-2 text-sm text-base-content/70">{t("transactions.description")}</p>
         </div>
-        <button className="btn btn-primary" onClick={openCreate}>
+        <Button onClick={openCreate}>
           <PlusIcon className="h-5 w-5" />
           {t("actions.newTransaction")}
-        </button>
+        </Button>
       </div>
 
       {error ? <div className="alert alert-error">{error}</div> : null}
@@ -146,12 +147,12 @@ export default function TransactionsPage() {
                     </td>
                     <td>
                       <div className="flex gap-2">
-                        <button className="btn btn-sm btn-ghost" onClick={() => openEdit(transaction)}>
+                        <Button onClick={() => openEdit(transaction)}>
                           <PencilIcon className="h-4 w-4" />
-                        </button>
-                        <button className="btn btn-sm btn-error" onClick={() => openDelete(transaction)}>
+                        </Button>
+                        <Button onClick={() => openDelete(transaction)}>
                           <TrashIcon className="h-4 w-4" />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>

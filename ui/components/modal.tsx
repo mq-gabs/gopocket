@@ -1,6 +1,7 @@
 "use client";
 
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { Button } from "./button";
 
 interface ModalProps {
   title: string;
@@ -19,9 +20,10 @@ export function Modal({ title, open, onClose, children }: ModalProps) {
       <div className="w-full max-w-xl rounded-3xl border border-base-300 bg-base-100 p-6 shadow-2xl">
         <div className="mb-6 flex items-center justify-between">
           <h3 className="text-xl font-semibold text-base-content">{title}</h3>
-          <button className="btn btn-ghost btn-sm" onClick={onClose}>
+          <Button onClick={onClose}>
+
             <XMarkIcon className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
         {children}
       </div>

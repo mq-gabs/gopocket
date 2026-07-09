@@ -8,6 +8,7 @@ import { Modal } from "@/components/modal";
 import { useI18n } from "@/contexts/i18n-context";
 import { categoryService } from "@/services/category.service";
 import type { Category, CreateCategoryPayload, UpdateCategoryPayload } from "@/types/models";
+import { Button } from "@/components/button";
 
 export default function CategoriesPage() {
   const { t } = useI18n();
@@ -84,10 +85,10 @@ export default function CategoriesPage() {
           <h1 className="text-3xl font-semibold text-base-content">{t("categories.title")}</h1>
           <p className="mt-2 text-sm text-base-content/70">{t("categories.description")}</p>
         </div>
-        <button className="btn btn-primary" onClick={openCreate}>
+        <Button onClick={openCreate}>
           <PlusIcon className="h-5 w-5" />
           {t("actions.newCategory")}
-        </button>
+        </Button>
       </div>
 
       {error ? <div className="alert alert-error">{error}</div> : null}
@@ -119,14 +120,14 @@ export default function CategoriesPage() {
               </div>
             </div>
             <div className="mt-6 flex gap-2 opacity-0 transition group-hover:opacity-100">
-              <button className="btn btn-sm btn-ghost" onClick={() => openEdit(category)}>
+              <Button onClick={() => openEdit(category)}>
                 <PencilIcon className="h-4 w-4" />
                 {t("actions.edit")}
-              </button>
-              <button className="btn btn-sm btn-error" onClick={() => openDelete(category)}>
+              </Button>
+              <Button onClick={() => openDelete(category)}>
                 <TrashIcon className="h-4 w-4" />
                 {t("actions.delete")}
-              </button>
+              </Button>
             </div>
           </div>
         ))}

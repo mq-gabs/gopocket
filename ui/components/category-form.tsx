@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CATEGORY_ICONS, type CategoryIcon } from "@/constants/category-icons";
 import { useI18n } from "@/contexts/i18n-context";
 import type { Category, CreateCategoryPayload, UpdateCategoryPayload } from "@/types/models";
+import { Button } from "./button";
 
 interface CategoryFormProps {
   initialValues?: Category;
@@ -62,9 +63,9 @@ export function CategoryForm({ initialValues, onSubmit, submitLabel }: CategoryF
       </label>
 
       <div className="flex justify-end">
-        <button className="btn btn-primary" type="submit">
+        <Button type="submit">
           {submitLabel}
-        </button>
+        </Button>
       </div>
     </form>
   );

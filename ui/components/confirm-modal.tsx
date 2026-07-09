@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "./button";
 import { Modal } from "./modal";
 
 interface ConfirmModalProps {
@@ -15,12 +16,12 @@ export function ConfirmModal({ title, message, open, onClose, onConfirm }: Confi
     <Modal title={title} open={open} onClose={onClose}>
       <p className="mb-6 text-sm text-base-content/70">{message}</p>
       <div className="flex justify-end gap-3">
-        <button className="btn btn-ghost" onClick={onClose}>
+        <Button onClick={onClose}>
           Cancel
-        </button>
-        <button className="btn btn-error" onClick={onConfirm}>
+        </Button>
+        <Button onClick={onConfirm}>
           Confirm
-        </button>
+        </Button>
       </div>
     </Modal>
   );
