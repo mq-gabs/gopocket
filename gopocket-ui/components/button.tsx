@@ -13,7 +13,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }  
 
 export function Button({ children, onClick,  variation = 'primary', ...rest }: ButtonProps) {
-  const baseClasses = "text-sm hover:brightness-110 font-bold cursor-pointer px-4 py-2 rounded flex items-center justify-center gap-2";
+  const baseClasses = "text-sm hover:brightness-110 font-bold cursor-pointer px-4 py-2 rounded-lg  flex items-center justify-center gap-2";
 
 //   const extraClasses = rest.className ? ` ${rest.className}` : "";
 const { className: extraClasses, ...restProps } = rest;
