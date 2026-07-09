@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/contexts/i18n-context";
 import type { Category, CreateTransactionPayload, Transaction, UpdateTransactionPayload } from "@/types/models";
+import { Button } from "./button";
 
 interface TransactionFormProps {
   categories: Category[];
@@ -71,9 +72,9 @@ export function TransactionForm({ categories, initialValues, onSubmit, submitLab
       </label>
 
       <div className="flex justify-end">
-        <button className="btn btn-primary" type="submit">
+        <Button className="btn btn-primary" type="submit">
           {submitLabel}
-        </button>
+        </Button>
       </div>
     </form>
   );
