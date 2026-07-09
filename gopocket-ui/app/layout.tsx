@@ -25,7 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <Sidebar />
               <div className="flex min-h-screen flex-1 flex-col">
                 <GlobalHeader />
-                <main className="flex-1 p-6">{children}</main>
+                <main className="flex-1 p-4">{children}</main>
               </div>
             </div>
           </I18nProvider>
