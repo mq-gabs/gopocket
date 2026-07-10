@@ -180,14 +180,14 @@ export default function TransactionsPage() {
                     <td>
                       <div className="flex gap-2">
                         <Button
-                          className="p-2!"
+                          className="p-1!"
                           variation="neutral"
                           onClick={() => openEdit(transaction)}
                         >
                           <PencilIcon className="h-4 w-4" />
                         </Button>
                         <Button
-                          className="p-2!"
+                          className="p-1!"
                           variation="destructive"
                           onClick={() => openDelete(transaction)}
                         >
