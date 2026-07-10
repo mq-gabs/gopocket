@@ -3,8 +3,14 @@
 import { useEffect, useState } from "react";
 import { CATEGORY_ICONS, type CategoryIcon } from "@/constants/category-icons";
 import { useI18n } from "@/contexts/i18n-context";
-import type { Category, CreateCategoryPayload, UpdateCategoryPayload } from "@/types/models";
+import type {
+  Category,
+  CreateCategoryPayload,
+  UpdateCategoryPayload,
+} from "@/types/models";
 import { Button } from "./button";
+import { InputLabel } from "./inputs/input-label";
+import { SelectLabel } from "./select/select-label";
 
 interface CategoryFormProps {
   initialValues?: Category;
@@ -12,10 +18,16 @@ interface CategoryFormProps {
   submitLabel: string;
 }
 
-export function CategoryForm({ initialValues, onSubmit, submitLabel }: CategoryFormProps) {
+export function CategoryForm({
+  initialValues,
+  onSubmit,
+  submitLabel,
+}: CategoryFormProps) {
   const { t } = useI18n();
   const [name, setName] = useState(initialValues?.name ?? "");
-  const [icon, setIcon] = useState<CategoryIcon>(initialValues?.icon as CategoryIcon ?? "wallet");
+  const [icon, setIcon] = useState<CategoryIcon>(
+    (initialValues?.icon as CategoryIcon) ?? "wallet",
+  );
   const [color, setColor] = useState(initialValues?.color ?? "#09BC8A");
   const [type, setType] = useState(initialValues?.type ?? "EXPENSE");
 
@@ -33,39 +45,51 @@ export function CategoryForm({ initialValues, onSubmit, submitLabel }: CategoryF
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <label className="form-control w-full">
-        <span className="label-text">{t("categories.form.name")}</span>
-        <input className="input input-bordered" value={name} onChange={(event) => setName(event.target.value)} required />
-      </label>
-
-      <label className="form-control w-full">
-        <span className="label-text">{t("categories.form.icon")}</span>
-        <select className="select select-bordered" value={icon} onChange={(event) => setIcon(event.target.value as CategoryIcon)}>
-          {CATEGORY_ICONS.map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="form-control w-full">
-        <span className="label-text">{t("categories.form.color")}</span>
-        <input type="color" className="h-12 w-full cursor-pointer rounded-lg border border-base-300" value={color} onChange={(event) => setColor(event.target.value)} />
-      </label>
-
-      <label className="form-control w-full">
-        <span className="label-text">{t("categories.form.type")}</span>
-        <select className="select select-bordered" value={type} onChange={(event) => setType(event.target.value as "EXPENSE" | "INCOME") }>
-          <option value="EXPENSE">{t("categories.form.type.expense")}</option>
-          <option value="INCOME">{t("categories.form.type.income")}</option>
-        </select>
-      </label>
-
+      <InputLabel
+        id="name"
+        label={t("categories.form.name")}
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+        required
+      />
+      <SelectLabel
+        id="icon"
+        label={t("categories.form.icon")}
+        value={icon}
+        onChange={(event) => setIcon(event.target.value as CategoryIcon)}
+        options={CATEGORY_ICONS.map((icon) => ({
+          value: icon,
+          label: icon,
+        }))}
+      />
+      <InputLabel
+        id="color"
+        label={t("categories.form.color")}
+        type="color"
+        className="h-12 cursor-pointer"
+        value={color}
+        onChange={(event) => setColor(event.target.value)}
+      />
+      <SelectLabel
+        id="type"
+        label={t("categories.form.type")}
+        value={type}
+        onChange={(event) =>
+          setType(event.target.value as "EXPENSE" | "INCOME")
+        }
+        options={[
+          {
+            value: "EXPENSE",
+            label: t("categories.form.type.expense"),
+          },
+          {
+            value: "INCOME",
+            label: t("categories.form.type.income"),
+          },
+        ]}
+      />{" "}
       <div className="flex justify-end">
-        <Button type="submit">
-          {submitLabel}
-        </Button>
+        <Button type="submit">{submitLabel}</Button>
       </div>
     </form>
   );
