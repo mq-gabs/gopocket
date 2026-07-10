@@ -20,11 +20,15 @@ export function Sidebar() {
 
   const items: NavItem[] = [
     { href: "/categories", label: t("navigation.categories"), icon: TagIcon },
-    { href: "/transactions", label: t("navigation.transactions"), icon: BanknotesIcon },
+    {
+      href: "/transactions",
+      label: t("navigation.transactions"),
+      icon: BanknotesIcon,
+    },
   ];
 
   return (
-    <aside className="hidden w-72 shrink-0 border-r border-light-gray bg-background p-4 lg:flex lg:flex-col">
+    <aside className="hidden w-60 shrink-0 border-r border-light-gray bg-background p-4 lg:flex lg:flex-col">
       <div className="mb-10">
         <Logo />
       </div>
@@ -36,7 +40,7 @@ export function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 rounded-lg px-4 py-3 transition ${
+              className={`flex text-sm items-center gap-3 rounded-lg px-2 py-2 transition ${
                 active
                   ? "bg-primary text-primary-foreground hover:brightness-110"
                   : "hover:bg-light-gray"
