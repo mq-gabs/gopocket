@@ -15,7 +15,9 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocale] = useState<Locale>("en");
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("gopocket-locale") as Locale | null;
+    const stored = window.localStorage.getItem(
+      "gopocket-locale",
+    ) as Locale | null;
     if (stored === "en" || stored === "pt-br") {
       setLocale(stored);
     }
@@ -26,11 +28,15 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     window.localStorage.setItem("gopocket-locale", locale);
   }, [locale]);
 
-  const value = useMemo(() => ({
-    locale,
-    setLocale,
-    t: (key: TranslationKey) => dictionaries[locale][key],
-  }), [locale]);
+  const value = useMemo(
+    () => ({
+      locale,
+      setLocale,
+      t: (key: TranslationKey) =>
+        dictionaries[locale][key] || "<missing translation>",
+    }),
+    [locale],
+  );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
