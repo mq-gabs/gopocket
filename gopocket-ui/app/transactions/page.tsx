@@ -8,14 +8,21 @@ import { TransactionForm } from "@/components/transaction-form";
 import { useI18n } from "@/contexts/i18n-context";
 import { categoryService } from "@/services/category.service";
 import { transactionService } from "@/services/transaction.service";
-import type { Category, CreateTransactionPayload, Transaction, UpdateTransactionPayload } from "@/types/models";
+import type {
+  Category,
+  CreateTransactionPayload,
+  Transaction,
+  UpdateTransactionPayload,
+} from "@/types/models";
 import { Button } from "@/components/button";
 
 export default function TransactionsPage() {
   const { t } = useI18n();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | undefined>();
+  const [selectedTransaction, setSelectedTransaction] = useState<
+    Transaction | undefined
+  >();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -41,7 +48,10 @@ export default function TransactionsPage() {
     void loadData();
   }, []);
 
-  const categoryMap = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
+  const categoryMap = useMemo(
+    () => new Map(categories.map((category) => [category.id, category])),
+    [categories],
+  );
 
   const openCreate = () => {
     setSelectedTransaction(undefined);
@@ -58,10 +68,15 @@ export default function TransactionsPage() {
     setIsDeleteOpen(true);
   };
 
-  const handleSubmit = async (payload: CreateTransactionPayload | UpdateTransactionPayload) => {
+  const handleSubmit = async (
+    payload: CreateTransactionPayload | UpdateTransactionPayload,
+  ) => {
     try {
       if (selectedTransaction) {
-        await transactionService.update(selectedTransaction.id, payload as UpdateTransactionPayload);
+        await transactionService.update(
+          selectedTransaction.id,
+          payload as UpdateTransactionPayload,
+        );
       } else {
         await transactionService.create(payload as CreateTransactionPayload);
       }
@@ -90,8 +105,12 @@ export default function TransactionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-base-content">{t("transactions.title")}</h1>
-          <p className="mt-2 text-sm text-base-content/70">{t("transactions.description")}</p>
+          <h1 className="text-3xl font-semibold text-base-content">
+            {t("transactions.title")}
+          </h1>
+          <p className="mt-2 text-sm text-base-content/70">
+            {t("transactions.description")}
+          </p>
         </div>
         <Button onClick={openCreate}>
           <PlusIcon className="h-5 w-5" />
@@ -110,7 +129,7 @@ export default function TransactionsPage() {
       ) : null}
 
       {!loading && transactions.length > 0 ? (
-        <div className="overflow-x-auto rounded-3xl border border-base-300 bg-base-100 shadow-sm">
+        <div className="overflow-x-auto rounded-lg border border-base-300 bg-base-100 shadow-sm">
           <table className="table">
             <thead>
               <tr>
@@ -127,17 +146,30 @@ export default function TransactionsPage() {
                 const category = categoryMap.get(transaction.category_id);
                 return (
                   <tr key={transaction.id}>
-                    <td className="font-medium text-base-content">{transaction.title}</td>
-                    <td className="text-base-content/70">{transaction.description}</td>
+                    <td className="font-medium text-base-content">
+                      {transaction.title}
+                    </td>
+                    <td className="text-base-content/70">
+                      {transaction.description}
+                    </td>
                     <td className="text-base-content">{transaction.amount}</td>
                     <td className="text-base-content">{transaction.type}</td>
                     <td>
                       {category ? (
                         <div className="flex items-center gap-2">
-                          <span className="flex h-8 w-8 items-center justify-center rounded-full text-sm" style={{ backgroundColor: `${category.color}22`, color: category.color }}>
+                          <span
+                            className="flex h-8 w-8 items-center justify-center rounded-full text-sm"
+                            style={{
+                              backgroundColor: `${category.color}22`,
+                              color: category.color,
+                            }}
+                          >
                             {category.icon}
                           </span>
-                          <span className="font-medium" style={{ color: category.color }}>
+                          <span
+                            className="font-medium"
+                            style={{ color: category.color }}
+                          >
                             {category.name}
                           </span>
                         </div>
@@ -147,10 +179,16 @@ export default function TransactionsPage() {
                     </td>
                     <td>
                       <div className="flex gap-2">
-                        <Button onClick={() => openEdit(transaction)}>
+                        <Button
+                          variation="neutral"
+                          onClick={() => openEdit(transaction)}
+                        >
                           <PencilIcon className="h-4 w-4" />
                         </Button>
-                        <Button onClick={() => openDelete(transaction)}>
+                        <Button
+                          variation="destructive"
+                          onClick={() => openDelete(transaction)}
+                        >
                           <TrashIcon className="h-4 w-4" />
                         </Button>
                       </div>
@@ -163,7 +201,15 @@ export default function TransactionsPage() {
         </div>
       ) : null}
 
-      <Modal title={selectedTransaction ? t("transactions.form.title.edit") : t("transactions.form.title.create")} open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal
+        title={
+          selectedTransaction
+            ? t("transactions.form.title.edit")
+            : t("transactions.form.title.create")
+        }
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      >
         <TransactionForm
           categories={categories}
           initialValues={selectedTransaction}
