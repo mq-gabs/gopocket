@@ -10,6 +10,7 @@ import type {
 } from "@/types/models";
 import { Button } from "./button";
 import { SelectLabel } from "./select/select-label";
+import { CurrencyInput } from "./inputs/currency-input";
 import { InputLabel } from "./inputs/input-label";
 import { TextareaLabel } from "./textarea/textarea-label";
 
@@ -71,12 +72,11 @@ export function TransactionForm({
         onChange={(event) => setDescription(event.target.value)}
       />
 
-      <InputLabel
+      <CurrencyInput
         id="amount"
         label={t("transactions.form.amount")}
-        type="number"
         value={amount}
-        onChange={(event) => setAmount(Number(event.target.value))}
+        onChange={(value) => setAmount(value)}
         required
       />
 

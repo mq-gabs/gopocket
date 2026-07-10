@@ -5,7 +5,6 @@ export const makeOnKeyDown = <T extends HTMLElement>(
   callback: () => void,
 ): KeyboardEventHandler<T> => {
   return (event) => {
-    console.log({ event })
     if (event.key === key) {
       callback();
     }
