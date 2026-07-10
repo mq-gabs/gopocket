@@ -18,7 +18,7 @@ export function TextareaLabel({
 
       <textarea
         id={id}
-        className={`textarea border-0 w-full ${className} resize-none bg-light-gray`}
+        className={`text-sm border border-light-gray px-3 py-1 w-full resize-none outline-primary rounded-lg ${className} `}
         {...props}
       />
     </div>

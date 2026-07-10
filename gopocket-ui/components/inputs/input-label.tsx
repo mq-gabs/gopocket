@@ -18,7 +18,7 @@ export function InputLabel({
 
       <input
         id={id}
-        className={`input w-full border-0 bg-light-gray ${className}`}
+        className={`text-sm border border-light-gray outline-primary px-3 py-1 rounded-lg w-full ${className}`}
         {...props}
       />
     </div>

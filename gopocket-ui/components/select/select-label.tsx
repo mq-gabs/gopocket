@@ -25,7 +25,7 @@ export function SelectLabel({
 
       <select
         id={id}
-        className={`select border-0 w-full ${className} bg-light-gray`}
+        className={`text-sm border border-light-gray outline-primary px-3! py-1! rounded-lg w-full ${className} `}
         {...props}
       >
         {options.map((option) => (
