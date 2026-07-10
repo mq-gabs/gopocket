@@ -18,7 +18,7 @@ export function TextareaLabel({
 
       <textarea
         id={id}
-        className={`textarea textarea-bordered w-full ${className} resize-none`}
+        className={`textarea border-0 w-full ${className} resize-none bg-light-gray`}
         {...props}
       />
     </div>

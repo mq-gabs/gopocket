@@ -129,7 +129,7 @@ export default function TransactionsPage() {
       ) : null}
 
       {!loading && transactions.length > 0 ? (
-        <div className="overflow-x-auto rounded-lg border border-base-300 bg-base-100 shadow-sm">
+        <div className="overflow-x-auto rounded-lg border border-light-gray bg-background">
           <table className="table">
             <thead>
               <tr>
@@ -180,12 +180,14 @@ export default function TransactionsPage() {
                     <td>
                       <div className="flex gap-2">
                         <Button
+                          className="p-2!"
                           variation="neutral"
                           onClick={() => openEdit(transaction)}
                         >
                           <PencilIcon className="h-4 w-4" />
                         </Button>
                         <Button
+                          className="p-2!"
                           variation="destructive"
                           onClick={() => openDelete(transaction)}
                         >

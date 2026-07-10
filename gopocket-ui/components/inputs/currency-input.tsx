@@ -132,7 +132,7 @@ export function CurrencyInput({
         type="text"
         inputMode="numeric"
         autoComplete="off"
-        className={`input input-bordered w-full ${className}`}
+        className={`input border-0 w-full bg-light-gray ${className}`}
         value={formatCurrencyValue(rawValue, locale)}
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}

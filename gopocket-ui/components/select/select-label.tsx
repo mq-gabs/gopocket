@@ -5,8 +5,7 @@ interface SelectOption {
   label: string;
 }
 
-interface SelectLabelProps
-  extends SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectLabelProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   options: SelectOption[];
 }
@@ -20,16 +19,13 @@ export function SelectLabel({
 }: SelectLabelProps) {
   return (
     <div className="flex flex-col gap-2">
-      <label
-        htmlFor={id}
-        className="text-sm font-medium text-base-content"
-      >
+      <label htmlFor={id} className="text-sm font-medium text-base-content">
         {label}
       </label>
 
       <select
         id={id}
-        className={`select select-bordered w-full ${className}`}
+        className={`select border-0 w-full ${className} bg-light-gray`}
         {...props}
       >
         {options.map((option) => (
