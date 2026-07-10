@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "daisyui";
 
 
 :root {
@@ -14,6 +15,7 @@
   --destructive-foreground: #EFE9F4;
 
   --light-gray: #d6cfe0;
+  --dark-gray: #232c2b;
 
   --transition-duration: 300ms;
 }
@@ -29,6 +31,7 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-light-gray: var(--light-gray);
+  --color-dark-gray: var(--dark-gray);
   --color-base-100: var(--background);
   --color-base-200: #e7dff0;
   --color-base-300: #d6cfe0;

@@ -2,6 +2,8 @@
 
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Button } from "./button";
+import { makeOnKeyDown } from "@/utils/key";
+import { useEffect, useRef } from "react";
 
 interface ModalProps {
   title: string;
@@ -11,22 +13,31 @@ interface ModalProps {
 }
 
 export function Modal({ title, open, onClose, children }: ModalProps) {
+  const ref = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    if (open && ref.current) {
+      ref.current.focus();
+    }
+  }, [open]);
+
   if (!open) {
     return null;
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-base-300/60 px-4">
-      <div className="w-full max-w-xl rounded-3xl border border-base-300 bg-base-100 p-6 shadow-2xl">
-        <div className="mb-6 flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-base-content">{title}</h3>
-          <Button onClick={onClose}>
-
-            <XMarkIcon className="h-5 w-5" />
-          </Button>
-        </div>
-        {children}
+    <dialog className="modal modal-open" onKeyDown={makeOnKeyDown('Escape', onClose)} tabIndex={0} ref={ref}>
+      <div className="modal-box bg-background" >
+         <div className="mb-6 flex items-center justify-between">
+           <h3 className="text-xl font-semibold text-base-content">{title}</h3>
+           <Button onClick={onClose} className="p-2!" variation="blank">
+             <XMarkIcon className="h-4 w-4" />
+           </Button>
+         </div>
+         {children}
       </div>
-    </div>
+      <div onClick={onClose} className="modal-backdrop">
+      </div>
+    </dialog>
   );
 }

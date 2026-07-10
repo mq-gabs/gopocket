@@ -1,4 +1,4 @@
-type ButtonVariation = 'primary' | 'secondary' | 'destructive' | 'neutral';
+type ButtonVariation = 'primary' | 'secondary' | 'destructive' | 'neutral' | 'blank';
 
 // map variation to classes
 const mapVariationToClasses: Record<ButtonVariation, string> = {
@@ -6,6 +6,7 @@ const mapVariationToClasses: Record<ButtonVariation, string> = {
   secondary: "bg-secondary text-secondary-foreground",
   destructive: "bg-destructive text-destructive-foreground",
   neutral: "bg-light-gray text-foreground",
+  blank: "hover:bg-light-gray",
 };
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
