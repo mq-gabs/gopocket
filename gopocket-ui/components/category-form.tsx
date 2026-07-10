@@ -11,6 +11,7 @@ import type {
 import { Button } from "./button";
 import { InputLabel } from "./inputs/input-label";
 import { SelectLabel } from "./select/select-label";
+import { useMyState } from "@/app/hooks/use-my-state";
 
 interface CategoryFormProps {
   initialValues?: Category;
@@ -24,7 +25,7 @@ export function CategoryForm({
   submitLabel,
 }: CategoryFormProps) {
   const { t } = useI18n();
-  const [name, setName] = useState(initialValues?.name ?? "");
+  const name = useMyState<string>(initialValues?.name ?? "");
   const [icon, setIcon] = useState<CategoryIcon>(
     (initialValues?.icon as CategoryIcon) ?? "wallet",
   );
@@ -32,7 +33,7 @@ export function CategoryForm({
   const [type, setType] = useState(initialValues?.type ?? "EXPENSE");
 
   useEffect(() => {
-    setName(initialValues?.name ?? "");
+    name.set(initialValues?.name ?? "");
     setIcon((initialValues?.icon as CategoryIcon) ?? "wallet");
     setColor(initialValues?.color ?? "#09BC8A");
     setType(initialValues?.type ?? "EXPENSE");
@@ -40,7 +41,7 @@ export function CategoryForm({
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    onSubmit({ name, icon, color, type });
+    onSubmit({ name: name.value, icon, color, type });
   };
 
   return (
@@ -48,8 +49,8 @@ export function CategoryForm({
       <InputLabel
         id="name"
         label={t("categories.form.name")}
-        value={name}
-        onChange={(event) => setName(event.target.value)}
+        value={name.value}
+        onChange={name.onChange}
         required
       />
       <SelectLabel
