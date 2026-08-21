@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BanknotesIcon, TagIcon } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
-import { useTheme } from "@/contexts/theme-context";
 import { Logo } from "./logo";
 
 interface NavItem {
@@ -16,7 +15,6 @@ interface NavItem {
 export function Sidebar() {
   const pathname = usePathname();
   const { t } = useI18n();
-  const { theme } = useTheme();
 
   const items: NavItem[] = [
     { href: "/categories", label: t("navigation.categories"), icon: TagIcon },
