@@ -100,6 +100,11 @@ export default function TransactionsPage() {
       setError(err instanceof Error ? err.message : t("common.error"));
     }
   };
+  
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTransaction(undefined);
+  }
 
   return (
     <div className="space-y-6">
@@ -210,13 +215,14 @@ export default function TransactionsPage() {
             : t("transactions.form.title.create")
         }
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
       >
         <TransactionForm
           categories={categories}
           initialValues={selectedTransaction}
           submitLabel={t("actions.save")}
           onSubmit={handleSubmit}
+          onCancel={handleCloseModal}
         />
       </Modal>
 
@@ -226,6 +232,7 @@ export default function TransactionsPage() {
         open={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
+        confirmType="destructive"
       />
     </div>
   );

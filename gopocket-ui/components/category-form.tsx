@@ -16,6 +16,7 @@ import { useMyState } from "@/app/hooks/use-my-state";
 interface CategoryFormProps {
   initialValues?: Category;
   onSubmit: (payload: CreateCategoryPayload | UpdateCategoryPayload) => void;
+  onCancel?: () => void;
   submitLabel: string;
 }
 
@@ -34,6 +35,7 @@ export function CategoryForm({
   initialValues,
   onSubmit,
   submitLabel,
+  onCancel,
 }: CategoryFormProps) {
   const { t } = useI18n();
   const name = useMyState<string>(initialValues?.name ?? "");
@@ -91,7 +93,12 @@ export function CategoryForm({
         }
         options={buildTypeOptions(t)}
       />{" "}
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        {onCancel && (
+          <Button type="button" variation="neutral" onClick={onCancel}>
+            {t("actions.cancel")}
+          </Button>
+        ) }
         <Button type="submit">{submitLabel}</Button>
       </div>
     </form>

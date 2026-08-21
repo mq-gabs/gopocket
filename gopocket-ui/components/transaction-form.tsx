@@ -20,6 +20,7 @@ interface TransactionFormProps {
   onSubmit: (
     payload: CreateTransactionPayload | UpdateTransactionPayload,
   ) => void;
+  onCancel?: () => void;
   submitLabel: string;
 }
 
@@ -27,6 +28,7 @@ export function TransactionForm({
   categories,
   initialValues,
   onSubmit,
+  onCancel,
   submitLabel,
 }: TransactionFormProps) {
   const { t } = useI18n();
@@ -110,7 +112,12 @@ export function TransactionForm({
         }))}
       />
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        {onCancel && (
+          <Button type="button" variation="neutral" onClick={onCancel}>
+            {t("actions.cancel")}
+          </Button>
+        )}
         <Button type="submit">{submitLabel}</Button>
       </div>
     </form>

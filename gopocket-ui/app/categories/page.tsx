@@ -79,6 +79,11 @@ export default function CategoriesPage() {
     }
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCategory(undefined);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -113,11 +118,12 @@ export default function CategoriesPage() {
         ))}
       </div>
 
-      <Modal title={selectedCategory ? t("categories.form.title.edit") : t("categories.form.title.create")} open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal title={selectedCategory ? t("categories.form.title.edit") : t("categories.form.title.create")} open={isModalOpen} onClose={handleCloseModal}>
         <CategoryForm
           initialValues={selectedCategory}
           submitLabel={selectedCategory ? t("actions.save") : t("actions.save")}
           onSubmit={handleSubmit}
+          onCancel={handleCloseModal}
         />
       </Modal>
 
@@ -127,6 +133,7 @@ export default function CategoriesPage() {
         open={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
+        confirmType="destructive"
       />
     </div>
   );
