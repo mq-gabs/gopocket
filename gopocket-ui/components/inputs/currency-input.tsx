@@ -1,5 +1,6 @@
 "use client";
 
+import { doNothing } from "@/utils/functions";
 import {
   ClipboardEvent,
   InputHTMLAttributes,
@@ -134,6 +135,7 @@ export function CurrencyInput({
         value={formatCurrencyValue(rawValue)}
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
+        onChange={doNothing}
         {...props}
       />
     </div>

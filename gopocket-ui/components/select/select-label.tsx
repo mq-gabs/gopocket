@@ -1,4 +1,4 @@
-import { ComponentType, SelectHTMLAttributes } from "react";
+import { ComponentType, Fragment, SelectHTMLAttributes } from "react";
 
 interface SelectOption {
   value: string;
@@ -16,7 +16,7 @@ interface LabelProps  {
 
 function Label({ label }: LabelProps) {
   if (typeof label === 'string') {
-    return <span>{label}</span>
+    return <Fragment>{label}</Fragment>
   }
 
   const Label = label
