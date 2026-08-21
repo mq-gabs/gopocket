@@ -3,12 +3,15 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { dictionaries, Locale, TranslationKey } from "@/locales";
 
+export type TranslateFunction = (key: TranslationKey) => string
+
 interface I18nContextValue {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: (key: TranslationKey) => string;
+  t: TranslateFunction; 
 }
 
+ 
 const I18nContext = createContext<I18nContextValue | undefined>(undefined);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {

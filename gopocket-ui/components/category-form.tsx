@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CATEGORY_ICONS, type CategoryIcon } from "@/constants/category-icons";
-import { useI18n } from "@/contexts/i18n-context";
+import { type CategoryIcon } from "@/constants/category-icons";
+import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
   CreateCategoryPayload,
@@ -18,6 +18,17 @@ interface CategoryFormProps {
   onSubmit: (payload: CreateCategoryPayload | UpdateCategoryPayload) => void;
   submitLabel: string;
 }
+
+const buildTypeOptions = (t: TranslateFunction) => [
+  {
+    value: "EXPENSE",
+    label: t("categories.form.type.expense"),
+  },
+  {
+    value: "INCOME",
+    label: t("categories.form.type.income"),
+  },
+];
 
 export function CategoryForm({
   initialValues,
@@ -53,7 +64,7 @@ export function CategoryForm({
         onChange={name.onChange}
         required
       />
-      <SelectLabel
+      {/* <SelectLabel
         id="icon"
         label={t("categories.form.icon")}
         value={icon}
@@ -62,7 +73,7 @@ export function CategoryForm({
           value: icon,
           label: icon,
         }))}
-      />
+      /> */}
       <InputLabel
         id="color"
         label={t("categories.form.color")}
@@ -78,16 +89,7 @@ export function CategoryForm({
         onChange={(event) =>
           setType(event.target.value as "EXPENSE" | "INCOME")
         }
-        options={[
-          {
-            value: "EXPENSE",
-            label: t("categories.form.type.expense"),
-          },
-          {
-            value: "INCOME",
-            label: t("categories.form.type.income"),
-          },
-        ]}
+        options={buildTypeOptions(t)}
       />{" "}
       <div className="flex justify-end">
         <Button type="submit">{submitLabel}</Button>

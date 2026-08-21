@@ -7,7 +7,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useI18n } from "@/contexts/i18n-context";
 
 interface CurrencyInputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -57,7 +56,6 @@ export function CurrencyInput({
   onChange,
   ...props
 }: CurrencyInputProps) {
-  const { locale } = useI18n();
   const [rawValue, setRawValue] = useState(Math.max(0, Math.floor(value)));
   const [digits, setDigits] = useState(String(Math.max(0, Math.floor(value))));
 

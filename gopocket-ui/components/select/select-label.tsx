@@ -1,13 +1,27 @@
-import { SelectHTMLAttributes } from "react";
+import { ComponentType, ReactComponentElement, ReactElement, SelectHTMLAttributes } from "react";
 
 interface SelectOption {
   value: string;
-  label: string;
+  label: string | ComponentType;
 }
 
 interface SelectLabelProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   options: SelectOption[];
+}
+
+interface LabelProps  {
+  label: SelectOption['label']
+}
+
+function Label({ label }: LabelProps) {
+  if (typeof label === 'string') {
+    return <span>{label}</span>
+  }
+
+  const Label = label
+
+  return <Label />
 }
 
 export function SelectLabel({
@@ -30,7 +44,7 @@ export function SelectLabel({
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+           <Label label={option.label} />
           </option>
         ))}
       </select>
