@@ -37,16 +37,16 @@ function formatIntegerWithSeparators(value: number, separator: string) {
   return parts.join(separator);
 }
 
-function formatCurrencyValue(value: number, locale: "en" | "pt-br") {
+const PREFIX = '$'
+const THOUSAND_SEPARATOR = ","
+const DECIMAL_SEPARATOR = "."
+
+function formatCurrencyValue(value: number) {
   const safeValue = Math.max(0, Math.floor(value));
-  const isPortuguese = locale === "pt-br";
   const integerPart = Math.floor(safeValue / 100);
   const decimalPart = safeValue % 100;
-  const thousandsSeparator = isPortuguese ? "." : ",";
-  const decimalSeparator = isPortuguese ? "," : ".";
-  const prefix = isPortuguese ? "R$ " : "$ ";
 
-  return `${prefix}${formatIntegerWithSeparators(integerPart, thousandsSeparator)}${decimalSeparator}${decimalPart.toString().padStart(2, "0")}`;
+  return `${PREFIX}${formatIntegerWithSeparators(integerPart, THOUSAND_SEPARATOR)}${DECIMAL_SEPARATOR}${decimalPart.toString().padStart(2, "0")}`;
 }
 
 export function CurrencyInput({
@@ -133,7 +133,7 @@ export function CurrencyInput({
         inputMode="numeric"
         autoComplete="off"
         className={`text-sm border border-light-gray w-full outline-primary rounded-lg px-3 py-1 ${className}`}
-        value={formatCurrencyValue(rawValue, locale)}
+        value={formatCurrencyValue(rawValue)}
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
         {...props}
