@@ -162,7 +162,7 @@ export default function TransactionsPage() {
                     <td>
                       {category ? (
                         <div className="flex items-center gap-2">
-                          <span
+                          {/* <span
                             className="flex h-8 w-8 items-center justify-center rounded-full text-sm"
                             style={{
                               backgroundColor: `${category.color}22`,
@@ -170,7 +170,7 @@ export default function TransactionsPage() {
                             }}
                           >
                             {category.icon}
-                          </span>
+                          </span> */}
                           <span
                             className="font-medium"
                             style={{ color: category.color }}

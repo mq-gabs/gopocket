@@ -84,7 +84,7 @@ export function CategoryForm({
         value={color}
         onChange={(event) => setColor(event.target.value)}
       />
-      <SelectLabel
+      {/* <SelectLabel
         id="type"
         label={t("categories.form.type")}
         value={type}
@@ -92,7 +92,7 @@ export function CategoryForm({
           setType(event.target.value as "EXPENSE" | "INCOME")
         }
         options={buildTypeOptions(t)}
-      />{" "}
+      />{" "} */}
       <div className="flex justify-end gap-2">
         {onCancel && (
           <Button type="button" variation="neutral" onClick={onCancel}>

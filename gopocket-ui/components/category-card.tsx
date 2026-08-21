@@ -21,15 +21,15 @@ export function CategoryCard({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div
+          {/* <div
             className="flex h-12 w-12 items-center justify-center rounded-2xl"
             style={{ backgroundColor: category.color }}
           >
             <span className="text-lg text-white">{category.icon}</span>
-          </div>
+          </div> */}
           <div>
             <h2 className="font-semibold text-base-content">{category.name}</h2>
-            <p className="text-xs text-base-content/70">{category.type}</p>
+            {/* <p className="text-xs text-base-content/70">{category.type}</p> */}
           </div>
         </div>
       </div>
