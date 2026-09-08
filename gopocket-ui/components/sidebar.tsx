@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BanknotesIcon, TagIcon } from "@heroicons/react/24/outline";
+import { BanknotesIcon, ChartBarIcon, TagIcon } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
 import { Logo } from "./logo";
 
@@ -17,6 +17,7 @@ export function Sidebar() {
   const { t } = useI18n();
 
   const items: NavItem[] = [
+    { href: "/", label: t("navigation.dashboard"), icon: ChartBarIcon },
     { href: "/categories", label: t("navigation.categories"), icon: TagIcon },
     {
       href: "/transactions",

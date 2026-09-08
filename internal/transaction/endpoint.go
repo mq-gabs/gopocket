@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	ginhttp "gopocket/internal/http"
@@ -21,11 +22,22 @@ func NewEndpoint(service Service) *Endpoint {
 
 // RegisterRoutes attaches transaction routes to the router.
 func (e *Endpoint) RegisterRoutes(router *gin.RouterGroup) {
+	router.GET("/dashboard", e.dashboard)
 	router.GET("/transactions", e.list)
 	router.GET("/transactions/:id", e.get)
 	router.POST("/transactions", e.create)
 	router.PATCH("/transactions/:id", e.update)
 	router.DELETE("/transactions/:id", e.delete)
+}
+
+func (e *Endpoint) dashboard(ctx *gin.Context) {
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	data, err := e.service.Dashboard(DashboardQuery{Mode: ctx.Query("mode"), Date: ctx.Query("date"), Page: page})
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	ginhttp.WriteSuccess(ctx, http.StatusOK, data)
 }
 
 func (e *Endpoint) create(ctx *gin.Context) {

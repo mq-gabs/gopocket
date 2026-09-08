@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { CategoryForm } from "@/components/category-form";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Modal } from "@/components/modal";

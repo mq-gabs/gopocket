@@ -1,6 +1,10 @@
 package transaction
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 // Repository persists transactions in the database.
 type Repository interface {
@@ -9,6 +13,7 @@ type Repository interface {
 	FindAll() ([]Transaction, error)
 	Update(transaction *Transaction) (*Transaction, error)
 	Delete(id string) error
+	FindForPeriod(start, end time.Time) ([]Transaction, error)
 }
 
 type repository struct {
@@ -59,4 +64,13 @@ func (r *repository) Delete(id string) error {
 		return gorm.ErrRecordNotFound
 	}
 	return nil
+}
+
+func (r *repository) FindForPeriod(start, end time.Time) ([]Transaction, error) {
+	var transactions []Transaction
+	query := "COALESCE(NULLIF(transaction_date, ?), created_at) >= ? AND COALESCE(NULLIF(transaction_date, ?), created_at) < ?"
+	if err := r.db.Preload("Category").Where(query, time.Time{}, start, time.Time{}, end).Order("COALESCE(NULLIF(transaction_date, created_at), created_at) DESC").Find(&transactions).Error; err != nil {
+		return nil, err
+	}
+	return transactions, nil
 }

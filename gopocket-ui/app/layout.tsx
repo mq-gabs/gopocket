@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Sidebar } from "@/components/sidebar";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import { I18nProvider } from "@/contexts/i18n-context";
 import { ThemeProvider } from "@/contexts/theme-context";
 import "./globals.css";

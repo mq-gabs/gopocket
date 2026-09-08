@@ -10,7 +10,6 @@ import type {
 } from "@/types/models";
 import { Button } from "./button";
 import { InputLabel } from "./inputs/input-label";
-import { SelectLabel } from "./select/select-label";
 import { useMyState } from "@/app/hooks/use-my-state";
 
 interface CategoryFormProps {

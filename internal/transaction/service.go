@@ -12,6 +12,7 @@ type Service interface {
 	FindAll() ([]Transaction, error)
 	Update(id string, dto UpdateTransactionRequest) (*Transaction, error)
 	Delete(id string) error
+	Dashboard(query DashboardQuery) (*DashboardResponse, error)
 }
 
 type service struct {
@@ -55,6 +56,9 @@ func (s *service) Update(id string, dto UpdateTransactionRequest) (*Transaction,
 	}
 	if dto.CategoryID != "" {
 		model.CategoryID = dto.CategoryID
+	}
+	if dto.TransactionDate != "" {
+		model.TransactionDate = parseTransactionDate(dto.TransactionDate)
 	}
 	return s.repository.Update(model)
 }
