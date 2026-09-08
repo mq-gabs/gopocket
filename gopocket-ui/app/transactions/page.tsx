@@ -15,6 +15,10 @@ import type {
   UpdateTransactionPayload,
 } from "@/types/models";
 import { Button } from "@/components/button";
+import { formatCurrency } from "@/utils/currency";
+import TransactionIcon from "@/components/transaction-icon";
+import CategoryBadge from "@/components/category-badge";
+
 
 export default function TransactionsPage() {
   const { t } = useI18n();
@@ -157,27 +161,11 @@ export default function TransactionsPage() {
                     <td className="text-base-content/70">
                       {transaction.description}
                     </td>
-                    <td className="text-base-content">{transaction.amount}</td>
-                    <td className="text-base-content">{transaction.type}</td>
+                    <td className="text-base-content">{formatCurrency(transaction.amount)}</td>
+                    <td><TransactionIcon type={transaction.type} /></td>
                     <td>
                       {category ? (
-                        <div className="flex items-center gap-2">
-                          {/* <span
-                            className="flex h-8 w-8 items-center justify-center rounded-full text-sm"
-                            style={{
-                              backgroundColor: `${category.color}22`,
-                              color: category.color,
-                            }}
-                          >
-                            {category.icon}
-                          </span> */}
-                          <span
-                            className="font-medium"
-                            style={{ color: category.color }}
-                          >
-                            {category.name}
-                          </span>
-                        </div>
+                        <CategoryBadge category={category} />
                       ) : (
                         <span className="text-base-content/60">—</span>
                       )}

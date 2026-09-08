@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"fmt"
+	"gopocket/internal/transaction/transactiontype"
 	"math"
 	"time"
 )
@@ -109,7 +110,7 @@ func buildDashboard(transactions []Transaction, mode string, start, end time.Tim
 		if mode == "year" {
 			label = period.Format("2006-01")
 		}
-		if transaction.Type == "INCOME" {
+		if transaction.Type == transactiontype.TransactionTypeIncome {
 			response.Summary.TotalIncome += transaction.Amount
 			balanceByPeriod[label] += transaction.Amount
 		} else {

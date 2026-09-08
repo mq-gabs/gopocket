@@ -2,20 +2,22 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowRightIcon, ArrowTrendingDownIcon, ArrowTrendingUpIcon, BanknotesIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowRightIcon,
+  ArrowTrendingDownIcon,
+  ArrowTrendingUpIcon,
+  BanknotesIcon,
+} from "@heroicons/react/24/outline";
 import { DashboardCharts } from "@/components/dashboard-charts";
 import { Button } from "@/components/button";
 import { useI18n } from "@/contexts/i18n-context";
 import { transactionService } from "@/services/transaction.service";
 import type { DashboardData } from "@/types/models";
+import { formatCurrency } from "@/utils/currency";
+import TransactionIcon from "@/components/transaction-icon";
 
 const currentMonth = new Date().toISOString().slice(0, 7);
 const currentYear = currentMonth.slice(0, 4);
-const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
-
-function formatMoney(value: number) {
-  return money.format(value / 100);
-}
 
 export default function DashboardPage() {
   const { t } = useI18n();
@@ -27,9 +29,12 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    void transactionService.getDashboard(mode, date, page)
+    void transactionService
+      .getDashboard(mode, date, page)
       .then(setData)
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : t("common.error")))
+      .catch((err: unknown) =>
+        setError(err instanceof Error ? err.message : t("common.error")),
+      )
       .finally(() => setLoading(false));
   }, [date, mode, page, t]);
 
@@ -43,42 +48,188 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-7xl space-y-7 pb-8">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">{t("app.title")}</p>
-          <h1 className="mt-2 text-3xl font-semibold text-base-content">{t("dashboard.title")}</h1>
-          <p className="mt-2 text-sm text-base-content/65">{t("dashboard.description")}</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
+            {t("app.title")}
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold text-base-content">
+            {t("dashboard.title")}
+          </h1>
+          <p className="mt-2 text-sm text-base-content/65">
+            {t("dashboard.description")}
+          </p>
         </div>
         <div className="flex items-center gap-2 rounded-xl border border-base-300 bg-base-100 p-1">
-          <button className={`rounded-lg px-3 py-2 text-sm font-medium ${mode === "month" ? "bg-primary text-primary-foreground" : "text-base-content/70"}`} onClick={() => changeMode("month")}>{t("dashboard.month")}</button>
-          <button className={`rounded-lg px-3 py-2 text-sm font-medium ${mode === "year" ? "bg-primary text-primary-foreground" : "text-base-content/70"}`} onClick={() => changeMode("year")}>{t("dashboard.year")}</button>
-          <input aria-label={mode === "month" ? t("dashboard.month") : t("dashboard.year")} type={mode === "month" ? "month" : "number"} min={mode === "year" ? "2000" : undefined} max={mode === "year" ? "2100" : undefined} value={date} onChange={(event) => { setDate(event.target.value); setPage(1); }} className="w-32 rounded-lg border border-base-300 bg-base-100 px-2 py-2 text-sm" />
+          <button
+            className={`rounded-lg px-3 py-2 text-sm font-medium ${mode === "month" ? "bg-primary text-primary-foreground" : "text-base-content/70"}`}
+            onClick={() => changeMode("month")}
+          >
+            {t("dashboard.month")}
+          </button>
+          <button
+            className={`rounded-lg px-3 py-2 text-sm font-medium ${mode === "year" ? "bg-primary text-primary-foreground" : "text-base-content/70"}`}
+            onClick={() => changeMode("year")}
+          >
+            {t("dashboard.year")}
+          </button>
+          <input
+            aria-label={
+              mode === "month" ? t("dashboard.month") : t("dashboard.year")
+            }
+            type={mode === "month" ? "month" : "number"}
+            min={mode === "year" ? "2000" : undefined}
+            max={mode === "year" ? "2100" : undefined}
+            value={date}
+            onChange={(event) => {
+              setDate(event.target.value);
+              setPage(1);
+            }}
+            className="w-32 rounded-lg border border-base-300 bg-base-100 px-2 py-2 text-sm"
+          />
         </div>
       </header>
 
       {error ? <div className="alert alert-error">{error}</div> : null}
-      {loading && !data ? <p className="text-sm text-base-content/65">{t("common.loading")}</p> : null}
+      {loading && !data ? (
+        <p className="text-sm text-base-content/65">{t("common.loading")}</p>
+      ) : null}
 
-      {data ? <>
-        <section className="grid gap-4 md:grid-cols-3">
-          <SummaryCard label={t("dashboard.balance")} value={data.summary.total_balance} icon={<BanknotesIcon className="h-5 w-5" />} accent="text-primary" />
-          <SummaryCard label={t("dashboard.income")} value={data.summary.total_income} icon={<ArrowTrendingUpIcon className="h-5 w-5" />} accent="text-tertiary" />
-          <SummaryCard label={t("dashboard.expenses")} value={data.summary.total_expenses} icon={<ArrowTrendingDownIcon className="h-5 w-5" />} accent="text-secondary" />
-        </section>
+      {data ? (
+        <>
+          <section className="grid gap-4 md:grid-cols-3">
+            <SummaryCard
+              label={t("dashboard.balance")}
+              value={data.summary.total_balance}
+              icon={<BanknotesIcon className="h-5 w-5" />}
+              accent="text-primary"
+            />
+            <SummaryCard
+              label={t("dashboard.income")}
+              value={data.summary.total_income}
+              icon={<ArrowTrendingUpIcon className="h-5 w-5" />}
+              accent="text-tertiary"
+            />
+            <SummaryCard
+              label={t("dashboard.expenses")}
+              value={data.summary.total_expenses}
+              icon={<ArrowTrendingDownIcon className="h-5 w-5" />}
+              accent="text-secondary"
+            />
+          </section>
 
-        <section className="grid gap-5 xl:grid-cols-[1.65fr_1fr]">
-          <article className="rounded-2xl border border-base-300 bg-base-100 p-5"><div className="mb-2"><h2 className="text-lg font-semibold">{t("dashboard.balanceTrend")}</h2><p className="text-sm text-base-content/60">{data.start_date} to {data.end_date}</p></div><DashboardCharts trend={data.trend} expenses={[]} /></article>
-          <article className="rounded-2xl border border-base-300 bg-base-100 p-5"><h2 className="mb-2 text-lg font-semibold">{t("dashboard.expenseBreakdown")}</h2><DashboardCharts trend={[]} expenses={data.expenses} /></article>
-        </section>
+          <section className="grid gap-5 xl:grid-cols-[1.65fr_1fr]">
+            <article className="rounded-2xl border border-base-300 bg-base-100 p-5">
+              <div className="mb-2">
+                <h2 className="text-lg font-semibold">
+                  {t("dashboard.balanceTrend")}
+                </h2>
+                <p className="text-sm text-base-content/60">
+                  {data.start_date} to {data.end_date}
+                </p>
+              </div>
+              <DashboardCharts trend={data.trend} expenses={[]} />
+            </article>
+            <article className="rounded-2xl border border-base-300 bg-base-100 p-5">
+              <h2 className="mb-2 text-lg font-semibold">
+                {t("dashboard.expenseBreakdown")}
+              </h2>
+              <DashboardCharts trend={[]} expenses={data.expenses} />
+            </article>
+          </section>
 
-        <section className="overflow-hidden rounded-2xl border border-base-300 bg-base-100">
-          <div className="flex flex-col gap-3 border-b border-base-300 p-5 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-lg font-semibold">{t("dashboard.recentTransactions")}</h2><p className="text-sm text-base-content/60">{data.total_transactions} {t("dashboard.transactionsInPeriod")}</p></div><Link href="/transactions"><Button variation="neutral">{t("dashboard.viewAll")} <ArrowRightIcon className="h-4 w-4" /></Button></Link></div>
-          <div className="overflow-x-auto"><table className="table"><thead><tr><th>{t("transactions.table.title")}</th><th>{t("transactions.table.type")}</th><th>{t("transactions.table.amount")}</th><th>{t("dashboard.date")}</th></tr></thead><tbody>{data.recent_transactions.map((transaction) => <tr key={transaction.id}><td className="font-medium">{transaction.title}</td><td><span className={transaction.type === "INCOME" ? "text-primary" : "text-secondary"}>{transaction.type}</span></td><td className="font-medium">{formatMoney(transaction.amount)}</td><td className="text-base-content/65">{transaction.transaction_date?.slice(0, 10)}</td></tr>)}</tbody></table></div>
-          <div className="flex items-center justify-between border-t border-base-300 px-5 py-3 text-sm"><span>{t("dashboard.page")} {data.page} / {data.total_pages}</span><div className="join"><button className="btn btn-sm join-item" disabled={data.page <= 1} onClick={() => setPage((value) => value - 1)}>‹</button><button className="btn btn-sm join-item" disabled={data.page >= data.total_pages} onClick={() => setPage((value) => value + 1)}>›</button></div></div>
-        </section>
-      </> : null}
+          <section className="overflow-hidden rounded-2xl border border-base-300 bg-base-100">
+            <div className="flex flex-col gap-3 border-b border-base-300 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">
+                  {t("dashboard.recentTransactions")}
+                </h2>
+                <p className="text-sm text-base-content/60">
+                  {data.total_transactions}{" "}
+                  {t("dashboard.transactionsInPeriod")}
+                </p>
+              </div>
+              <Link href="/transactions">
+                <Button variation="neutral">
+                  {t("dashboard.viewAll")}{" "}
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>{t("transactions.table.title")}</th>
+                    <th>{t("transactions.table.type")}</th>
+                    <th>{t("transactions.table.amount")}</th>
+                    <th>{t("dashboard.date")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.recent_transactions.map((transaction) => (
+                    <tr key={transaction.id}>
+                      <td className="font-medium">{transaction.title}</td>
+                      <td>
+                        <TransactionIcon type={transaction.type} />
+                      </td>
+                      <td className="font-medium">
+                        {formatCurrency(transaction.amount)}
+                      </td>
+                      <td className="text-base-content/65">
+                        {transaction.transaction_date?.slice(0, 10)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex items-center justify-between border-t border-base-300 px-5 py-3 text-sm">
+              <span>
+                {t("dashboard.page")} {data.page} / {data.total_pages}
+              </span>
+              <div className="join">
+                <button
+                  className="btn btn-sm join-item"
+                  disabled={data.page <= 1}
+                  onClick={() => setPage((value) => value - 1)}
+                >
+                  ‹
+                </button>
+                <button
+                  className="btn btn-sm join-item"
+                  disabled={data.page >= data.total_pages}
+                  onClick={() => setPage((value) => value + 1)}
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+          </section>
+        </>
+      ) : null}
     </div>
   );
 }
 
-function SummaryCard({ label, value, icon, accent }: { label: string; value: number; icon: React.ReactNode; accent: string }) {
-  return <article className="rounded-2xl border border-base-300 bg-base-100 p-5"><div className={`mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-base-200 ${accent}`}>{icon}</div><p className="text-sm text-base-content/65">{label}</p><p className="mt-1 text-2xl font-semibold">{formatMoney(value)}</p></article>;
+function SummaryCard({
+  label,
+  value,
+  icon,
+  accent,
+}: {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  accent: string;
+}) {
+  return (
+    <article className="rounded-2xl border border-base-300 bg-base-100 p-5">
+      <div
+        className={`mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-base-200 ${accent}`}
+      >
+        {icon}
+      </div>
+      <p className="text-sm text-base-content/65">{label}</p>
+      <p className="mt-1 text-2xl font-semibold">{formatCurrency(value)}</p>
+    </article>
+  );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { type CategoryIcon } from "@/constants/category-icons";
-import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
+import { useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
   CreateCategoryPayload,
@@ -11,6 +11,7 @@ import type {
 import { Button } from "./button";
 import { InputLabel } from "./inputs/input-label";
 import { useMyState } from "@/app/hooks/use-my-state";
+import { TransactionType } from "@/types/transaction-type";
 
 interface CategoryFormProps {
   initialValues?: Category;
@@ -19,16 +20,6 @@ interface CategoryFormProps {
   submitLabel: string;
 }
 
-const buildTypeOptions = (t: TranslateFunction) => [
-  {
-    value: "EXPENSE",
-    label: t("categories.form.type.expense"),
-  },
-  {
-    value: "INCOME",
-    label: t("categories.form.type.income"),
-  },
-];
 
 export function CategoryForm({
   initialValues,
@@ -42,13 +33,13 @@ export function CategoryForm({
     (initialValues?.icon as CategoryIcon) ?? "wallet",
   );
   const [color, setColor] = useState(initialValues?.color ?? "#09BC8A");
-  const [type, setType] = useState(initialValues?.type ?? "EXPENSE");
+  const [type, setType] = useState(initialValues?.type ?? TransactionType.EXPENSE);
 
   useEffect(() => {
     name.set(initialValues?.name ?? "");
     setIcon((initialValues?.icon as CategoryIcon) ?? "wallet");
     setColor(initialValues?.color ?? "#09BC8A");
-    setType(initialValues?.type ?? "EXPENSE");
+    setType(initialValues?.type ?? TransactionType.EXPENSE);
   }, [initialValues]);
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -65,16 +56,6 @@ export function CategoryForm({
         onChange={name.onChange}
         required
       />
-      {/* <SelectLabel
-        id="icon"
-        label={t("categories.form.icon")}
-        value={icon}
-        onChange={(event) => setIcon(event.target.value as CategoryIcon)}
-        options={CATEGORY_ICONS.map((icon) => ({
-          value: icon,
-          label: icon,
-        }))}
-      /> */}
       <InputLabel
         id="color"
         label={t("categories.form.color")}
@@ -83,15 +64,6 @@ export function CategoryForm({
         value={color}
         onChange={(event) => setColor(event.target.value)}
       />
-      {/* <SelectLabel
-        id="type"
-        label={t("categories.form.type")}
-        value={type}
-        onChange={(event) =>
-          setType(event.target.value as "EXPENSE" | "INCOME")
-        }
-        options={buildTypeOptions(t)}
-      />{" "} */}
       <div className="flex justify-end gap-2">
         {onCancel && (
           <Button type="button" variation="neutral" onClick={onCancel}>

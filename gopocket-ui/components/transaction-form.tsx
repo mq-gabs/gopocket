@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useI18n } from "@/contexts/i18n-context";
+import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
   CreateTransactionPayload,
@@ -13,6 +13,18 @@ import { SelectLabel } from "./select/select-label";
 import { CurrencyInput } from "./inputs/currency-input";
 import { InputLabel } from "./inputs/input-label";
 import { TextareaLabel } from "./textarea/textarea-label";
+import { TransactionType } from "@/types/transaction-type";
+
+const buildTypeOptions = (t: TranslateFunction) => [
+  {
+    value: TransactionType.EXPENSE,
+    label: t("categories.form.type.expense"),
+  },
+  {
+    value: TransactionType.INCOME,
+    label: t("categories.form.type.income"),
+  },
+];
 
 interface TransactionFormProps {
   categories: Category[];
@@ -37,7 +49,7 @@ export function TransactionForm({
     initialValues?.description ?? "",
   );
   const [amount, setAmount] = useState(initialValues?.amount ?? 0);
-  const [type, setType] = useState(initialValues?.type ?? "EXPENSE");
+  const [type, setType] = useState(initialValues?.type ?? TransactionType.EXPENSE);
   const [categoryId, setCategoryId] = useState(
     initialValues?.category_id ?? categories[0]?.id ?? "",
   );
@@ -49,7 +61,7 @@ export function TransactionForm({
     setTitle(initialValues?.title ?? "");
     setDescription(initialValues?.description ?? "");
     setAmount(initialValues?.amount ?? 0);
-    setType(initialValues?.type ?? "EXPENSE");
+    setType(initialValues?.type ?? TransactionType.EXPENSE);
     setCategoryId(initialValues?.category_id ?? categories[0]?.id ?? "");
     setTransactionDate(initialValues?.transaction_date?.slice(0, 10) ?? new Date().toISOString().slice(0, 10));
   }, [categories, initialValues]);
@@ -91,18 +103,9 @@ export function TransactionForm({
         label={t("transactions.form.type")}
         value={type}
         onChange={(event) =>
-          setType(event.target.value as "EXPENSE" | "INCOME")
+          setType(event.target.value as TransactionType) 
         }
-        options={[
-          {
-            value: "EXPENSE",
-            label: t("categories.form.type.expense"),
-          },
-          {
-            value: "INCOME",
-            label: t("categories.form.type.income"),
-          },
-        ]}
+        options={buildTypeOptions(t)}
       />
 
       <InputLabel
