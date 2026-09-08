@@ -18,10 +18,11 @@ import { Button } from "@/components/button";
 import { formatCurrency } from "@/utils/currency";
 import TransactionIcon from "@/components/transaction-icon";
 import CategoryBadge from "@/components/category-badge";
+import { formatDate } from "@/utils/time";
 
 
 export default function TransactionsPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedTransaction, setSelectedTransaction] = useState<
@@ -147,6 +148,7 @@ export default function TransactionsPage() {
                 <th>{t("transactions.table.amount")}</th>
                 <th>{t("transactions.table.type")}</th>
                 <th>{t("transactions.table.category")}</th>
+                <th>{t("transactions.table.date")}</th>
                 <th>{t("transactions.table.actions")}</th>
               </tr>
             </thead>
@@ -169,6 +171,9 @@ export default function TransactionsPage() {
                       ) : (
                         <span className="text-base-content/60">—</span>
                       )}
+                    </td>
+                    <td>
+                      <span>{formatDate(transaction.transaction_date, locale)}</span>
                     </td>
                     <td>
                       <div className="flex gap-2">

@@ -61,6 +61,7 @@ export const ptBr = {
   "transactions.table.type": "Tipo",
   "transactions.table.category": "Categoria",
   "transactions.table.actions": "Ações",
+  "transactions.table.date": "Data",
   "transactions.delete.title": "Excluir transação",
   "transactions.delete.message": "Tem certeza que deseja excluir esta transação?",
   "common.required": "Este campo é obrigatório",

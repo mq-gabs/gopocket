@@ -61,6 +61,7 @@ export const en = {
   "transactions.table.type": "Type",
   "transactions.table.category": "Category",
   "transactions.table.actions": "Actions",
+  "transactions.table.date": "Date",
   "transactions.delete.title": "Delete transaction",
   "transactions.delete.message": "Are you sure you want to delete this transaction?",
   "common.required": "This field is required",

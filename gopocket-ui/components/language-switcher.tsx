@@ -11,7 +11,7 @@ const options = [
 ];
 
 export function LanguageSwitcher() {
-  const { locale, setLocale, t } = useI18n();
+  const { locale, setLocale, } = useI18n();
 
   const makeChangeSelection = () => {
     return (e: ChangeEvent<HTMLSelectElement>) => {

@@ -15,12 +15,13 @@ import { transactionService } from "@/services/transaction.service";
 import type { DashboardData } from "@/types/models";
 import { formatCurrency } from "@/utils/currency";
 import TransactionIcon from "@/components/transaction-icon";
+import { formatDate } from "@/utils/time";
 
 const currentMonth = new Date().toISOString().slice(0, 7);
 const currentYear = currentMonth.slice(0, 4);
 
 export default function DashboardPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [mode, setMode] = useState<"month" | "year">("month");
   const [date, setDate] = useState(currentMonth);
   const [page, setPage] = useState(1);
@@ -175,7 +176,7 @@ export default function DashboardPage() {
                         {formatCurrency(transaction.amount)}
                       </td>
                       <td className="text-base-content/65">
-                        {transaction.transaction_date?.slice(0, 10)}
+                        {formatDate(transaction.transaction_date, locale)}
                       </td>
                     </tr>
                   ))}
