@@ -24,6 +24,7 @@ func New(
 			"GET",
 			"POST",
 			"PUT",
+			"PATCH",
 			"DELETE",
 			"OPTIONS",
 		},
