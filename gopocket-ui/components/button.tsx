@@ -6,9 +6,9 @@ export type ButtonVariation =
   | "blank";
 
 const mapVariationToClasses: Record<ButtonVariation, string> = {
-  primary: "bg-primary-80 text-primary-foreground border border-primary" ,
+  primary: "bg-primary-20 text-primary border border-primary" ,
   secondary: "bg-secondary-60 text-secondary-foreground border border-secondary",
-  destructive: "bg-destructive/80 text-destructive-foreground border border-destructive",
+  destructive: "bg-destructive/20 text-destructive border border-destructive",
   neutral: "bg-light-gray/50 text-foreground border bordr-light-gray",
   blank: "hover:bg-light-gray/50 border border-transparent hover:border-light-gray",
 };
