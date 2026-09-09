@@ -2,9 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BanknotesIcon, ChartBarIcon, TagIcon } from "@heroicons/react/24/outline";
+import {
+  BanknotesIcon,
+  ChartBarIcon,
+  TagIcon,
+} from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
 import { Logo } from "./logo";
+import { cls, clsx } from "@/utils/cls";
 
 interface NavItem {
   href: string;
@@ -39,11 +44,13 @@ export function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex text-sm items-center gap-3 rounded-lg px-2 py-2 transition ${
-                active
-                  ? "bg-primary text-primary-foreground hover:brightness-110"
-                  : "hover:bg-primary-20"
-              }`}
+              className={cls(
+                "flex text-sm items-center gap-3 rounded-lg px-2 py-2 transition",
+                clsx({
+                  "bg-primary text-primary-foreground hover:brightness-110": active,
+                  "hover:bg-primary-20": !active,
+                }),
+              )}
             >
               <Icon className="h-5 w-5" />
               <span className="font-medium">{label}</span>
