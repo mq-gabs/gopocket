@@ -2,33 +2,45 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-export type ThemeMode = "light" | "dark";
+const themes = ["light", "dark"] as const;
+export type ThemeMode = typeof themes[number];
 
 interface ThemeContextValue {
   theme: ThemeMode;
   setTheme: (theme: ThemeMode) => void;
 }
 
+const THEME_KEY = "gopocket-theme"
+
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<ThemeMode>("light");
+  const [theme, setThemeMemo] = useState<ThemeMode>(window.localStorage.getItem(THEME_KEY) as ThemeMode || "light");
+  
+  const setTheme = (theme: ThemeMode) => {
+    console.log({ theme })
+    if (!themes.includes(theme)) {
+      return
+    }
+
+    setThemeMemo(theme);
+    localStorage.setItem(THEME_KEY, theme);
+  }
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("gopocket-theme") as ThemeMode | null;
-    if (stored === "light" || stored === "dark") {
+    const stored = window.localStorage.getItem(THEME_KEY) as ThemeMode | null;
+    if (stored && themes.includes(stored)) {
       setTheme(stored);
       return;
     }
 
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    setTheme(media.matches ? "dark" : "light");
+    setTheme("light")
   }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     document.documentElement.classList.toggle("dark", theme === "dark");
-    window.localStorage.setItem("gopocket-theme", theme);
+    window.localStorage.setItem(THEME_KEY, theme);
   }, [theme]);
 
   const value = useMemo(() => ({ theme, setTheme }), [theme]);
