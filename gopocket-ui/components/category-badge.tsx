@@ -10,7 +10,7 @@ export default function CategoryBadge({ category: { name, color } }: ICategoryBa
     return (
         <span className={`py-1 px-2 rounded uppercase text-xs font-bold`} style={{
             backgroundColor: color,
-            color: foregroundColor
+            color: foregroundColor,
         }}>
             {name}
         </span>
