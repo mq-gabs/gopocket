@@ -102,18 +102,21 @@ export default function DashboardPage() {
               value={data.summary.total_balance}
               icon={<BanknotesIcon className="h-5 w-5" />}
               accent="text-primary"
+              className="bg-primary-20 border border-success"
             />
             <SummaryCard
               label={t("dashboard.income")}
               value={data.summary.total_income}
               icon={<ArrowTrendingUpIcon className="h-5 w-5" />}
-              accent="text-tertiary"
+              accent="text-secondary"
+              className="bg-secondary/20 border border-secondary"
             />
             <SummaryCard
               label={t("dashboard.expenses")}
               value={data.summary.total_expenses}
               icon={<ArrowTrendingDownIcon className="h-5 w-5" />}
-              accent="text-secondary"
+              accent="text-destructive"
+              className="bg-destructive/20 border border-destructive"
             />
           </section>
 
@@ -216,14 +219,16 @@ function SummaryCard({
   value,
   icon,
   accent,
+  className,
 }: {
   label: string;
   value: number;
   icon: React.ReactNode;
   accent: string;
+  className?: string;
 }) {
   return (
-    <article className="rounded-2xl border border-base-300 bg-base-100 p-5">
+    <article className={`rounded-2xl border border-base-300 bg-base-100 p-5 ${className}`}>
       <div
         className={`mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-base-200 ${accent}`}
       >

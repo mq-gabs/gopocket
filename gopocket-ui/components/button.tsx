@@ -5,14 +5,15 @@ export type ButtonVariation =
   | "neutral"
   | "blank";
 
-// map variation to classes
 const mapVariationToClasses: Record<ButtonVariation, string> = {
-  primary: "bg-primary text-primary-foreground",
-  secondary: "bg-secondary text-secondary-foreground",
-  destructive: "bg-destructive text-destructive-foreground",
-  neutral: "bg-light-gray/50 text-foreground",
-  blank: "hover:bg-light-gray",
+  primary: "bg-primary-80 text-primary-foreground border border-primary" ,
+  secondary: "bg-secondary-60 text-secondary-foreground border border-secondary",
+  destructive: "bg-destructive/80 text-destructive-foreground border border-destructive",
+  neutral: "bg-light-gray/50 text-foreground border bordr-light-gray",
+  blank: "hover:bg-light-gray/50 border border-transparent hover:border-light-gray",
 };
+const getClassByVariation = (variation: ButtonVariation): string => mapVariationToClasses[variation] || mapVariationToClasses['primary']
+
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -34,7 +35,7 @@ export function Button({
   return (
     <button
       onClick={onClick}
-      className={`${baseClasses} ${mapVariationToClasses[variation]} ${extraClasses}`}
+      className={`${baseClasses} ${getClassByVariation(variation)} ${extraClasses}`}
       {...restProps}
     >
       {children}

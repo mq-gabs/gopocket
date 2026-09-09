@@ -42,7 +42,7 @@ export function Sidebar() {
               className={`flex text-sm items-center gap-3 rounded-lg px-2 py-2 transition ${
                 active
                   ? "bg-primary text-primary-foreground hover:brightness-110"
-                  : "hover:bg-light-gray"
+                  : "hover:bg-primary-20"
               }`}
             >
               <Icon className="h-5 w-5" />

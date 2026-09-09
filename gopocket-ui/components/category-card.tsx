@@ -16,20 +16,13 @@ export function CategoryCard({
   return (
     <div
       key={category.id}
-      className="group relative overflow-hidden rounded-lg bg-base-100 p-4 border border-light-gray"
-      style={{ backgroundColor: `${category.color}10` }}
+      className="group relative overflow-hidden rounded-lg bg-base-100 p-4 border" 
+      style={{ backgroundColor: `${category.color}10`, borderColor: category.color }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/* <div
-            className="flex h-12 w-12 items-center justify-center rounded-2xl"
-            style={{ backgroundColor: category.color }}
-          >
-            <span className="text-lg text-white">{category.icon}</span>
-          </div> */}
           <div>
             <h2 className="font-semibold text-base-content">{category.name}</h2>
-            {/* <p className="text-xs text-base-content/70">{category.type}</p> */}
           </div>
         </div>
       </div>

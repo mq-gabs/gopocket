@@ -6,10 +6,17 @@
   --background: #EFE9F4;
   --foreground: #171D1C;
   --primary: #09BC8A;
+  --primary-80: #09BC8Acc;
+  --primary-60: #09BC8A99;
+  --primary-40: #09BC8A66;
+  --primary-20: #09BC8A33;
   --primary-foreground: #EFE9F4;
-  --secondary: #C3423F;
+  --secondary: #2D82B7;
+  --secondary-80: #2D82B7cc;
+  --secondary-60: #2D82B799;
+  --secondary-40: #2D82B766;
+  --secondary-20: #2D82B733;
   --secondary-foreground: #EFE9F4;
-  --tertiary: #2D82B7;
 
   --destructive: #C3423F;
   --destructive-foreground: #EFE9F4;
@@ -24,10 +31,17 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-primary-80: var(--primary-80);
+  --color-primary-60: var(--primary-60);
+  --color-primary-40: var(--primary-40);
+  --color-primary-20: var(--primary-20);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
+  --color-secondary-80: var(--secondary-80);
+  --color-secondary-60: var(--secondary-60);
+  --color-secondary-40: var(--secondary-40);
+  --color-secondary-20: var(--secondary-20);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-tertiary: var(--tertiary);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-light-gray: var(--light-gray);
