@@ -132,7 +132,7 @@ export default function TransactionsPage() {
       {loading ? <p>{t("common.loading")}</p> : null}
 
       {!loading && transactions.length === 0 ? (
-        <div className="rounded-3xl border border-base-300 bg-base-100 p-8 text-center text-base-content/70">
+        <div className="rounded-3xl border border-foreground/10 bg-background p-8 text-center text-foreground">
           {t("transactions.empty")}
         </div>
       ) : null}
@@ -141,7 +141,7 @@ export default function TransactionsPage() {
         <div className="overflow-x-auto rounded-xl border border-foreground/10 bg-background">
           <table className="table">
             <thead>
-              <tr>
+              <tr className="text-foreground">
                 <th>{t("transactions.table.title")}</th>
                 <th>{t("transactions.table.description")}</th>
                 <th>{t("transactions.table.amount")}</th>
@@ -156,13 +156,13 @@ export default function TransactionsPage() {
                 const category = categoryMap.get(transaction.category_id);
                 return (
                   <tr key={transaction.id}>
-                    <td className="font-medium text-base-content">
+                    <td className="font-medium text-foreground/80">
                       {transaction.title}
                     </td>
-                    <td className="text-base-content/70">
+                    <td className="text-foreground/60">
                       {transaction.description}
                     </td>
-                    <td className="text-base-content">
+                    <td className="text-foreground/80">
                       {formatCurrencyString(transaction.amount)}
                     </td>
                     <td>
@@ -172,10 +172,10 @@ export default function TransactionsPage() {
                       {category ? (
                         <CategoryBadge category={category} />
                       ) : (
-                        <span className="text-base-content/60">—</span>
+                        <span className="text-foreground/60">—</span>
                       )}
                     </td>
-                    <td>
+                    <td className="text-foreground/80">
                       <span>
                         {formatDate(transaction.transaction_date, locale)}
                       </span>

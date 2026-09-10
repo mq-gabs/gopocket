@@ -17,7 +17,7 @@ export function CategoryCard({
   return (
     <div
       key={category.id}
-      className="group relative overflow-hidden rounded-lg bg-foreground/10 p-4 border border-foreground/15" 
+      className="group relative overflow-hidden rounded-xl bg-foreground/10 p-4 border border-foreground/15"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
