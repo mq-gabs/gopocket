@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { type CategoryIcon } from "@/constants/category-icons";
 import { useI18n } from "@/contexts/i18n-context";
 import type {
@@ -20,7 +20,6 @@ interface CategoryFormProps {
   submitLabel: string;
 }
 
-
 export function CategoryForm({
   initialValues,
   onSubmit,
@@ -29,18 +28,11 @@ export function CategoryForm({
 }: CategoryFormProps) {
   const { t } = useI18n();
   const name = useMyState<string>(initialValues?.name ?? "");
-  const [icon, setIcon] = useState<CategoryIcon>(
+  const [icon] = useState<CategoryIcon>(
     (initialValues?.icon as CategoryIcon) ?? "wallet",
   );
   const [color, setColor] = useState(initialValues?.color ?? "#09BC8A");
-  const [type, setType] = useState(initialValues?.type ?? TransactionType.EXPENSE);
-
-  useEffect(() => {
-    name.set(initialValues?.name ?? "");
-    setIcon((initialValues?.icon as CategoryIcon) ?? "wallet");
-    setColor(initialValues?.color ?? "#09BC8A");
-    setType(initialValues?.type ?? TransactionType.EXPENSE);
-  }, [initialValues]);
+  const [type] = useState(initialValues?.type ?? TransactionType.EXPENSE);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -69,7 +61,7 @@ export function CategoryForm({
           <Button type="button" variation="neutral" onClick={onCancel}>
             {t("actions.cancel")}
           </Button>
-        ) }
+        )}
         <Button type="submit">{submitLabel}</Button>
       </div>
     </form>

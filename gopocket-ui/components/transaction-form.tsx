@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
@@ -49,26 +49,27 @@ export function TransactionForm({
     initialValues?.description ?? "",
   );
   const [amount, setAmount] = useState(initialValues?.amount ?? 0);
-  const [type, setType] = useState(initialValues?.type ?? TransactionType.EXPENSE);
+  const [type, setType] = useState(
+    initialValues?.type ?? TransactionType.EXPENSE,
+  );
   const [categoryId, setCategoryId] = useState(
     initialValues?.category_id ?? categories[0]?.id ?? "",
   );
   const [transactionDate, setTransactionDate] = useState(
-    initialValues?.transaction_date?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
+    initialValues?.transaction_date?.slice(0, 10) ??
+      new Date().toISOString().slice(0, 10),
   );
-
-  useEffect(() => {
-    setTitle(initialValues?.title ?? "");
-    setDescription(initialValues?.description ?? "");
-    setAmount(initialValues?.amount ?? 0);
-    setType(initialValues?.type ?? TransactionType.EXPENSE);
-    setCategoryId(initialValues?.category_id ?? categories[0]?.id ?? "");
-    setTransactionDate(initialValues?.transaction_date?.slice(0, 10) ?? new Date().toISOString().slice(0, 10));
-  }, [categories, initialValues]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    onSubmit({ title, description, amount, type, category_id: categoryId, transaction_date: new Date(`${transactionDate}T12:00:00`).toISOString() });
+    onSubmit({
+      title,
+      description,
+      amount,
+      type,
+      category_id: categoryId,
+      transaction_date: new Date(`${transactionDate}T12:00:00`).toISOString(),
+    });
   };
 
   const categoryOptions = useMemo(() => categories, [categories]);
@@ -102,9 +103,7 @@ export function TransactionForm({
         id="type"
         label={t("transactions.form.type")}
         value={type}
-        onChange={(event) =>
-          setType(event.target.value as TransactionType) 
-        }
+        onChange={(event) => setType(event.target.value as TransactionType)}
         options={buildTypeOptions(t)}
       />
 

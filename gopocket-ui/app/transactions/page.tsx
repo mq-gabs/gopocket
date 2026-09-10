@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Modal } from "@/components/modal";
@@ -20,7 +20,6 @@ import TransactionIcon from "@/components/transaction-icon";
 import CategoryBadge from "@/components/category-badge";
 import { formatDate } from "@/utils/time";
 
-
 export default function TransactionsPage() {
   const { t, locale } = useI18n();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -33,7 +32,7 @@ export default function TransactionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [transactionData, categoryData] = await Promise.all([
@@ -47,11 +46,11 @@ export default function TransactionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void loadData();
-  }, []);
+  }, [loadData]);
 
   const categoryMap = useMemo(
     () => new Map(categories.map((category) => [category.id, category])),
@@ -105,11 +104,11 @@ export default function TransactionsPage() {
       setError(err instanceof Error ? err.message : t("common.error"));
     }
   };
-  
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedTransaction(undefined);
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -163,8 +162,12 @@ export default function TransactionsPage() {
                     <td className="text-base-content/70">
                       {transaction.description}
                     </td>
-                    <td className="text-base-content">{formatCurrencyString(transaction.amount)}</td>
-                    <td><TransactionIcon type={transaction.type} /></td>
+                    <td className="text-base-content">
+                      {formatCurrencyString(transaction.amount)}
+                    </td>
+                    <td>
+                      <TransactionIcon type={transaction.type} />
+                    </td>
                     <td>
                       {category ? (
                         <CategoryBadge category={category} />
@@ -173,7 +176,9 @@ export default function TransactionsPage() {
                       )}
                     </td>
                     <td>
-                      <span>{formatDate(transaction.transaction_date, locale)}</span>
+                      <span>
+                        {formatDate(transaction.transaction_date, locale)}
+                      </span>
                     </td>
                     <td>
                       <div className="flex gap-2">
