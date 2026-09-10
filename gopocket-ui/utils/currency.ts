@@ -1,1 +1,2 @@
-export const formatCurrency = (cents: number): string => `$${(cents / 100).toFixed(2)}`;
+export const formatCurrentyScale = (cents: number): number => cents / 100
+export const formatCurrencyString = (cents: number): string => `$${formatCurrentyScale(cents).toFixed(2)}`;

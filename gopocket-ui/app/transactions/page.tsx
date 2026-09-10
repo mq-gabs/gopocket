@@ -15,7 +15,7 @@ import type {
   UpdateTransactionPayload,
 } from "@/types/models";
 import { Button } from "@/components/button";
-import { formatCurrency } from "@/utils/currency";
+import { formatCurrencyString } from "@/utils/currency";
 import TransactionIcon from "@/components/transaction-icon";
 import CategoryBadge from "@/components/category-badge";
 import { formatDate } from "@/utils/time";
@@ -163,7 +163,7 @@ export default function TransactionsPage() {
                     <td className="text-base-content/70">
                       {transaction.description}
                     </td>
-                    <td className="text-base-content">{formatCurrency(transaction.amount)}</td>
+                    <td className="text-base-content">{formatCurrencyString(transaction.amount)}</td>
                     <td><TransactionIcon type={transaction.type} /></td>
                     <td>
                       {category ? (

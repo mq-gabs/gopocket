@@ -1,6 +1,6 @@
 import { TransactionType } from "./transaction-type";
 
-export interface Category {
+export type Category =  {
   id: string;
   name: string;
   color: string;
@@ -8,7 +8,7 @@ export interface Category {
   type: TransactionType;
 }
 
-export interface Transaction {
+export type Transaction =  {
   id: string;
   title: string;
   description: string;
@@ -19,14 +19,14 @@ export interface Transaction {
   category?: Category;
 }
 
-export interface CreateCategoryPayload {
+export type CreateCategoryPayload =  {
   name: string;
   color: string;
   icon: string;
   type: TransactionType;
 }
 
-export interface UpdateCategoryPayload {
+export type UpdateCategoryPayload = {
   name?: string;
   color?: string;
   icon?: string;
@@ -42,7 +42,7 @@ export interface CreateTransactionPayload {
   transaction_date?: string;
 }
 
-export interface UpdateTransactionPayload {
+export type UpdateTransactionPayload =  {
   title?: string;
   description?: string;
   amount?: number;
@@ -51,8 +51,14 @@ export interface UpdateTransactionPayload {
   transaction_date?: string;
 }
 
-export interface DashboardData {
-  mode: "month" | "year";
+export const dashboardModes = ["month", "year"] as const
+export type DashboardMode = typeof dashboardModes[number]
+
+export type DashboardTrend = { label: string; balance: number }
+export type DashboardExpense = { category: string; amount: number }
+
+export type DashboardData = {
+  mode:DashboardMode; 
   start_date: string;
   end_date: string;
   summary: {
@@ -60,8 +66,8 @@ export interface DashboardData {
     total_income: number;
     total_expenses: number;
   };
-  trend: Array<{ label: string; balance: number }>;
-  expenses: Array<{ category: string; amount: number }>;
+  trend: DashboardTrend[];
+  expenses: DashboardExpense[]; 
   recent_transactions: Transaction[];
   page: number;
   page_size: number;

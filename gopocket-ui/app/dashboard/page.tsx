@@ -12,20 +12,19 @@ import { DashboardCharts } from "@/components/dashboard-charts";
 import { Button, ButtonVariation } from "@/components/button";
 import { useI18n } from "@/contexts/i18n-context";
 import { transactionService } from "@/services/transaction.service";
-import type { DashboardData } from "@/types/models";
-import { formatCurrency } from "@/utils/currency";
+import type { DashboardData, DashboardMode } from "@/types/models";
+import { formatCurrencyString } from "@/utils/currency";
 import TransactionIcon from "@/components/transaction-icon";
 import { formatDate } from "@/utils/time";
+import BalanceTrend from "@/components/charts/balance-trend-chart";
+import ExpenseChart from "@/components/charts/expenses-chart";
 
 const currentMonth = new Date().toISOString().slice(0, 7);
 const currentYear = currentMonth.slice(0, 4);
 
-const modes = ["month", "year"] as const
-type Mode = typeof modes[number]
-
 export default function DashboardPage() {
   const { t, locale } = useI18n();
-  const [mode, setMode] = useState<Mode>("month");
+  const [mode, setMode] = useState<DashboardMode>("month");
   const [date, setDate] = useState(currentMonth);
   const [page, setPage] = useState(1);
   const [data, setData] = useState<DashboardData | null>(null);
@@ -43,23 +42,23 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, [date, mode, page, t]);
 
-  const changeMode = (nextMode: Mode) => {
+  const changeMode = (nextMode: DashboardMode) => {
     setMode(nextMode);
     setDate(nextMode === "year" ? currentYear : currentMonth);
     setPage(1);
   };
 
-  const getButtonVariation = (mode: Mode, target: Mode): ButtonVariation => {
-    return mode === target ? "primary" : "blank"
-  }
+  const getButtonVariation = (
+    mode: DashboardMode,
+    target: DashboardMode,
+  ): ButtonVariation => {
+    return mode === target ? "primary" : "blank";
+  };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-7 pb-8">
+    <div className="space-y-7">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-            {t("app.title")}
-          </p>
           <h1 className="mt-2 text-3xl font-semibold text-base-content">
             {t("dashboard.title")}
           </h1>
@@ -68,10 +67,16 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-xl border border-foreground/20 py-1 px-1">
-          <Button onClick={() => changeMode("month")} variation={getButtonVariation(mode, "month")}>
+          <Button
+            onClick={() => changeMode("month")}
+            variation={getButtonVariation(mode, "month")}
+          >
             {t("dashboard.month")}
           </Button>
-          <Button onClick={() => changeMode("year")} variation={getButtonVariation(mode, "year")}>
+          <Button
+            onClick={() => changeMode("year")}
+            variation={getButtonVariation(mode, "year")}
+          >
             {t("dashboard.year")}
           </Button>
           <input
@@ -132,13 +137,13 @@ export default function DashboardPage() {
                   {data.start_date} to {data.end_date}
                 </p>
               </div>
-              <DashboardCharts trend={data.trend} expenses={[]} />
+              <BalanceTrend trends={data.trend} />
             </article>
             <article className="rounded-2xl border border-base-300 bg-base-100 p-5">
               <h2 className="mb-2 text-lg font-semibold">
                 {t("dashboard.expenseBreakdown")}
               </h2>
-              <DashboardCharts trend={[]} expenses={data.expenses} />
+              <ExpenseChart expenses={data.expenses} />
             </article>
           </section>
 
@@ -178,7 +183,7 @@ export default function DashboardPage() {
                         <TransactionIcon type={transaction.type} />
                       </td>
                       <td className="font-medium">
-                        {formatCurrency(transaction.amount)}
+                        {formatCurrencyString(transaction.amount)}
                       </td>
                       <td className="text-base-content/65">
                         {formatDate(transaction.transaction_date, locale)}
@@ -230,14 +235,18 @@ function SummaryCard({
   className?: string;
 }) {
   return (
-    <article className={`rounded-2xl border border-base-300 bg-base-100 p-5 ${className}`}>
+    <article
+      className={`rounded-2xl border border-base-300 bg-base-100 p-5 ${className}`}
+    >
       <div
         className={`mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-background ${accent}`}
       >
         {icon}
       </div>
       <p className="text-sm text-base-content/65">{label}</p>
-      <p className="mt-1 text-2xl font-semibold">{formatCurrency(value)}</p>
+      <p className="mt-1 text-2xl font-semibold">
+        {formatCurrencyString(value)}
+      </p>
     </article>
   );
 }
