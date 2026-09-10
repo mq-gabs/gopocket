@@ -170,7 +170,10 @@ export default function TransactionsPage() {
                     </td>
                     <td>
                       {category ? (
-                        <CategoryBadge category={category} />
+                        <CategoryBadge
+                          category={category}
+                          className="w-full block text-center"
+                        />
                       ) : (
                         <span className="text-foreground/60">—</span>
                       )}
