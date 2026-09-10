@@ -35,7 +35,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   const value: I18nContextValue = useMemo(
     () => ({
-      locale: locale || 'en',
+      locale: locale || "en",
       setLocale,
       t: (key: TranslationKey) =>
         locale ? dictionaries[locale][key] : "<missing translation>",
