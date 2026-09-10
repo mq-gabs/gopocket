@@ -10,7 +10,7 @@ const mapVariationToClasses: Record<ButtonVariation, string> = {
   secondary: "bg-secondary-60 text-secondary-foreground border border-secondary",
   destructive: "bg-destructive/20 text-destructive border border-destructive",
   neutral: "bg-light-gray/50 text-foreground border bordr-light-gray",
-  blank: "hover:bg-light-gray/50 border border-transparent hover:border-light-gray",
+  blank: "hover:bg-light-gray/50 border text-foreground border-transparent hover:border-light-gray",
 };
 const getClassByVariation = (variation: ButtonVariation): string => mapVariationToClasses[variation] || mapVariationToClasses['primary']
 

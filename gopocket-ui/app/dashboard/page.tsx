@@ -9,7 +9,7 @@ import {
   BanknotesIcon,
 } from "@heroicons/react/24/outline";
 import { DashboardCharts } from "@/components/dashboard-charts";
-import { Button } from "@/components/button";
+import { Button, ButtonVariation } from "@/components/button";
 import { useI18n } from "@/contexts/i18n-context";
 import { transactionService } from "@/services/transaction.service";
 import type { DashboardData } from "@/types/models";
@@ -20,12 +20,16 @@ import { formatDate } from "@/utils/time";
 const currentMonth = new Date().toISOString().slice(0, 7);
 const currentYear = currentMonth.slice(0, 4);
 
+const modes = ["month", "year"] as const
+type Mode = typeof modes[number]
+
 export default function DashboardPage() {
   const { t, locale } = useI18n();
-  const [mode, setMode] = useState<"month" | "year">("month");
+  const [mode, setMode] = useState<Mode>("month");
   const [date, setDate] = useState(currentMonth);
   const [page, setPage] = useState(1);
   const [data, setData] = useState<DashboardData | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,11 +43,15 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, [date, mode, page, t]);
 
-  const changeMode = (nextMode: "month" | "year") => {
+  const changeMode = (nextMode: Mode) => {
     setMode(nextMode);
     setDate(nextMode === "year" ? currentYear : currentMonth);
     setPage(1);
   };
+
+  const getButtonVariation = (mode: Mode, target: Mode): ButtonVariation => {
+    return mode === target ? "primary" : "blank"
+  }
 
   return (
     <div className="mx-auto max-w-7xl space-y-7 pb-8">
@@ -59,19 +67,13 @@ export default function DashboardPage() {
             {t("dashboard.description")}
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-base-300 bg-base-100 p-1">
-          <button
-            className={`rounded-lg px-3 py-2 text-sm font-medium ${mode === "month" ? "bg-primary text-primary-foreground" : "text-base-content/70"}`}
-            onClick={() => changeMode("month")}
-          >
+        <div className="flex items-center gap-2 rounded-xl border border-foreground/20 py-1 px-1">
+          <Button onClick={() => changeMode("month")} variation={getButtonVariation(mode, "month")}>
             {t("dashboard.month")}
-          </button>
-          <button
-            className={`rounded-lg px-3 py-2 text-sm font-medium ${mode === "year" ? "bg-primary text-primary-foreground" : "text-base-content/70"}`}
-            onClick={() => changeMode("year")}
-          >
+          </Button>
+          <Button onClick={() => changeMode("year")} variation={getButtonVariation(mode, "year")}>
             {t("dashboard.year")}
-          </button>
+          </Button>
           <input
             aria-label={
               mode === "month" ? t("dashboard.month") : t("dashboard.year")
@@ -84,7 +86,7 @@ export default function DashboardPage() {
               setDate(event.target.value);
               setPage(1);
             }}
-            className="w-32 rounded-lg border border-base-300 bg-base-100 px-2 py-2 text-sm"
+            className="w-40 rounded-lg border border-foreground/20 px-2 py-1 text-sm"
           />
         </div>
       </header>
@@ -230,7 +232,7 @@ function SummaryCard({
   return (
     <article className={`rounded-2xl border border-base-300 bg-base-100 p-5 ${className}`}>
       <div
-        className={`mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-base-200 ${accent}`}
+        className={`mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-background ${accent}`}
       >
         {icon}
       </div>
