@@ -26,18 +26,22 @@ export function Modal({ title, open, onClose, children }: ModalProps) {
   }
 
   return (
-    <dialog className="modal modal-open" onKeyDown={makeOnKeyDown('Escape', onClose)} tabIndex={0} ref={ref}>
-      <div className="modal-box bg-background" >
-         <div className="mb-6 flex items-center justify-between">
-           <h3 className="text-xl font-semibold text-base-content">{title}</h3>
-           <Button onClick={onClose} className="p-2!" variation="blank">
-             <XMarkIcon className="h-4 w-4" />
-           </Button>
-         </div>
-         {children}
+    <dialog
+      className="modal modal-open"
+      onKeyDown={makeOnKeyDown("Escape", onClose)}
+      tabIndex={0}
+      ref={ref}
+    >
+      <div className="modal-box bg-background rounded-xl border border-foreground/10">
+        <div className="mb-6 flex items-center justify-between">
+          <h3 className="text-xl font-semibold">{title}</h3>
+          <Button onClick={onClose} className="p-1!" variation="blank">
+            <XMarkIcon className="h-4 w-4" />
+          </Button>
+        </div>
+        {children}
       </div>
-      <div onClick={onClose} className="modal-backdrop">
-      </div>
+      <div onClick={onClose} className="modal-backdrop bg-black/50"></div>
     </dialog>
   );
 }

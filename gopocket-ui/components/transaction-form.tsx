@@ -56,7 +56,7 @@ export function TransactionForm({
     initialValues?.category_id ?? categories[0]?.id ?? "",
   );
   const [transactionDate, setTransactionDate] = useState(
-    initialValues?.transaction_date?.slice(0, 10) ??
+    initialValues?.transaction_date?.toISOString().slice(0, 10) ??
       new Date().toISOString().slice(0, 10),
   );
 

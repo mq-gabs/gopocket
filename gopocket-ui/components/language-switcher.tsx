@@ -11,23 +11,23 @@ const options = [
 ];
 
 export function LanguageSwitcher() {
-  const { locale, setLocale, } = useI18n();
+  const { locale, setLocale } = useI18n();
 
   const makeChangeSelection = () => {
     return (e: ChangeEvent<HTMLSelectElement>) => {
       const { value } = e.target;
 
       if (isLocale(value)) {
-        setLocale(value)
+        setLocale(value);
       }
-    }
-  }
+    };
+  };
 
   return (
-    <label className="flex items-center gap-2 rounded-full border border-base-300 bg-base-100 px-2 py-1 text-xs">
+    <label className="flex items-center gap-2 rounded-xl bg-background px-2 py-1 text-xs">
       <LanguageIcon className="h-5 w-5" />
       <select
-        className="select select-xs select-bordered cursor-pointer px-5"
+        className="select select-xs select-bordered cursor-pointer px-5 border border-foreground/20 rounded-xl p-3"
         value={locale}
         onChange={makeChangeSelection()}
       >

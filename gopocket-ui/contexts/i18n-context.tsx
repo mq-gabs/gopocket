@@ -38,7 +38,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       locale: locale || "en",
       setLocale,
       t: (key: TranslationKey) =>
-        locale ? dictionaries[locale][key] : "<missing translation>",
+        dictionaries[locale || "en"][key] || "<missing translation>",
     }),
     [locale],
   );

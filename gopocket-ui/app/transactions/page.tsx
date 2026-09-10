@@ -138,7 +138,7 @@ export default function TransactionsPage() {
       ) : null}
 
       {!loading && transactions.length > 0 ? (
-        <div className="overflow-x-auto rounded-lg border border-light-gray bg-background">
+        <div className="overflow-x-auto rounded-xl border border-foreground/10 bg-background">
           <table className="table">
             <thead>
               <tr>

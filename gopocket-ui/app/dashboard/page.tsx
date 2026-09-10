@@ -65,7 +65,7 @@ export default function DashboardPage() {
             {t("dashboard.description")}
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-foreground/20 py-1 px-1">
+        <div className="flex items-center gap-2 rounded-2xl border border-foreground/20 py-1 px-1">
           <Button
             onClick={() => changeMode("month")}
             variation={getButtonVariation(mode, "month")}
@@ -90,7 +90,7 @@ export default function DashboardPage() {
               setDate(event.target.value);
               setPage(1);
             }}
-            className="w-40 rounded-lg border border-foreground/20 px-2 py-1 text-sm"
+            className="w-40 rounded-xl border border-foreground/20 px-2 py-1 text-sm"
           />
         </div>
       </header>
@@ -127,7 +127,7 @@ export default function DashboardPage() {
           </section>
 
           <section className="grid gap-5 xl:grid-cols-[1.65fr_1fr]">
-            <article className="rounded-2xl border border-base-300 bg-base-100 p-5">
+            <article className="rounded-2xl border border-foreground/10 bg-background p-5">
               <div className="mb-2">
                 <h2 className="text-lg font-semibold">
                   {t("dashboard.balanceTrend")}
@@ -138,7 +138,7 @@ export default function DashboardPage() {
               </div>
               <BalanceTrend trends={data.trend} />
             </article>
-            <article className="rounded-2xl border border-base-300 bg-base-100 p-5">
+            <article className="rounded-2xl border border-foreground/10 bg-background p-5">
               <h2 className="mb-2 text-lg font-semibold">
                 {t("dashboard.expenseBreakdown")}
               </h2>
@@ -146,8 +146,8 @@ export default function DashboardPage() {
             </article>
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-base-300 bg-base-100">
-            <div className="flex flex-col gap-3 border-b border-base-300 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <section className="overflow-hidden rounded-2xl border border-foreground/10 bg-background">
+            <div className="flex flex-col gap-3 border-b border-foreground/10 p-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-lg font-semibold">
                   {t("dashboard.recentTransactions")}
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                 </tbody>
               </table>
             </div>
-            <div className="flex items-center justify-between border-t border-base-300 px-5 py-3 text-sm">
+            <div className="flex items-center justify-between border-t border-foreground/10 px-5 py-3 text-sm">
               <span>
                 {t("dashboard.page")} {data.page} / {data.total_pages}
               </span>
@@ -235,15 +235,17 @@ function SummaryCard({
 }) {
   return (
     <article
-      className={`rounded-2xl border border-base-300 bg-base-100 p-5 ${className}`}
+      className={`rounded-2xl border border-foreground/10 bg-background p-5 ${className}`}
     >
-      <div
-        className={`mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-background ${accent}`}
-      >
-        {icon}
+      <div className="flex gap-2 items-center mb-6">
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-xl bg-background ${accent}`}
+        >
+          {icon}
+        </div>
+        <p className={`text-sm ${accent}`}>{label}</p>
       </div>
-      <p className="text-sm text-base-content/65">{label}</p>
-      <p className="mt-1 text-2xl font-semibold">
+      <p className={`mt-1 text-2xl font-semibold text-right ${accent}`}>
         {formatCurrencyString(value)}
       </p>
     </article>

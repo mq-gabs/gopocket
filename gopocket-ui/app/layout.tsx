@@ -13,10 +13,12 @@ export const metadata: Metadata = {
   description: "Personal finance dashboard",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter} h-full antialiased`}>
-      <body className="min-h-full bg-base-100 text-base-content">
+    <html lang="en" className={`${inter.className} h-full antialiased`}>
+      <body className="min-h-full bg-background text-foreground">
         <ThemeProvider>
           <I18nProvider>
             <div className="flex min-h-screen">
