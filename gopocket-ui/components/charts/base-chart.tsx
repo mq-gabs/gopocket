@@ -11,17 +11,18 @@ export default function BaseChart({ options }: IBaseChart) {
   const throttleRender = makeVoidThrottle({ timeoutMs: 1000 });
 
   useEffect(() => {
-    throttleRender(() => {
+    let apex: ApexCharts;
+
+    import("apexcharts").then(({ default: ApexCharts }) => {
       if (!ref.current) return;
-      let apex: ApexCharts;
 
-      import("apexcharts").then(({ default: ApexCharts }) => {
-        if (!ref.current) return;
+      apex = new ApexCharts(ref.current, options);
 
-        apex = new ApexCharts(ref.current, options);
-
+      throttleRender(() => {
         apex.render();
       });
+
+      return () => apex.destroy();
     });
   }, [ref, options]);
 

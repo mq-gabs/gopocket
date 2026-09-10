@@ -1,42 +1,44 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { dictionaries, Locale, TranslationKey } from "@/locales";
+import { dictionaries, Locale, LOCALES, TranslationKey } from "@/locales";
 
-export type TranslateFunction = (key: TranslationKey) => string
+export type TranslateFunction = (key: TranslationKey) => string;
+
+const LOCAL_KEY = "gopocket-locale";
 
 interface I18nContextValue {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: TranslateFunction; 
+  t: TranslateFunction;
 }
 
- 
 const I18nContext = createContext<I18nContextValue | undefined>(undefined);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocale] = useState<Locale>("en");
+  const [locale, setLocale] = useState<Locale | null>(null);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(
-      "gopocket-locale",
-    ) as Locale | null;
-    if (stored === "en" || stored === "pt-br") {
+    const stored = window.localStorage.getItem(LOCAL_KEY) as Locale | null;
+
+    if (stored && LOCALES.includes(stored)) {
       setLocale(stored);
     }
   }, []);
 
   useEffect(() => {
+    if (!locale) return;
+
     document.documentElement.lang = locale;
     window.localStorage.setItem("gopocket-locale", locale);
   }, [locale]);
 
-  const value = useMemo(
+  const value: I18nContextValue = useMemo(
     () => ({
-      locale,
+      locale: locale || 'en',
       setLocale,
       t: (key: TranslationKey) =>
-        dictionaries[locale][key] || "<missing translation>",
+        locale ? dictionaries[locale][key] : "<missing translation>",
     }),
     [locale],
   );
