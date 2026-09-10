@@ -8,7 +8,6 @@ import {
   ArrowTrendingUpIcon,
   BanknotesIcon,
 } from "@heroicons/react/24/outline";
-import { DashboardCharts } from "@/components/dashboard-charts";
 import { Button, ButtonVariation } from "@/components/button";
 import { useI18n } from "@/contexts/i18n-context";
 import { transactionService } from "@/services/transaction.service";
