@@ -1,14 +1,13 @@
-import { makeVoidThrottle } from "@/utils/functions";
+"use client";
+
 import ApexCharts, { ApexOptions } from "apexcharts";
 import { useEffect, useRef } from "react";
 
 interface IBaseChart {
   options: ApexOptions;
 }
-
 export default function BaseChart({ options }: IBaseChart) {
   const ref = useRef<HTMLDivElement>(null);
-  const throttleRender = makeVoidThrottle({ timeoutMs: 1000 });
 
   useEffect(() => {
     let apex: ApexCharts;
@@ -18,12 +17,10 @@ export default function BaseChart({ options }: IBaseChart) {
 
       apex = new ApexCharts(ref.current, options);
 
-      throttleRender(() => {
-        apex.render();
-      });
-
-      return () => apex.destroy();
+      apex.render();
     });
+
+    return () => apex?.destroy();
   }, [ref, options]);
 
   return <div ref={ref} />;
