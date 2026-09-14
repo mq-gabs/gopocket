@@ -12,14 +12,15 @@ export default function CategoryBadge({
 }: ICategoryBadge) {
   const foregroundColor = getForegroundContrastColor(color);
   return (
-    <span
-      className={`py-1 px-2 rounded-xl uppercase text-xs font-bold ${className}`}
-      style={{
-        backgroundColor: color,
-        color: foregroundColor,
-      }}
-    >
-      {name}
-    </span>
+    <div className={`py-1 px-2 flex gap-2 items-center ${className}`}>
+      <span
+        className="size-2 rounded-full"
+        style={{
+          backgroundColor: color,
+          color: foregroundColor,
+        }}
+      ></span>
+      <span className="uppercase text-xs font-bold">{name}</span>
+    </div>
   );
 }
