@@ -14,7 +14,7 @@ export default function CategoryBadge({
   return (
     <div className={`py-1 px-2 flex gap-2 items-center ${className}`}>
       <span
-        className="size-2 rounded-full"
+        className="size-2 rounded-full border border-foreground"
         style={{
           backgroundColor: color,
           color: foregroundColor,
