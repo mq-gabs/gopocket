@@ -30,7 +30,7 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const baseClasses =
-    "text-sm hover:brightness-110 font-bold cursor-pointer px-3 py-1 rounded-xl  flex items-center justify-center gap-2";
+    "text-sm hover:brightness-120 font-bold cursor-pointer px-3 py-1 rounded-xl  flex items-center justify-center gap-2";
 
   const { className: extraClasses, ...restProps } = rest;
 

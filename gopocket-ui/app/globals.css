@@ -1,30 +1,29 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-
 :root {
-  --background: #EFE9F4;
-  --foreground: #171D1C;
-  --primary: #09BC8A;
-  --primary-80: #09BC8Acc;
-  --primary-60: #09BC8A99;
-  --primary-40: #09BC8A66;
-  --primary-20: #09BC8A33;
-  --primary-foreground: #EFE9F4;
-  --secondary: #2D82B7;
-  --secondary-80: #2D82B7cc;
-  --secondary-60: #2D82B799;
-  --secondary-40: #2D82B766;
-  --secondary-20: #2D82B733;
-  --secondary-foreground: #EFE9F4;
+  --background: #efe9f4;
+  --foreground: #171d1c;
+  --primary: #09bc8a;
+  --primary-80: #09bc8acc;
+  --primary-60: #09bc8a99;
+  --primary-40: #09bc8a66;
+  --primary-20: #09bc8a33;
+  --primary-foreground: #efe9f4;
+  --secondary: #2d82b7;
+  --secondary-80: #2d82b7cc;
+  --secondary-60: #2d82b799;
+  --secondary-40: #2d82b766;
+  --secondary-20: #2d82b733;
+  --secondary-foreground: #efe9f4;
 
-  --destructive: #C3423F;
-  --destructive-foreground: #EFE9F4;
+  --destructive: #c3423f;
+  --destructive-foreground: #efe9f4;
 
   --light-gray: #d0d0d0;
   --dark-gray: #232c2b;
 
-  --transition-duration: 300ms;
+  --transition-duration: 200ms;
 }
 
 @theme inline {
@@ -53,12 +52,12 @@
 }
 
 html[data-theme="dark"] {
-  --background: #171D1C;
-  --foreground: #EFE9F4;
-  --color-base-100: #171D1C;
+  --background: #171d1c;
+  --foreground: #efe9f4;
+  --color-base-100: #171d1c;
   --color-base-200: #232c2b;
   --color-base-300: #2d3735;
-  --color-base-content: #EFE9F4;
+  --color-base-content: #efe9f4;
 }
 
 body {
