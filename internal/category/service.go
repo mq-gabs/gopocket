@@ -2,7 +2,6 @@ package category
 
 import (
 	"errors"
-	"gopocket/internal/transaction/transactiontype"
 )
 
 // Service encapsulates category business logic.
@@ -46,12 +45,6 @@ func (s *service) Update(id string, dto UpdateCategoryRequest) (*Category, error
 	}
 	if dto.Color != "" {
 		model.Color = dto.Color
-	}
-	if dto.Icon != "" {
-		model.Icon = dto.Icon
-	}
-	if dto.Type != "" {
-		model.Type = transactiontype.TransactionType(dto.Type)
 	}
 	return s.repository.Update(model)
 }
