@@ -24,7 +24,6 @@ export function Sidebar() {
 
   const items: NavItem[] = [
     { href: "/", label: t("navigation.dashboard"), icon: ChartBarIcon },
-    { href: "/categories", label: t("navigation.categories"), icon: TagIcon },
     {
       href: "/transactions",
       label: t("navigation.transactions"),
@@ -35,6 +34,7 @@ export function Sidebar() {
       label: "Planned",
       icon: ClipboardDocumentListIcon,
     },
+    { href: "/categories", label: t("navigation.categories"), icon: TagIcon },
   ];
 
   return (
