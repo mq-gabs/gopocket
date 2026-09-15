@@ -9,11 +9,14 @@ import (
 // Repository persists transactions in the database.
 type Repository interface {
 	Create(transaction *Transaction) (*Transaction, error)
-	FindByID(id string) (*Transaction, error)
-	FindAll() ([]Transaction, error)
 	Update(transaction *Transaction) (*Transaction, error)
 	Delete(id string) error
-	FindForPeriod(start, end time.Time) ([]Transaction, error)
+	FindByID(id string) (*Transaction, error)
+
+	FindAllActual() ([]Transaction, error)
+	FindActualForPeriod(start, end time.Time) ([]Transaction, error)
+
+	FindAllPlanned() ([]Transaction, error)
 }
 
 type repository struct {
@@ -30,22 +33,6 @@ func (r *repository) Create(transaction *Transaction) (*Transaction, error) {
 		return nil, err
 	}
 	return transaction, nil
-}
-
-func (r *repository) FindByID(id string) (*Transaction, error) {
-	var transaction Transaction
-	if err := r.db.First(&transaction, "id = ?", id).Error; err != nil {
-		return nil, err
-	}
-	return &transaction, nil
-}
-
-func (r *repository) FindAll() ([]Transaction, error) {
-	var transactions []Transaction
-	if err := r.db.Where("paid_at IS NOT NULL").Find(&transactions).Error; err != nil {
-		return nil, err
-	}
-	return transactions, nil
 }
 
 func (r *repository) Update(transaction *Transaction) (*Transaction, error) {
@@ -66,11 +53,50 @@ func (r *repository) Delete(id string) error {
 	return nil
 }
 
-func (r *repository) FindForPeriod(start, end time.Time) ([]Transaction, error) {
+func (r *repository) FindByID(id string) (*Transaction, error) {
+	var transaction Transaction
+	if err := r.db.First(&transaction, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &transaction, nil
+}
+
+// ACTUAL
+
+func (r *repository) FindAllActual() ([]Transaction, error) {
 	var transactions []Transaction
-	query := "COALESCE(NULLIF(transaction_date, ?), created_at) >= ? AND COALESCE(NULLIF(transaction_date, ?), created_at) < ?"
-	if err := r.db.Preload("Category").Where(query, time.Time{}, start, time.Time{}, end).Order("COALESCE(NULLIF(transaction_date, created_at), created_at) DESC").Find(&transactions).Error; err != nil {
+	if err := withActual(r.db).Find(&transactions).Error; err != nil {
 		return nil, err
 	}
 	return transactions, nil
+}
+
+func (r *repository) FindActualForPeriod(start, end time.Time) ([]Transaction, error) {
+	var transactions []Transaction
+	query := "COALESCE(NULLIF(paid_at, ?), created_at) >= ? AND COALESCE(NULLIF(paid_at, ?), created_at) < ?"
+	if err := withActual(r.db).Preload("Category").Where(query, time.Time{}, start, time.Time{}, end).Order("COALESCE(NULLIF(paid_at, created_at), created_at) DESC").Find(&transactions).Error; err != nil {
+		return nil, err
+	}
+	return transactions, nil
+}
+
+// PLANNED
+
+func (r *repository) FindAllPlanned() ([]Transaction, error) {
+	var transactions []Transaction
+	if err := withPlanned(r.db).Find(&transactions).Error; err != nil {
+		return nil, err
+	}
+
+	return transactions, nil
+}
+
+// UTILS
+
+func withActual(tx *gorm.DB) *gorm.DB {
+	return tx.Where("paid_at IS NOT NULL")
+}
+
+func withPlanned(tx *gorm.DB) *gorm.DB {
+	return tx.Where("paid_at IS NULL")
 }

@@ -23,11 +23,16 @@ func NewEndpoint(service Service) *Endpoint {
 // RegisterRoutes attaches transaction routes to the router.
 func (e *Endpoint) RegisterRoutes(router *gin.RouterGroup) {
 	router.GET("/dashboard", e.dashboard)
-	router.GET("/transactions", e.list)
-	router.GET("/transactions/:id", e.get)
-	router.POST("/transactions", e.create)
+
 	router.PATCH("/transactions/:id", e.update)
 	router.DELETE("/transactions/:id", e.delete)
+	router.GET("/transactions/:id", e.getByID)
+
+	router.POST("/transactions/actual", e.createActual)
+	router.GET("/transactions/actual", e.listActual)
+
+	router.POST("/transactions/planned", e.createPlanned)
+	router.GET("/transactions/planned", e.listPlanned)
 }
 
 func (e *Endpoint) dashboard(ctx *gin.Context) {
@@ -40,19 +45,19 @@ func (e *Endpoint) dashboard(ctx *gin.Context) {
 	ginhttp.WriteSuccess(ctx, http.StatusOK, data)
 }
 
-func (e *Endpoint) create(ctx *gin.Context) {
-	dto, err := ginhttp.ReadBody[CreateTransactionRequest](ctx)
+func (e *Endpoint) createActual(ctx *gin.Context) {
+	dto, err := ginhttp.ReadBody[CreateActualTransactionRequest](ctx)
 	if err != nil {
 		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
-	if err := ValidateCreateTransaction(*dto); err != nil {
+	if err := ValidateCreateActualTransaction(*dto); err != nil {
 		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	model, err := e.service.Create(*dto)
+	model, err := e.service.CreateActual(*dto)
 	if err != nil {
 		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -61,7 +66,28 @@ func (e *Endpoint) create(ctx *gin.Context) {
 	ginhttp.WriteSuccess(ctx, http.StatusCreated, ToResponse(model))
 }
 
-func (e *Endpoint) get(ctx *gin.Context) {
+func (e *Endpoint) createPlanned(ctx *gin.Context) {
+	dto, err := ginhttp.ReadBody[CreatePlannedTransactionRequest](ctx)
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	if err := ValidateCreatePlannedTransaction(*dto); err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	model, err := e.service.CreatePlanned(*dto)
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ginhttp.WriteSuccess(ctx, http.StatusCreated, ToResponse(model))
+}
+
+func (e *Endpoint) getByID(ctx *gin.Context) {
 	id := strings.TrimSpace(ctx.Param("id"))
 	model, err := e.service.FindByID(id)
 	if err != nil {
@@ -72,8 +98,23 @@ func (e *Endpoint) get(ctx *gin.Context) {
 	ginhttp.WriteSuccess(ctx, http.StatusOK, ToResponse(model))
 }
 
-func (e *Endpoint) list(ctx *gin.Context) {
-	models, err := e.service.FindAll()
+func (e *Endpoint) listActual(ctx *gin.Context) {
+	models, err := e.service.FindAllActual()
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responses := make([]TransactionResponse, 0, len(models))
+	for _, model := range models {
+		responses = append(responses, ToResponse(&model))
+	}
+
+	ginhttp.WriteSuccess(ctx, http.StatusOK, responses)
+}
+
+func (e *Endpoint) listPlanned(ctx *gin.Context) {
+	models, err := e.service.FindAllPlanned()
 	if err != nil {
 		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error())
 		return

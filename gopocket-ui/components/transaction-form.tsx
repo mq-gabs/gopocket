@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
-  CreateTransactionPayload,
-  Transaction,
+  CreateActualTransactionPayload,
+  ActualTransaction,
   UpdateTransactionPayload,
 } from "@/types/models";
 import { Button } from "./button";
@@ -28,9 +28,9 @@ const buildTypeOptions = (t: TranslateFunction) => [
 
 interface TransactionFormProps {
   categories: Category[];
-  initialValues?: Transaction;
+  initialValues?: ActualTransaction;
   onSubmit: (
-    payload: CreateTransactionPayload | UpdateTransactionPayload,
+    payload: CreateActualTransactionPayload | UpdateTransactionPayload,
   ) => void;
   onCancel?: () => void;
   submitLabel: string;

@@ -44,7 +44,6 @@ func New(
 		MaxAge:           12 * time.Hour,
 	}))
 
-
 	api := r.Group("/api")
 	categoryEndpoint.RegisterRoutes(api)
 	transactionEndpoint.RegisterRoutes(api)

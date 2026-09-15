@@ -9,37 +9,52 @@ import (
 func ToResponse(model *Transaction) TransactionResponse {
 	paidAt := model.PaidAt.Format(time.RFC3339)
 	return TransactionResponse{
-		ID:              model.ID,
-		Title:           model.Title,
-		Description:     model.Description,
-		Amount:          model.Amount,
-		Type:            string(model.Type),
-		CategoryID:      model.CategoryID,
-		PaidAt:&paidAt, 
+		ID:          model.ID,
+		Title:       model.Title,
+		Description: model.Description,
+		Amount:      model.Amount,
+		Type:        string(model.Type),
+		CategoryID:  model.CategoryID,
+		PaidAt:      &paidAt,
 	}
 }
 
-// CreateRequestToModel maps a create request DTO to the database model.
-func CreateRequestToModel(dto CreateTransactionRequest) Transaction {
+// CreateActualRequestToModel maps a create request DTO to the database model.
+func CreateActualRequestToModel(dto CreateActualTransactionRequest) Transaction {
+	paidAt := parseTransactionDate(dto.PaidAt)
 	return Transaction{
-		Title:           dto.Title,
-		Description:     dto.Description,
-		Amount:          dto.Amount,
-		Type:            transactiontype.TransactionType(dto.Type),
-		CategoryID:      dto.CategoryID,
-		PaidAt: parseTransactionDate(dto.PaidAt),
+		Title:       dto.Title,
+		Description: dto.Description,
+		Amount:      dto.Amount,
+		Type:        transactiontype.TransactionType(dto.Type),
+		CategoryID:  dto.CategoryID,
+		PaidAt:      paidAt,
+		DueAt:       *paidAt,
 	}
 }
 
-func parseTransactionDate(value *string) *time.Time {
-	if value == nil || *value == "" {
-		now := time.Now()
-		return &now 
+// CreatePlannedRequestToModel maps a create request DTO to the database model.
+func CreatePlannedRequestToModel(dto CreatePlannedTransactionRequest) Transaction {
+	return Transaction{
+		Title:       dto.Title,
+		Description: dto.Description,
+		Amount:      dto.Amount,
+		Type:        transactiontype.TransactionType(dto.Type),
+		CategoryID:  dto.CategoryID,
+		PaidAt:      parseTransactionDate(dto.PaidAt),
+		DueAt:       *parseTransactionDate(dto.DueAt),
 	}
-	parsed, err := time.Parse(time.RFC3339, *value)
+}
+
+func parseTransactionDate(value string) *time.Time {
+	if value == "" {
+		now := time.Now()
+		return &now
+	}
+	parsed, err := time.Parse(time.RFC3339, value)
 	if err != nil {
 		now := time.Now()
-		return &now 
+		return &now
 	}
 	return &parsed
 }

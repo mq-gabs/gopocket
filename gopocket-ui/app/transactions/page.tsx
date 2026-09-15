@@ -10,8 +10,8 @@ import { categoryService } from "@/services/category.service";
 import { transactionService } from "@/services/transaction.service";
 import type {
   Category,
-  CreateTransactionPayload,
-  Transaction,
+  CreateActualTransactionPayload,
+  ActualTransaction,
   UpdateTransactionPayload,
 } from "@/types/models";
 import { Button } from "@/components/button";
@@ -22,10 +22,10 @@ import { formatDate } from "@/utils/time";
 
 export default function TransactionsPage() {
   const { t, locale } = useI18n();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<ActualTransaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedTransaction, setSelectedTransaction] = useState<
-    Transaction | undefined
+    ActualTransaction | undefined
   >();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -36,7 +36,7 @@ export default function TransactionsPage() {
     try {
       setLoading(true);
       const [transactionData, categoryData] = await Promise.all([
-        transactionService.getAll(),
+        transactionService.getAllActual(),
         categoryService.getAll(),
       ]);
       setTransactions(transactionData);
@@ -62,18 +62,18 @@ export default function TransactionsPage() {
     setIsModalOpen(true);
   };
 
-  const openEdit = (transaction: Transaction) => {
+  const openEdit = (transaction: ActualTransaction) => {
     setSelectedTransaction(transaction);
     setIsModalOpen(true);
   };
 
-  const openDelete = (transaction: Transaction) => {
+  const openDelete = (transaction: ActualTransaction) => {
     setSelectedTransaction(transaction);
     setIsDeleteOpen(true);
   };
 
   const handleSubmit = async (
-    payload: CreateTransactionPayload | UpdateTransactionPayload,
+    payload: CreateActualTransactionPayload | UpdateTransactionPayload,
   ) => {
     try {
       if (selectedTransaction) {
@@ -82,7 +82,9 @@ export default function TransactionsPage() {
           payload as UpdateTransactionPayload,
         );
       } else {
-        await transactionService.create(payload as CreateTransactionPayload);
+        await transactionService.createActual(
+          payload as CreateActualTransactionPayload,
+        );
       }
       setIsModalOpen(false);
       await loadData();

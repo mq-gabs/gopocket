@@ -50,7 +50,7 @@ func (s *service) Dashboard(query DashboardQuery) (*DashboardResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	transactions, err := s.repository.FindForPeriod(start, end)
+	transactions, err := s.repository.FindActualForPeriod(start, end)
 	if err != nil {
 		return nil, err
 	}

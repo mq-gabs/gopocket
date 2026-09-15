@@ -8,7 +8,7 @@ export type Category = {
   type: TransactionType;
 };
 
-export type Transaction = {
+export type ActualTransaction = {
   id: string;
   title: string;
   description: string;
@@ -16,6 +16,18 @@ export type Transaction = {
   type: TransactionType;
   category_id: string;
   paid_at: string;
+  category?: Category;
+};
+
+export type PlannedTransaction = {
+  id: string;
+  title: string;
+  description: string;
+  amount: number;
+  type: TransactionType;
+  category_id: string;
+  paid_at: string;
+  due_at: string;
   category?: Category;
 };
 
@@ -33,13 +45,23 @@ export type UpdateCategoryPayload = {
   type?: TransactionType;
 };
 
-export interface CreateTransactionPayload {
+export interface CreateActualTransactionPayload {
   title: string;
   description: string;
   amount: number;
   type: TransactionType;
   category_id: string;
-  paid_at?: string;
+  paid_at: string;
+}
+
+export interface CreatePlannedTransactionPayload {
+  title: string;
+  description: string;
+  amount: number;
+  type: TransactionType;
+  category_id: string;
+  paid_at: string;
+  due_at: string;
 }
 
 export type UpdateTransactionPayload = {
@@ -68,7 +90,7 @@ export type DashboardData = {
   };
   trend: DashboardTrend[];
   expenses: DashboardExpense[];
-  recent_transactions: Transaction[];
+  recent_transactions: ActualTransaction[];
   page: number;
   page_size: number;
   total_transactions: number;

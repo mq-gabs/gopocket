@@ -7,12 +7,17 @@ import (
 
 // Service encapsulates transaction business logic.
 type Service interface {
-	Create(dto CreateTransactionRequest) (*Transaction, error)
-	FindByID(id string) (*Transaction, error)
-	FindAll() ([]Transaction, error)
 	Update(id string, dto UpdateTransactionRequest) (*Transaction, error)
 	Delete(id string) error
+	FindByID(id string) (*Transaction, error)
+
 	Dashboard(query DashboardQuery) (*DashboardResponse, error)
+
+	CreateActual(dto CreateActualTransactionRequest) (*Transaction, error)
+	FindAllActual() ([]Transaction, error)
+
+	CreatePlanned(dto CreatePlannedTransactionRequest) (*Transaction, error)
+	FindAllPlanned() ([]Transaction, error)
 }
 
 type service struct {
@@ -22,19 +27,6 @@ type service struct {
 // NewService wires a transaction service with its repository.
 func NewService(repository Repository) Service {
 	return &service{repository: repository}
-}
-
-func (s *service) Create(dto CreateTransactionRequest) (*Transaction, error) {
-	model := CreateRequestToModel(dto)
-	return s.repository.Create(&model)
-}
-
-func (s *service) FindByID(id string) (*Transaction, error) {
-	return s.repository.FindByID(id)
-}
-
-func (s *service) FindAll() ([]Transaction, error) {
-	return s.repository.FindAll()
 }
 
 func (s *service) Update(id string, dto UpdateTransactionRequest) (*Transaction, error) {
@@ -57,7 +49,7 @@ func (s *service) Update(id string, dto UpdateTransactionRequest) (*Transaction,
 	if dto.CategoryID != "" {
 		model.CategoryID = dto.CategoryID
 	}
-	if dto.PaidAt != nil {
+	if dto.PaidAt != "" {
 		model.PaidAt = parseTransactionDate(dto.PaidAt)
 	}
 	return s.repository.Update(model)
@@ -68,4 +60,29 @@ func (s *service) Delete(id string) error {
 		return errors.New("transaction id is required")
 	}
 	return s.repository.Delete(id)
+}
+
+func (s *service) FindByID(id string) (*Transaction, error) {
+	return s.repository.FindByID(id)
+}
+
+// ACTUAL
+
+func (s *service) CreateActual(dto CreateActualTransactionRequest) (*Transaction, error) {
+	model := CreateActualRequestToModel(dto)
+	return s.repository.Create(&model)
+}
+
+func (s *service) FindAllActual() ([]Transaction, error) {
+	return s.repository.FindAllActual()
+}
+
+// PLANNED
+func (s *service) CreatePlanned(dto CreatePlannedTransactionRequest) (*Transaction, error) {
+	model := CreatePlannedRequestToModel(dto)
+	return s.repository.Create(&model)
+}
+
+func (s *service) FindAllPlanned() ([]Transaction, error) {
+	return s.repository.FindAllPlanned()
 }
