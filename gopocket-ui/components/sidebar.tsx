@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   BanknotesIcon,
   ChartBarIcon,
+  ClipboardDocumentListIcon,
   TagIcon,
 } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
@@ -28,6 +29,11 @@ export function Sidebar() {
       href: "/transactions",
       label: t("navigation.transactions"),
       icon: BanknotesIcon,
+    },
+    {
+      href: "/planned",
+      label: "Planned",
+      icon: ClipboardDocumentListIcon,
     },
   ];
 

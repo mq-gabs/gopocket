@@ -40,4 +40,5 @@ type TransactionResponse struct {
 	Type        string  `json:"type"`
 	CategoryID  string  `json:"category_id"`
 	PaidAt      *string `json:"paid_at"`
+	DueAt       string  `json:"due_at"`
 }

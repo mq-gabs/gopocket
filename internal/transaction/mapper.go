@@ -7,7 +7,11 @@ import (
 
 // ToResponse maps the database model to the public DTO.
 func ToResponse(model *Transaction) TransactionResponse {
-	paidAt := model.PaidAt.Format(time.RFC3339)
+	var paidAt *string
+	if model.PaidAt != nil {
+		f := model.PaidAt.Format(time.RFC3339)
+		paidAt = &f
+	}
 	return TransactionResponse{
 		ID:          model.ID,
 		Title:       model.Title,
@@ -15,7 +19,8 @@ func ToResponse(model *Transaction) TransactionResponse {
 		Amount:      model.Amount,
 		Type:        string(model.Type),
 		CategoryID:  model.CategoryID,
-		PaidAt:      &paidAt,
+		PaidAt:      paidAt,
+		DueAt:       model.DueAt.Format(time.RFC3339),
 	}
 }
 
