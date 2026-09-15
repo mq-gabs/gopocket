@@ -185,7 +185,7 @@ export default function DashboardPage() {
                         {formatCurrencyString(transaction.amount)}
                       </td>
                       <td className="text-base-content/65">
-                        {formatDate(transaction.transaction_date, locale)}
+                        {formatDate(transaction.paid_at, locale)}
                       </td>
                     </tr>
                   ))}

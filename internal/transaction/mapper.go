@@ -7,6 +7,7 @@ import (
 
 // ToResponse maps the database model to the public DTO.
 func ToResponse(model *Transaction) TransactionResponse {
+	paidAt := model.PaidAt.Format(time.RFC3339)
 	return TransactionResponse{
 		ID:              model.ID,
 		Title:           model.Title,
@@ -14,7 +15,7 @@ func ToResponse(model *Transaction) TransactionResponse {
 		Amount:          model.Amount,
 		Type:            string(model.Type),
 		CategoryID:      model.CategoryID,
-		TransactionDate: model.TransactionDate.Format(time.RFC3339),
+		PaidAt:&paidAt, 
 	}
 }
 
@@ -26,19 +27,21 @@ func CreateRequestToModel(dto CreateTransactionRequest) Transaction {
 		Amount:          dto.Amount,
 		Type:            transactiontype.TransactionType(dto.Type),
 		CategoryID:      dto.CategoryID,
-		TransactionDate: parseTransactionDate(dto.TransactionDate),
+		PaidAt: parseTransactionDate(dto.PaidAt),
 	}
 }
 
-func parseTransactionDate(value string) time.Time {
-	if value == "" {
-		return time.Now()
+func parseTransactionDate(value *string) *time.Time {
+	if value == nil || *value == "" {
+		now := time.Now()
+		return &now 
 	}
-	parsed, err := time.Parse(time.RFC3339, value)
+	parsed, err := time.Parse(time.RFC3339, *value)
 	if err != nil {
-		return time.Now()
+		now := time.Now()
+		return &now 
 	}
-	return parsed
+	return &parsed
 }
 
 // UpdateRequestToModel maps an update request DTO to the database model.

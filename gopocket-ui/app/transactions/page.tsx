@@ -179,9 +179,7 @@ export default function TransactionsPage() {
                       )}
                     </td>
                     <td className="text-foreground/80">
-                      <span>
-                        {formatDate(transaction.transaction_date, locale)}
-                      </span>
+                      <span>{formatDate(transaction.paid_at, locale)}</span>
                     </td>
                     <td>
                       <div className="flex gap-2">

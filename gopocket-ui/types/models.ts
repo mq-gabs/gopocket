@@ -15,7 +15,7 @@ export type Transaction = {
   amount: number;
   type: TransactionType;
   category_id: string;
-  transaction_date: string;
+  paid_at: string;
   category?: Category;
 };
 
@@ -39,7 +39,7 @@ export interface CreateTransactionPayload {
   amount: number;
   type: TransactionType;
   category_id: string;
-  transaction_date?: string;
+  paid_at?: string;
 }
 
 export type UpdateTransactionPayload = {
@@ -48,7 +48,7 @@ export type UpdateTransactionPayload = {
   amount?: number;
   type?: TransactionType;
   category_id?: string;
-  transaction_date?: string;
+  paid_at?: string;
 };
 
 export const dashboardModes = ["month", "year"] as const;

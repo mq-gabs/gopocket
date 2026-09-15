@@ -57,8 +57,8 @@ func (s *service) Update(id string, dto UpdateTransactionRequest) (*Transaction,
 	if dto.CategoryID != "" {
 		model.CategoryID = dto.CategoryID
 	}
-	if dto.TransactionDate != "" {
-		model.TransactionDate = parseTransactionDate(dto.TransactionDate)
+	if dto.PaidAt != nil {
+		model.PaidAt = parseTransactionDate(dto.PaidAt)
 	}
 	return s.repository.Update(model)
 }

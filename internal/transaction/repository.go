@@ -42,7 +42,7 @@ func (r *repository) FindByID(id string) (*Transaction, error) {
 
 func (r *repository) FindAll() ([]Transaction, error) {
 	var transactions []Transaction
-	if err := r.db.Find(&transactions).Error; err != nil {
+	if err := r.db.Where("paid_at IS NOT NULL").Find(&transactions).Error; err != nil {
 		return nil, err
 	}
 	return transactions, nil

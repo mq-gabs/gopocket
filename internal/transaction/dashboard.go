@@ -102,9 +102,9 @@ func buildDashboard(transactions []Transaction, mode string, start, end time.Tim
 	expenses := map[string]int{}
 	balanceByPeriod := map[string]int{}
 	for _, transaction := range transactions {
-		period := transaction.TransactionDate
-		if period.IsZero() {
-			period = transaction.CreatedAt
+		period := transaction.PaidAt
+		if period == nil || period.IsZero() {
+			period = &transaction.CreatedAt
 		}
 		label := period.Format("2006-01-02")
 		if mode == "year" {

@@ -7,7 +7,7 @@ type CreateTransactionRequest struct {
 	Amount          int    `json:"amount"`
 	Type            string `json:"type"`
 	CategoryID      string `json:"category_id"`
-	TransactionDate string `json:"transaction_date,omitempty"`
+	PaidAt *string `json:"paid_at,omitempty"`
 }
 
 // UpdateTransactionRequest is the request payload for updating a transaction.
@@ -17,7 +17,7 @@ type UpdateTransactionRequest struct {
 	Amount          int    `json:"amount,omitempty"`
 	Type            string `json:"type,omitempty"`
 	CategoryID      string `json:"category_id,omitempty"`
-	TransactionDate string `json:"transaction_date,omitempty"`
+	PaidAt *string `json:"paid_at,omitempty"`
 }
 
 // TransactionResponse is the public response payload for a transaction.
@@ -28,5 +28,5 @@ type TransactionResponse struct {
 	Amount          int    `json:"amount"`
 	Type            string `json:"type"`
 	CategoryID      string `json:"category_id"`
-	TransactionDate string `json:"transaction_date"`
+	PaidAt *string `json:"paid_at"`
 }
