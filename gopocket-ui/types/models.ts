@@ -1,37 +1,37 @@
 import { TransactionType } from "./transaction-type";
 
-export type Category =  {
+export type Category = {
   id: string;
   name: string;
   color: string;
   icon: string;
   type: TransactionType;
-}
+};
 
-export type Transaction =  {
+export type Transaction = {
   id: string;
   title: string;
   description: string;
   amount: number;
   type: TransactionType;
   category_id: string;
-  transaction_date: Date;
+  transaction_date: string;
   category?: Category;
-}
+};
 
-export type CreateCategoryPayload =  {
+export type CreateCategoryPayload = {
   name: string;
   color: string;
   icon: string;
   type: TransactionType;
-}
+};
 
 export type UpdateCategoryPayload = {
   name?: string;
   color?: string;
   icon?: string;
   type?: TransactionType;
-}
+};
 
 export interface CreateTransactionPayload {
   title: string;
@@ -42,23 +42,23 @@ export interface CreateTransactionPayload {
   transaction_date?: string;
 }
 
-export type UpdateTransactionPayload =  {
+export type UpdateTransactionPayload = {
   title?: string;
   description?: string;
   amount?: number;
   type?: TransactionType;
   category_id?: string;
   transaction_date?: string;
-}
+};
 
-export const dashboardModes = ["month", "year"] as const
-export type DashboardMode = typeof dashboardModes[number]
+export const dashboardModes = ["month", "year"] as const;
+export type DashboardMode = (typeof dashboardModes)[number];
 
-export type DashboardTrend = { label: string; balance: number }
-export type DashboardExpense = { category: string; amount: number }
+export type DashboardTrend = { label: string; balance: number };
+export type DashboardExpense = { category: string; amount: number };
 
 export type DashboardData = {
-  mode:DashboardMode; 
+  mode: DashboardMode;
   start_date: string;
   end_date: string;
   summary: {
@@ -67,10 +67,10 @@ export type DashboardData = {
     total_expenses: number;
   };
   trend: DashboardTrend[];
-  expenses: DashboardExpense[]; 
+  expenses: DashboardExpense[];
   recent_transactions: Transaction[];
   page: number;
   page_size: number;
   total_transactions: number;
   total_pages: number;
-}
+};
