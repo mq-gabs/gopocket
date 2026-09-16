@@ -46,13 +46,10 @@ func (s *service) Update(id string, dto UpdateTransactionRequest) (*Transaction,
 	if dto.Type != "" {
 		model.Type = transactiontype.TransactionType(dto.Type)
 	}
-	if dto.CategoryID != "" {
-		model.CategoryID = dto.CategoryID
-	}
 	if dto.PaidAt != "" {
 		model.PaidAt = parseTransactionDate(dto.PaidAt)
 	}
-	return s.repository.Update(model)
+	return s.repository.Update(model, dto.CategoryIDs)
 }
 
 func (s *service) Delete(id string) error {
@@ -70,7 +67,7 @@ func (s *service) FindByID(id string) (*Transaction, error) {
 
 func (s *service) CreateActual(dto CreateActualTransactionRequest) (*Transaction, error) {
 	model := CreateActualRequestToModel(dto)
-	return s.repository.Create(&model)
+	return s.repository.Create(&model, dto.CategoryIDs)
 }
 
 func (s *service) FindAllActual() ([]Transaction, error) {
@@ -80,7 +77,7 @@ func (s *service) FindAllActual() ([]Transaction, error) {
 // PLANNED
 func (s *service) CreatePlanned(dto CreatePlannedTransactionRequest) (*Transaction, error) {
 	model := CreatePlannedRequestToModel(dto)
-	return s.repository.Create(&model)
+	return s.repository.Create(&model, dto.CategoryIDs)
 }
 
 func (s *service) FindAllPlanned() ([]Transaction, error) {

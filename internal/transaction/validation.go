@@ -5,17 +5,19 @@ import (
 	"gopocket/internal/transaction/transactiontype"
 
 	"github.com/mq-gabs/vld/validator/vnumber"
+	"github.com/mq-gabs/vld/validator/vslices"
 	"github.com/mq-gabs/vld/validator/vstring"
 )
 
 var (
-	validateTitle       = vstring.String("title", vstring.MinLen(4), vstring.MaxLen(64))
-	validateDescription = vstring.String("description", vstring.MaxLen(512))
-	validateAmount      = vnumber.Number("amount", vnumber.IsNonZero[int]())
-	validateType        = vstring.String("type", vstring.OneOf(string(transactiontype.TransactionTypeExpense), string(transactiontype.TransactionTypeIncome)))
-	validateCategoryID  = vstring.String("categoryId", vstring.UUIDv4())
-	validatePaidAt      = vstring.String("paidAt", vstring.Required())
-	validateDueAt       = vstring.String("paidAt", vstring.Required())
+	validateTitle          = vstring.String("title", vstring.MinLen(4), vstring.MaxLen(64))
+	validateDescription    = vstring.String("description", vstring.MaxLen(512))
+	validateAmount         = vnumber.Number("amount", vnumber.IsNonZero[int]())
+	validateType           = vstring.String("type", vstring.OneOf(string(transactiontype.TransactionTypeExpense), string(transactiontype.TransactionTypeIncome)))
+	validateCategoryIDItem = vstring.String("categoryId", vstring.UUIDv4())
+	validateCategoryIDs    = vslices.Slice("categoryIds", vslices.Required[string](), vslices.Each(validateCategoryIDItem))
+	validatePaidAt         = vstring.String("paidAt", vstring.Required())
+	validateDueAt          = vstring.String("paidAt", vstring.Required())
 )
 
 // ValidateCreateActualTransaction is a placeholder validation hook for future rules.
@@ -25,7 +27,7 @@ func ValidateCreateActualTransaction(dto CreateActualTransactionRequest) error {
 		validateDescription(dto.Description),
 		validateAmount(dto.Amount),
 		validateType(dto.Type),
-		validateCategoryID(dto.CategoryID),
+		validateCategoryIDs(dto.CategoryIDs),
 		validatePaidAt(dto.PaidAt),
 	)
 }
@@ -37,7 +39,7 @@ func ValidateCreatePlannedTransaction(dto CreatePlannedTransactionRequest) error
 		validateDescription(dto.Description),
 		validateAmount(dto.Amount),
 		validateType(dto.Type),
-		validateCategoryID(dto.CategoryID),
+		validateCategoryIDs(dto.CategoryIDs),
 		validatePaidAt(dto.PaidAt),
 		validateDueAt(dto.DueAt),
 	)
@@ -45,5 +47,9 @@ func ValidateCreatePlannedTransaction(dto CreatePlannedTransactionRequest) error
 
 // ValidateUpdateTransaction is a placeholder validation hook for future rules.
 func ValidateUpdateTransaction(dto UpdateTransactionRequest) error {
-	return nil
+	if dto.CategoryIDs == nil {
+		return nil
+	}
+
+	return vslices.Slice("categoryIds", vslices.Each(validateCategoryIDItem))(dto.CategoryIDs)
 }

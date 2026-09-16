@@ -14,9 +14,8 @@ export type ActualTransaction = {
   description: string;
   amount: number;
   type: TransactionType;
-  category_id: string;
+  category_ids: string[];
   paid_at: string;
-  category?: Category;
 };
 
 export type PlannedTransaction = {
@@ -25,10 +24,9 @@ export type PlannedTransaction = {
   description: string;
   amount: number;
   type: TransactionType;
-  category_id: string;
+  category_ids: string[];
   paid_at: string;
   due_at: string;
-  category?: Category;
 };
 
 export type CreateCategoryPayload = {
@@ -50,7 +48,7 @@ export interface CreateActualTransactionPayload {
   description: string;
   amount: number;
   type: TransactionType;
-  category_id: string;
+  category_ids: string[];
   paid_at: string;
 }
 
@@ -59,7 +57,7 @@ export interface CreatePlannedTransactionPayload {
   description: string;
   amount: number;
   type: TransactionType;
-  category_id: string;
+  category_ids: string[];
   paid_at: string;
   due_at: string;
 }
@@ -69,7 +67,7 @@ export type UpdateTransactionPayload = {
   description?: string;
   amount?: number;
   type?: TransactionType;
-  category_id?: string;
+  category_ids?: string[];
   paid_at?: string;
 };
 

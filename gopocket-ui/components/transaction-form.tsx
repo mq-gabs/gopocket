@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
@@ -10,6 +10,7 @@ import type {
 } from "@/types/models";
 import { Button } from "./button";
 import { SelectLabel } from "./select/select-label";
+import { CategoryMultiSelect } from "./category-multi-select";
 import { CurrencyInput } from "./inputs/currency-input";
 import { InputLabel } from "./inputs/input-label";
 import { TextareaLabel } from "./textarea/textarea-label";
@@ -55,22 +56,36 @@ export function TransactionForm({
   const [type, setType] = useState(
     initialValues?.type ?? TransactionType.EXPENSE,
   );
-  const [categoryId, setCategoryId] = useState(
-    initialValues?.category_id ?? categories[0]?.id ?? "",
+  const [categoryIds, setCategoryIds] = useState<string[]>(
+    initialValues?.category_ids ?? [],
   );
+  const [categoryError, setCategoryError] = useState<string | null>(null);
   const [transactionDate, setTransactionDate] = useState(
     initialValues?.paid_at?.slice(0, 10) ??
       new Date().toISOString().slice(0, 10),
   );
 
+  const handleCategoryChange = (ids: string[]) => {
+    setCategoryIds(ids);
+    if (ids.length > 0) {
+      setCategoryError(null);
+    }
+  };
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+
+    if (!initialValues && categoryIds.length === 0) {
+      setCategoryError(t("common.required"));
+      return;
+    }
+
     const payload: UpdateTransactionPayload & Partial<CreateActualTransactionPayload> = {
       title,
       description,
       amount,
       type,
-      category_id: categoryId,
+      category_ids: categoryIds,
     };
 
     if (includeDate) {
@@ -79,8 +94,6 @@ export function TransactionForm({
 
     onSubmit(payload as CreateActualTransactionPayload | UpdateTransactionPayload);
   };
-
-  const categoryOptions = useMemo(() => categories, [categories]);
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
@@ -126,15 +139,13 @@ export function TransactionForm({
         />
       )}
 
-      <SelectLabel
+      <CategoryMultiSelect
         id="category"
         label={t("transactions.form.category")}
-        value={categoryId}
-        onChange={(event) => setCategoryId(event.target.value)}
-        options={categoryOptions.map((category) => ({
-          value: category.id,
-          label: category.name,
-        }))}
+        categories={categories}
+        selectedIds={categoryIds}
+        onChange={handleCategoryChange}
+        error={categoryError ?? undefined}
       />
 
       <div className="flex justify-end gap-2">

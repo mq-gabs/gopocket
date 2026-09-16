@@ -116,11 +116,17 @@ func buildDashboard(transactions []Transaction, mode string, start, end time.Tim
 		} else {
 			response.Summary.TotalExpenses += transaction.Amount
 			balanceByPeriod[label] -= transaction.Amount
-			category := transaction.Category.Name
-			if category == "" {
-				category = "Uncategorized"
+			if len(transaction.Categories) == 0 {
+				expenses["Uncategorized"] += transaction.Amount
+				continue
 			}
-			expenses[category] += transaction.Amount
+			for _, transactionCategory := range transaction.Categories {
+				name := transactionCategory.Name
+				if name == "" {
+					name = "Uncategorized"
+				}
+				expenses[name] += transaction.Amount
+			}
 		}
 	}
 	response.Summary.TotalBalance = response.Summary.TotalIncome - response.Summary.TotalExpenses

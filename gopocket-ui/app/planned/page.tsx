@@ -5,7 +5,7 @@ import { CheckIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Table, { TableColumn } from "@/components/tables/table";
 import { RowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
-import CategoryBadge from "@/components/category-badge";
+import { CategoryBadgesCell } from "@/components/tables/category-badges-cell";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Modal } from "@/components/modal";
 import { TransactionForm } from "@/components/transaction-form";
@@ -14,6 +14,7 @@ import { useCategories } from "@/contexts/category-context";
 import { useRequest } from "@/hooks/use-request";
 import { transactionService } from "@/services/transaction.service";
 import type {
+  Category,
   PlannedTransaction,
   UpdateTransactionPayload,
 } from "@/types/models";
@@ -118,15 +119,10 @@ export default function PlannedPage() {
       key: "category",
       header: t("transactions.table.category"),
       render: (row) => {
-        const category = categoryMap.get(row.category_id);
-        return category ? (
-          <CategoryBadge
-            category={category}
-            className="w-full block text-center"
-          />
-        ) : (
-          <span className="text-foreground/60">—</span>
-        );
+        const rowCategories = row.category_ids
+          .map((id) => categoryMap.get(id))
+          .filter((category): category is Category => category !== undefined);
+        return <CategoryBadgesCell categories={rowCategories} />;
       },
     },
     {

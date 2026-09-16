@@ -14,8 +14,7 @@ type Transaction struct {
 	Description string                          `gorm:"type:text"`
 	Amount      int                             `gorm:"not null"`
 	Type        transactiontype.TransactionType `gorm:"type:text;not null"`
-	CategoryID  string                          `gorm:"type:text;not null;index"`
-	Category    category.Category               `gorm:"foreignKey:CategoryID;references:ID"`
+	Categories  []category.Category             `gorm:"many2many:transaction_categories;"`
 	PaidAt      *time.Time                      `gorm:"index"`
 	DueAt       time.Time                       `gorm:"index"`
 }

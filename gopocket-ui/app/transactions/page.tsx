@@ -9,12 +9,13 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useCategories } from "@/contexts/category-context";
 import { transactionService } from "@/services/transaction.service";
 import type {
+  Category,
   CreateActualTransactionPayload,
   ActualTransaction,
   UpdateTransactionPayload,
 } from "@/types/models";
 import { Button } from "@/components/button";
-import CategoryBadge from "@/components/category-badge";
+import { CategoryBadgesCell } from "@/components/tables/category-badges-cell";
 import { formatDate } from "@/utils/time";
 import Table, { TableColumn } from "@/components/tables/table";
 import { RowActions } from "@/components/tables/row-actions";
@@ -121,15 +122,10 @@ export default function TransactionsPage() {
       key: "category",
       header: t("transactions.table.category"),
       render: (row) => {
-        const category = categoryMap.get(row.category_id);
-        return category ? (
-          <CategoryBadge
-            category={category}
-            className="w-full block text-center"
-          />
-        ) : (
-          <span className="text-foreground/60">—</span>
-        );
+        const rowCategories = row.category_ids
+          .map((id) => categoryMap.get(id))
+          .filter((category): category is Category => category !== undefined);
+        return <CategoryBadgesCell categories={rowCategories} />;
       },
     },
     {
