@@ -14,7 +14,6 @@ import type {
   UpdateTransactionPayload,
 } from "@/types/models";
 import { Button } from "@/components/button";
-import TransactionIcon from "@/components/transaction-icon";
 import CategoryBadge from "@/components/category-badge";
 import { formatDate } from "@/utils/time";
 import Table, { TableColumn } from "@/components/tables/table";
@@ -117,11 +116,6 @@ export default function TransactionsPage() {
       key: "amount",
       header: t("transactions.table.amount"),
       render: (row) => <AmountCell amount={row.amount} type={row.type} />,
-    },
-    {
-      key: "type",
-      header: t("transactions.table.type"),
-      render: (row) => <TransactionIcon type={row.type} />,
     },
     {
       key: "category",

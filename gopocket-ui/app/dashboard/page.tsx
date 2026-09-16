@@ -18,7 +18,6 @@ import type {
   DashboardMode,
 } from "@/types/models";
 import { formatCurrencyString } from "@/utils/currency";
-import TransactionIcon from "@/components/transaction-icon";
 import { formatDate } from "@/utils/time";
 import BalanceTrend from "@/components/charts/balance-trend-chart";
 import ExpenseChart from "@/components/charts/expenses-chart";
@@ -217,11 +216,6 @@ function buildRecentTransactionsColumns(
       header: t("transactions.table.title"),
       className: "font-medium",
       render: (row) => row.title,
-    },
-    {
-      key: "type",
-      header: t("transactions.table.type"),
-      render: (row) => <TransactionIcon type={row.type} />,
     },
     {
       key: "amount",

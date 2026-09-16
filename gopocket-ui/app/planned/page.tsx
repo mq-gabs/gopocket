@@ -1,15 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  CheckCircleIcon,
-  PencilIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import { CheckIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Table, { TableColumn } from "@/components/tables/table";
 import { RowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
-import TransactionIcon from "@/components/transaction-icon";
 import CategoryBadge from "@/components/category-badge";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Modal } from "@/components/modal";
@@ -115,11 +110,6 @@ export default function PlannedPage() {
       render: (row) => row.description || "—",
     },
     {
-      key: "type",
-      header: t("transactions.table.type"),
-      render: (row) => <TransactionIcon type={row.type} />,
-    },
-    {
       key: "amount",
       header: t("transactions.table.amount"),
       render: (row) => <AmountCell amount={row.amount} type={row.type} />,
@@ -155,7 +145,7 @@ export default function PlannedPage() {
               ? []
               : [
                   {
-                    icon: CheckCircleIcon,
+                    icon: CheckIcon,
                     label: t("actions.markAsPaid"),
                     variation: "primary" as const,
                     onClick: () => handleMarkAsPaid(row),
