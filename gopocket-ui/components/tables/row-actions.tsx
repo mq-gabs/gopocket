@@ -45,7 +45,7 @@ export function HoverRowActions({
   return (
     <div
       className={cls(
-        "absolute inset-y-0 right-2 z-10 flex items-center gap-2 rounded-lg bg-background pl-3 shadow-md transition-opacity duration-150 bottom-[32] top-[-32]",
+        "absolute inset-y-0 right-2 z-10 flex items-center gap-2 rounded-lg bg-background pl-3 shadow-md border border-foreground/10  transition-opacity duration-150 bottom-[32] top-[-32] ",
         isRowHovered ? "opacity-100" : "pointer-events-none opacity-0",
       )}
     >
