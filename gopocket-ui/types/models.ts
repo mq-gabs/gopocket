@@ -56,7 +56,6 @@ export interface CreatePlannedTransactionPayload {
   amount: number;
   type: TransactionType;
   category_ids: string[];
-  paid_at: string;
   due_at: string;
 }
 
@@ -67,6 +66,16 @@ export type UpdateTransactionPayload = {
   type?: TransactionType;
   category_ids?: string[];
   paid_at?: string;
+};
+
+export type TransactionListFilters = {
+  q?: string;
+  category_ids?: string[];
+  type?: TransactionType;
+  /** RFC3339 timestamp. */
+  start_date?: string;
+  /** RFC3339 timestamp, or the literal "now". */
+  end_date?: string;
 };
 
 export const dashboardModes = ["month", "year"] as const;

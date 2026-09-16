@@ -8,6 +8,17 @@ import (
 	"gorm.io/gorm"
 )
 
+// TransactionFilter represents parsed filter criteria applied when listing
+// transactions. StartDate/EndDate are matched against paid_at for actual
+// transactions and due_at for planned ones.
+type TransactionFilter struct {
+	Search      string
+	CategoryIDs []string
+	Type        string
+	StartDate   *time.Time
+	EndDate     *time.Time
+}
+
 // Repository persists transactions in the database.
 type Repository interface {
 	Create(transaction *Transaction, categoryIDs []string) (*Transaction, error)
@@ -15,10 +26,10 @@ type Repository interface {
 	Delete(id string) error
 	FindByID(id string) (*Transaction, error)
 
-	FindAllActual() ([]Transaction, error)
+	FindAllActual(filter TransactionFilter) ([]Transaction, error)
 	FindActualForPeriod(start, end time.Time) ([]Transaction, error)
 
-	FindAllPlanned() ([]Transaction, error)
+	FindAllPlanned(filter TransactionFilter) ([]Transaction, error)
 }
 
 type repository struct {
@@ -98,9 +109,10 @@ func (r *repository) FindByID(id string) (*Transaction, error) {
 
 // ACTUAL
 
-func (r *repository) FindAllActual() ([]Transaction, error) {
+func (r *repository) FindAllActual(filter TransactionFilter) ([]Transaction, error) {
 	var transactions []Transaction
-	if err := withActual(r.db).Preload("Categories").Find(&transactions).Error; err != nil {
+	query := r.applyFilter(withActual(r.db), filter, "paid_at")
+	if err := query.Preload("Categories").Order("paid_at DESC").Find(&transactions).Error; err != nil {
 		return nil, err
 	}
 	return transactions, nil
@@ -117,9 +129,10 @@ func (r *repository) FindActualForPeriod(start, end time.Time) ([]Transaction, e
 
 // PLANNED
 
-func (r *repository) FindAllPlanned() ([]Transaction, error) {
+func (r *repository) FindAllPlanned(filter TransactionFilter) ([]Transaction, error) {
 	var transactions []Transaction
-	if err := withPlanned(r.db).Preload("Categories").Find(&transactions).Error; err != nil {
+	query := r.applyFilter(withPlanned(r.db), filter, "due_at")
+	if err := query.Preload("Categories").Order("due_at ASC").Find(&transactions).Error; err != nil {
 		return nil, err
 	}
 
@@ -134,4 +147,31 @@ func withActual(tx *gorm.DB) *gorm.DB {
 
 func withPlanned(tx *gorm.DB) *gorm.DB {
 	return tx.Where("paid_at IS NULL")
+}
+
+// applyFilter narrows a transaction query by the given filter criteria.
+// dateColumn selects which column (paid_at or due_at) the date range matches.
+func (r *repository) applyFilter(tx *gorm.DB, filter TransactionFilter, dateColumn string) *gorm.DB {
+	if filter.Search != "" {
+		like := "%" + filter.Search + "%"
+		tx = tx.Where("title LIKE ? OR description LIKE ?", like, like)
+	}
+	if filter.Type != "" {
+		tx = tx.Where("type = ?", filter.Type)
+	}
+	if len(filter.CategoryIDs) > 0 {
+		tx = tx.Where(
+			"id IN (?)",
+			r.db.Table("transaction_categories").
+				Select("transaction_id").
+				Where("category_id IN ?", filter.CategoryIDs),
+		)
+	}
+	if filter.StartDate != nil {
+		tx = tx.Where(dateColumn+" >= ?", *filter.StartDate)
+	}
+	if filter.EndDate != nil {
+		tx = tx.Where(dateColumn+" <= ?", *filter.EndDate)
+	}
+	return tx
 }

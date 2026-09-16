@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Modal } from "@/components/modal";
+import { TransactionFiltersBar } from "@/components/transaction-filters";
 import { TransactionForm } from "@/components/transaction-form";
 import { useI18n } from "@/contexts/i18n-context";
 import { useCategories } from "@/contexts/category-context";
@@ -21,10 +22,21 @@ import Table, { TableColumn } from "@/components/tables/table";
 import { RowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
 import { useRequest } from "@/hooks/use-request";
+import { useTransactionFilters } from "@/hooks/use-transaction-filters";
 
 export default function TransactionsPage() {
+  return (
+    <Suspense fallback={null}>
+      <TransactionsPageContent />
+    </Suspense>
+  );
+}
+
+function TransactionsPageContent() {
   const { t, locale } = useI18n();
   const { categoryMap, categories } = useCategories();
+  const { state: filters, setState: setFilters, apiFilters } =
+    useTransactionFilters();
   const [selectedTransaction, setSelectedTransaction] = useState<
     ActualTransaction | undefined
   >();
@@ -38,12 +50,12 @@ export default function TransactionsPage() {
     loading,
     error: transactionsError,
   } = useRequest({
-    callback: () => transactionService.getAllActual(),
+    callback: () => transactionService.getAllActual(apiFilters),
   });
 
   useEffect(() => {
     getTransactions();
-  }, []);
+  }, [apiFilters]);
 
   const openCreate = () => {
     setSelectedTransaction(undefined);
@@ -175,6 +187,12 @@ export default function TransactionsPage() {
           {t("actions.newTransaction")}
         </Button>
       </div>
+
+      <TransactionFiltersBar
+        categories={categories}
+        value={filters}
+        onChange={setFilters}
+      />
 
       {requestError ? (
         <div className="alert alert-error">{requestError}</div>

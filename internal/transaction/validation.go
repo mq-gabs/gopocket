@@ -17,7 +17,7 @@ var (
 	validateCategoryIDItem = vstring.String("categoryId", vstring.UUIDv4())
 	validateCategoryIDs    = vslices.Slice("categoryIds", vslices.Required[string](), vslices.Each(validateCategoryIDItem))
 	validatePaidAt         = vstring.String("paidAt", vstring.Required())
-	validateDueAt          = vstring.String("paidAt", vstring.Required())
+	validateDueAt          = vstring.String("dueAt", vstring.Required())
 )
 
 // ValidateCreateActualTransaction is a placeholder validation hook for future rules.
@@ -33,6 +33,8 @@ func ValidateCreateActualTransaction(dto CreateActualTransactionRequest) error {
 }
 
 // ValidateCreatePlannedTransaction is a placeholder validation hook for future rules.
+// paid_at is intentionally not validated: planned transactions are unpaid
+// until marked as paid, so it is left unset at creation time.
 func ValidateCreatePlannedTransaction(dto CreatePlannedTransactionRequest) error {
 	return errors.Join(
 		validateTitle(dto.Title),
@@ -40,9 +42,24 @@ func ValidateCreatePlannedTransaction(dto CreatePlannedTransactionRequest) error
 		validateAmount(dto.Amount),
 		validateType(dto.Type),
 		validateCategoryIDs(dto.CategoryIDs),
-		validatePaidAt(dto.PaidAt),
 		validateDueAt(dto.DueAt),
 	)
+}
+
+// ValidateListTransactionsQuery validates optional filter parameters accepted
+// by the transaction listing endpoints.
+func ValidateListTransactionsQuery(query ListTransactionsQuery) error {
+	errs := make([]error, 0, len(query.CategoryIDs)+1)
+
+	if query.Type != "" {
+		errs = append(errs, validateType(query.Type))
+	}
+
+	for _, categoryID := range query.CategoryIDs {
+		errs = append(errs, validateCategoryIDItem(categoryID))
+	}
+
+	return errors.Join(errs...)
 }
 
 // ValidateUpdateTransaction is a placeholder validation hook for future rules.

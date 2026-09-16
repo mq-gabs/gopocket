@@ -17,7 +17,7 @@ type CreatePlannedTransactionRequest struct {
 	Amount      int      `json:"amount"`
 	Type        string   `json:"type"`
 	CategoryIDs []string `json:"category_ids"`
-	PaidAt      string   `json:"paid_at"`
+	PaidAt      string   `json:"paid_at,omitempty"`
 	DueAt       string   `json:"due_at"`
 }
 
@@ -29,6 +29,16 @@ type UpdateTransactionRequest struct {
 	Type        string   `json:"type,omitempty"`
 	CategoryIDs []string `json:"category_ids"`
 	PaidAt      string   `json:"paid_at,omitempty"`
+}
+
+// ListTransactionsQuery represents the raw filter parameters accepted by the
+// transaction listing endpoints.
+type ListTransactionsQuery struct {
+	Search      string
+	CategoryIDs []string
+	Type        string
+	StartDate   string
+	EndDate     string
 }
 
 // TransactionResponse is the public response payload for a transaction.

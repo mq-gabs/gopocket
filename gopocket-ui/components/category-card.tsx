@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button } from "./button";
 import { Category } from "@/types/models";
@@ -21,9 +22,12 @@ export function CategoryCard({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div>
+          <Link
+            href={`/transactions?category_ids=${category.id}`}
+            className="transition hover:brightness-110"
+          >
             <CategoryBadge category={category} />
-          </div>
+          </Link>
         </div>
       </div>
       <div className="mt-6 flex justify-end gap-2">

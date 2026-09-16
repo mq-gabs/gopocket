@@ -99,7 +99,13 @@ func (e *Endpoint) getByID(ctx *gin.Context) {
 }
 
 func (e *Endpoint) listActual(ctx *gin.Context) {
-	models, err := e.service.FindAllActual()
+	query := parseListTransactionsQuery(ctx)
+	if err := ValidateListTransactionsQuery(query); err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	models, err := e.service.FindAllActual(query)
 	if err != nil {
 		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -114,7 +120,13 @@ func (e *Endpoint) listActual(ctx *gin.Context) {
 }
 
 func (e *Endpoint) listPlanned(ctx *gin.Context) {
-	models, err := e.service.FindAllPlanned()
+	query := parseListTransactionsQuery(ctx)
+	if err := ValidateListTransactionsQuery(query); err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	models, err := e.service.FindAllPlanned(query)
 	if err != nil {
 		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -126,6 +138,29 @@ func (e *Endpoint) listPlanned(ctx *gin.Context) {
 	}
 
 	ginhttp.WriteSuccess(ctx, http.StatusOK, responses)
+}
+
+// parseListTransactionsQuery reads filter parameters shared by the actual and
+// planned listing endpoints. category_ids accepts repeated query params
+// and/or comma-separated values (e.g. ?category_ids=a,b&category_ids=c).
+func parseListTransactionsQuery(ctx *gin.Context) ListTransactionsQuery {
+	var categoryIDs []string
+	for _, raw := range ctx.QueryArray("category_ids") {
+		for _, id := range strings.Split(raw, ",") {
+			id = strings.TrimSpace(id)
+			if id != "" {
+				categoryIDs = append(categoryIDs, id)
+			}
+		}
+	}
+
+	return ListTransactionsQuery{
+		Search:      strings.TrimSpace(ctx.Query("q")),
+		CategoryIDs: categoryIDs,
+		Type:        strings.TrimSpace(ctx.Query("type")),
+		StartDate:   strings.TrimSpace(ctx.Query("start_date")),
+		EndDate:     strings.TrimSpace(ctx.Query("end_date")),
+	}
 }
 
 func (e *Endpoint) update(ctx *gin.Context) {

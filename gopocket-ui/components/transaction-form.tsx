@@ -5,7 +5,9 @@ import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
   CreateActualTransactionPayload,
+  CreatePlannedTransactionPayload,
   ActualTransaction,
+  PlannedTransaction,
   UpdateTransactionPayload,
 } from "@/types/models";
 import { Button } from "./button";
@@ -16,7 +18,7 @@ import { InputLabel } from "./inputs/input-label";
 import { TextareaLabel } from "./textarea/textarea-label";
 import { TransactionType } from "@/types/transaction-type";
 
-const buildTypeOptions = (t: TranslateFunction) => [
+export const buildTypeOptions = (t: TranslateFunction) => [
   {
     value: TransactionType.EXPENSE,
     label: t("categories.form.type.expense"),
@@ -29,14 +31,19 @@ const buildTypeOptions = (t: TranslateFunction) => [
 
 interface TransactionFormProps {
   categories: Category[];
-  initialValues?: ActualTransaction;
+  initialValues?: ActualTransaction | PlannedTransaction;
   onSubmit: (
-    payload: CreateActualTransactionPayload | UpdateTransactionPayload,
+    payload:
+      | CreateActualTransactionPayload
+      | CreatePlannedTransactionPayload
+      | UpdateTransactionPayload,
   ) => void;
   onCancel?: () => void;
   submitLabel: string;
   /** Set to false to hide the date field and leave paid_at untouched (e.g. editing a planned transaction). */
   includeDate?: boolean;
+  /** Set to true to show the due date field (creating a planned transaction). */
+  includeDueDate?: boolean;
 }
 
 export function TransactionForm({
@@ -46,6 +53,7 @@ export function TransactionForm({
   onCancel,
   submitLabel,
   includeDate = true,
+  includeDueDate = false,
 }: TransactionFormProps) {
   const { t } = useI18n();
   const [title, setTitle] = useState(initialValues?.title ?? "");
@@ -64,6 +72,10 @@ export function TransactionForm({
     initialValues?.paid_at?.slice(0, 10) ??
       new Date().toISOString().slice(0, 10),
   );
+  const [dueDate, setDueDate] = useState(
+    (initialValues as PlannedTransaction | undefined)?.due_at?.slice(0, 10) ??
+      new Date().toISOString().slice(0, 10),
+  );
 
   const handleCategoryChange = (ids: string[]) => {
     setCategoryIds(ids);
@@ -80,7 +92,9 @@ export function TransactionForm({
       return;
     }
 
-    const payload: UpdateTransactionPayload & Partial<CreateActualTransactionPayload> = {
+    const payload: UpdateTransactionPayload &
+      Partial<CreateActualTransactionPayload> &
+      Partial<CreatePlannedTransactionPayload> = {
       title,
       description,
       amount,
@@ -92,7 +106,16 @@ export function TransactionForm({
       payload.paid_at = new Date(`${transactionDate}T12:00:00`).toISOString();
     }
 
-    onSubmit(payload as CreateActualTransactionPayload | UpdateTransactionPayload);
+    if (includeDueDate) {
+      payload.due_at = new Date(`${dueDate}T12:00:00`).toISOString();
+    }
+
+    onSubmit(
+      payload as
+        | CreateActualTransactionPayload
+        | CreatePlannedTransactionPayload
+        | UpdateTransactionPayload,
+    );
   };
 
   return (
@@ -135,6 +158,17 @@ export function TransactionForm({
           type="date"
           value={transactionDate}
           onChange={(event) => setTransactionDate(event.target.value)}
+          required
+        />
+      )}
+
+      {includeDueDate && (
+        <InputLabel
+          id="transaction-due-date"
+          label={t("planned.form.dueAt")}
+          type="date"
+          value={dueDate}
+          onChange={(event) => setDueDate(event.target.value)}
           required
         />
       )}

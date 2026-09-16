@@ -14,10 +14,10 @@ type Service interface {
 	Dashboard(query DashboardQuery) (*DashboardResponse, error)
 
 	CreateActual(dto CreateActualTransactionRequest) (*Transaction, error)
-	FindAllActual() ([]Transaction, error)
+	FindAllActual(query ListTransactionsQuery) ([]Transaction, error)
 
 	CreatePlanned(dto CreatePlannedTransactionRequest) (*Transaction, error)
-	FindAllPlanned() ([]Transaction, error)
+	FindAllPlanned(query ListTransactionsQuery) ([]Transaction, error)
 }
 
 type service struct {
@@ -70,8 +70,8 @@ func (s *service) CreateActual(dto CreateActualTransactionRequest) (*Transaction
 	return s.repository.Create(&model, dto.CategoryIDs)
 }
 
-func (s *service) FindAllActual() ([]Transaction, error) {
-	return s.repository.FindAllActual()
+func (s *service) FindAllActual(query ListTransactionsQuery) ([]Transaction, error) {
+	return s.repository.FindAllActual(toTransactionFilter(query))
 }
 
 // PLANNED
@@ -80,6 +80,6 @@ func (s *service) CreatePlanned(dto CreatePlannedTransactionRequest) (*Transacti
 	return s.repository.Create(&model, dto.CategoryIDs)
 }
 
-func (s *service) FindAllPlanned() ([]Transaction, error) {
-	return s.repository.FindAllPlanned()
+func (s *service) FindAllPlanned(query ListTransactionsQuery) ([]Transaction, error) {
+	return s.repository.FindAllPlanned(toTransactionFilter(query))
 }

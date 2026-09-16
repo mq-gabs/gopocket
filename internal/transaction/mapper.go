@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"gopocket/internal/transaction/transactiontype"
+	"strings"
 	"time"
 )
 
@@ -52,9 +53,33 @@ func CreatePlannedRequestToModel(dto CreatePlannedTransactionRequest) Transactio
 		Description: dto.Description,
 		Amount:      dto.Amount,
 		Type:        transactiontype.TransactionType(dto.Type),
-		PaidAt:      parseTransactionDate(dto.PaidAt),
+		PaidAt:      parseOptionalTransactionDate(dto.PaidAt),
 		DueAt:       *parseTransactionDate(dto.DueAt),
 	}
+}
+
+// toTransactionFilter parses raw query parameters into a repository-ready
+// filter. EndDate accepts the literal "now" to mean the current instant.
+// Unparseable or empty dates leave the corresponding bound unset.
+func toTransactionFilter(query ListTransactionsQuery) TransactionFilter {
+	filter := TransactionFilter{
+		Search:      strings.TrimSpace(query.Search),
+		CategoryIDs: query.CategoryIDs,
+		Type:        query.Type,
+	}
+
+	if parsed, err := time.Parse(time.RFC3339, query.StartDate); err == nil {
+		filter.StartDate = &parsed
+	}
+
+	if strings.EqualFold(strings.TrimSpace(query.EndDate), "now") {
+		now := time.Now()
+		filter.EndDate = &now
+	} else if parsed, err := time.Parse(time.RFC3339, query.EndDate); err == nil {
+		filter.EndDate = &parsed
+	}
+
+	return filter
 }
 
 func parseTransactionDate(value string) *time.Time {
@@ -66,6 +91,20 @@ func parseTransactionDate(value string) *time.Time {
 	if err != nil {
 		now := time.Now()
 		return &now
+	}
+	return &parsed
+}
+
+// parseOptionalTransactionDate parses an RFC3339 timestamp, leaving it unset
+// (nil) when the value is empty or malformed. Used for planned transactions,
+// whose paid_at is only populated once they are marked as paid.
+func parseOptionalTransactionDate(value string) *time.Time {
+	if value == "" {
+		return nil
+	}
+	parsed, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		return nil
 	}
 	return &parsed
 }

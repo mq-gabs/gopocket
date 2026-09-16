@@ -1,28 +1,47 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CheckIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { Suspense, useEffect, useState } from "react";
+import {
+  CheckIcon,
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import Table, { TableColumn } from "@/components/tables/table";
 import { RowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
+import { Button } from "@/components/button";
 import { CategoryBadgesCell } from "@/components/tables/category-badges-cell";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Modal } from "@/components/modal";
+import { TransactionFiltersBar } from "@/components/transaction-filters";
 import { TransactionForm } from "@/components/transaction-form";
 import { useI18n } from "@/contexts/i18n-context";
 import { useCategories } from "@/contexts/category-context";
 import { useRequest } from "@/hooks/use-request";
+import { useTransactionFilters } from "@/hooks/use-transaction-filters";
 import { transactionService } from "@/services/transaction.service";
 import type {
   Category,
+  CreatePlannedTransactionPayload,
   PlannedTransaction,
   UpdateTransactionPayload,
 } from "@/types/models";
 import { formatDate } from "@/utils/time";
 
 export default function PlannedPage() {
+  return (
+    <Suspense fallback={null}>
+      <PlannedPageContent />
+    </Suspense>
+  );
+}
+
+function PlannedPageContent() {
   const { t, locale } = useI18n();
   const { categories, categoryMap } = useCategories();
+  const { state: filters, setState: setFilters, apiFilters } =
+    useTransactionFilters();
   const [selectedPlanned, setSelectedPlanned] = useState<
     PlannedTransaction | undefined
   >();
@@ -36,12 +55,17 @@ export default function PlannedPage() {
     result: plannedTransactions,
     error: plannedError,
   } = useRequest({
-    callback: () => transactionService.getAllPlanned(),
+    callback: () => transactionService.getAllPlanned(apiFilters),
   });
 
   useEffect(() => {
     getAllPlanned();
-  }, []);
+  }, [apiFilters]);
+
+  const openCreate = () => {
+    setSelectedPlanned(undefined);
+    setIsModalOpen(true);
+  };
 
   const openEdit = (planned: PlannedTransaction) => {
     setSelectedPlanned(planned);
@@ -58,13 +82,20 @@ export default function PlannedPage() {
     setSelectedPlanned(undefined);
   };
 
-  const handleSubmit = async (payload: UpdateTransactionPayload) => {
-    if (!selectedPlanned) {
-      return;
-    }
-
+  const handleSubmit = async (
+    payload: CreatePlannedTransactionPayload | UpdateTransactionPayload,
+  ) => {
     try {
-      await transactionService.update(selectedPlanned.id, payload);
+      if (selectedPlanned) {
+        await transactionService.update(
+          selectedPlanned.id,
+          payload as UpdateTransactionPayload,
+        );
+      } else {
+        await transactionService.createPlanned(
+          payload as CreatePlannedTransactionPayload,
+        );
+      }
       setIsModalOpen(false);
       getAllPlanned();
     } catch (err) {
@@ -168,14 +199,26 @@ export default function PlannedPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold text-base-content">
-          {t("planned.title")}
-        </h1>
-        <p className="mt-2 text-sm text-base-content/70">
-          {t("planned.description")}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold text-base-content">
+            {t("planned.title")}
+          </h1>
+          <p className="mt-2 text-sm text-base-content/70">
+            {t("planned.description")}
+          </p>
+        </div>
+        <Button onClick={openCreate}>
+          <PlusIcon className="h-5 w-5" />
+          {t("actions.newPlanned")}
+        </Button>
       </div>
+
+      <TransactionFiltersBar
+        categories={categories}
+        value={filters}
+        onChange={setFilters}
+      />
 
       {requestError ? (
         <div className="alert alert-error">{requestError}</div>
@@ -195,7 +238,11 @@ export default function PlannedPage() {
       ) : null}
 
       <Modal
-        title={t("planned.form.title.edit")}
+        title={
+          selectedPlanned
+            ? t("planned.form.title.edit")
+            : t("planned.form.title.create")
+        }
         open={isModalOpen}
         onClose={handleCloseModal}
       >
@@ -204,6 +251,7 @@ export default function PlannedPage() {
           initialValues={selectedPlanned}
           submitLabel={t("actions.save")}
           includeDate={false}
+          includeDueDate={!selectedPlanned}
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}
         />
