@@ -31,7 +31,6 @@ export default function DashboardPage() {
   const { t, locale } = useI18n();
   const [mode, setMode] = useState<DashboardMode>("month");
   const [date, setDate] = useState(currentMonth);
-  const [page, setPage] = useState(1);
   const [data, setData] = useState<DashboardData | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -39,18 +38,17 @@ export default function DashboardPage() {
 
   useEffect(() => {
     void transactionService
-      .getDashboard(mode, date, page)
+      .getDashboard(mode, date)
       .then(setData)
       .catch((err: unknown) =>
         setError(err instanceof Error ? err.message : t("common.error")),
       )
       .finally(() => setLoading(false));
-  }, [date, mode, page, t]);
+  }, [date, mode, t]);
 
   const changeMode = (nextMode: DashboardMode) => {
     setMode(nextMode);
     setDate(nextMode === "year" ? currentYear : currentMonth);
-    setPage(1);
   };
 
   const getButtonVariation = (
@@ -92,10 +90,7 @@ export default function DashboardPage() {
             min={mode === "year" ? "2000" : undefined}
             max={mode === "year" ? "2100" : undefined}
             value={date}
-            onChange={(event) => {
-              setDate(event.target.value);
-              setPage(1);
-            }}
+            onChange={(event) => setDate(event.target.value)}
             className="w-40 rounded-xl border border-foreground/20 px-2 py-1 text-sm"
           />
         </div>
@@ -139,7 +134,8 @@ export default function DashboardPage() {
                   {t("dashboard.balanceTrend")}
                 </h2>
                 <p className="text-sm text-base-content/60">
-                  {data.start_date} to {data.end_date}
+                  {formatDate(data.start_date, locale)} to{" "}
+                  {formatDate(data.end_date, locale)}
                 </p>
               </div>
               <BalanceTrend trends={data.trend} />
@@ -178,27 +174,6 @@ export default function DashboardPage() {
               getRowKey={(row) => row.id}
               emptyState={t("transactions.empty")}
             />
-            <div className="flex items-center justify-between border-t border-foreground/10 px-5 py-3 text-sm">
-              <span>
-                {t("dashboard.page")} {data.page} / {data.total_pages}
-              </span>
-              <div className="join">
-                <button
-                  className="btn btn-sm join-item"
-                  disabled={data.page <= 1}
-                  onClick={() => setPage((value) => value - 1)}
-                >
-                  ‹
-                </button>
-                <button
-                  className="btn btn-sm join-item"
-                  disabled={data.page >= data.total_pages}
-                  onClick={() => setPage((value) => value + 1)}
-                >
-                  ›
-                </button>
-              </div>
-            </div>
           </section>
         </>
       ) : null}

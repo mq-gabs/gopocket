@@ -18,7 +18,6 @@ export const en = {
   "dashboard.transactionsInPeriod": "transactions in this period",
   "dashboard.viewAll": "View all transactions",
   "dashboard.date": "Date",
-  "dashboard.page": "Page",
   "theme.label": "Theme",
   "theme.light": "Light",
   "theme.dark": "Dark",

@@ -18,7 +18,6 @@ export const ptBr = {
   "dashboard.transactionsInPeriod": "transações neste período",
   "dashboard.viewAll": "Ver todas as transações",
   "dashboard.date": "Data",
-  "dashboard.page": "Página",
   "theme.label": "Tema",
   "theme.light": "Claro",
   "theme.dark": "Escuro",
