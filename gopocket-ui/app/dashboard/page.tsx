@@ -9,14 +9,21 @@ import {
   BanknotesIcon,
 } from "@heroicons/react/24/outline";
 import { Button, ButtonVariation } from "@/components/button";
-import { useI18n } from "@/contexts/i18n-context";
+import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
+import type { Locale } from "@/locales";
 import { transactionService } from "@/services/transaction.service";
-import type { DashboardData, DashboardMode } from "@/types/models";
+import type {
+  ActualTransaction,
+  DashboardData,
+  DashboardMode,
+} from "@/types/models";
 import { formatCurrencyString } from "@/utils/currency";
 import TransactionIcon from "@/components/transaction-icon";
 import { formatDate } from "@/utils/time";
 import BalanceTrend from "@/components/charts/balance-trend-chart";
 import ExpenseChart from "@/components/charts/expenses-chart";
+import Table, { TableColumn } from "@/components/tables/table";
+import { AmountCell } from "@/components/amount-cell";
 
 const currentMonth = new Date().toISOString().slice(0, 7);
 const currentYear = currentMonth.slice(0, 4);
@@ -164,34 +171,14 @@ export default function DashboardPage() {
                 </Button>
               </Link>
             </div>
-            <div className="overflow-x-auto">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>{t("transactions.table.title")}</th>
-                    <th>{t("transactions.table.type")}</th>
-                    <th>{t("transactions.table.amount")}</th>
-                    <th>{t("dashboard.date")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.recent_transactions.map((transaction) => (
-                    <tr key={transaction.id}>
-                      <td className="font-medium">{transaction.title}</td>
-                      <td>
-                        <TransactionIcon type={transaction.type} />
-                      </td>
-                      <td className="font-medium">
-                        {formatCurrencyString(transaction.amount)}
-                      </td>
-                      <td className="text-base-content/65">
-                        {formatDate(transaction.paid_at, locale)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table
+              columns={buildRecentTransactionsColumns(t, locale)}
+              data={data.recent_transactions}
+              size="sm"
+              zebra
+              getRowKey={(row) => row.id}
+              emptyState={t("transactions.empty")}
+            />
             <div className="flex items-center justify-between border-t border-foreground/10 px-5 py-3 text-sm">
               <span>
                 {t("dashboard.page")} {data.page} / {data.total_pages}
@@ -218,6 +205,36 @@ export default function DashboardPage() {
       ) : null}
     </div>
   );
+}
+
+function buildRecentTransactionsColumns(
+  t: TranslateFunction,
+  locale: Locale,
+): TableColumn<ActualTransaction>[] {
+  return [
+    {
+      key: "title",
+      header: t("transactions.table.title"),
+      className: "font-medium",
+      render: (row) => row.title,
+    },
+    {
+      key: "type",
+      header: t("transactions.table.type"),
+      render: (row) => <TransactionIcon type={row.type} />,
+    },
+    {
+      key: "amount",
+      header: t("transactions.table.amount"),
+      render: (row) => <AmountCell amount={row.amount} type={row.type} />,
+    },
+    {
+      key: "paid_at",
+      header: t("dashboard.date"),
+      className: "text-base-content/65",
+      render: (row) => formatDate(row.paid_at, locale),
+    },
+  ];
 }
 
 function SummaryCard({

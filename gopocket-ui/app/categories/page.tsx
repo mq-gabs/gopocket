@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { CategoryForm } from "@/components/category-form";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Modal } from "@/components/modal";
 import { useI18n } from "@/contexts/i18n-context";
+import { useCategories } from "@/contexts/category-context";
 import { categoryService } from "@/services/category.service";
 import type {
   Category,
@@ -14,29 +15,21 @@ import type {
 } from "@/types/models";
 import { Button } from "@/components/button";
 import { CategoryCard } from "@/components/category-card";
-import { useRequest } from "@/hooks/use-request";
 
 export default function CategoriesPage() {
   const { t } = useI18n();
+  const {
+    categories,
+    loading,
+    error: requestError,
+    refetch: getCategories,
+  } = useCategories();
   const [selectedCategory, setSelectedCategory] = useState<
     Category | undefined
   >();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const {
-    call: getCategories,
-    result: categories,
-    loading,
-    error: requestError,
-  } = useRequest({
-    callback: () => categoryService.getAll(),
-  });
-
-  useEffect(() => {
-    getCategories();
-  }, []);
 
   const openCreate = () => {
     setSelectedCategory(undefined);
@@ -92,7 +85,6 @@ export default function CategoriesPage() {
   };
 
   const combinedError = error ?? requestError;
-  const categoryList = categories ?? [];
 
   return (
     <div className="space-y-6">
@@ -117,14 +109,14 @@ export default function CategoriesPage() {
 
       {loading ? <p>{t("common.loading")}</p> : null}
 
-      {!loading && categoryList.length === 0 ? (
+      {!loading && categories.length === 0 ? (
         <div className="rounded-3xl border border-base-300 bg-base-100 p-8 text-center text-base-content/70">
           {t("categories.empty")}
         </div>
       ) : null}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {categoryList.map((category) => (
+        {categories.map((category) => (
           <CategoryCard
             key={category.id}
             category={category}

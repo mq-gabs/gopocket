@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Sidebar } from "@/components/sidebar";
 import { I18nProvider } from "@/contexts/i18n-context";
 import { ThemeProvider } from "@/contexts/theme-context";
+import { CategoryProvider } from "@/contexts/category-context";
 import "./globals.css";
 import { GlobalHeader } from "@/components/global-header";
 
@@ -21,13 +22,15 @@ export default function RootLayout({
       <body className="min-h-full bg-background text-foreground">
         <ThemeProvider>
           <I18nProvider>
-            <div className="flex min-h-screen">
-              <Sidebar />
-              <div className="flex min-h-screen flex-1 flex-col">
-                <GlobalHeader />
-                <main className="flex-1 p-4">{children}</main>
+            <CategoryProvider>
+              <div className="flex min-h-screen">
+                <Sidebar />
+                <div className="flex min-h-screen flex-1 flex-col">
+                  <GlobalHeader />
+                  <main className="flex-1 p-4">{children}</main>
+                </div>
               </div>
-            </div>
+            </CategoryProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>

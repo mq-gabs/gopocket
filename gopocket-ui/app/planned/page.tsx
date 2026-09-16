@@ -1,35 +1,118 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import {
+  CheckCircleIcon,
+  PencilIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import Table, { TableColumn } from "@/components/tables/table";
+import { RowActions } from "@/components/tables/row-actions";
+import { AmountCell } from "@/components/amount-cell";
 import TransactionIcon from "@/components/transaction-icon";
-import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
+import CategoryBadge from "@/components/category-badge";
+import { ConfirmModal } from "@/components/confirm-modal";
+import { Modal } from "@/components/modal";
+import { TransactionForm } from "@/components/transaction-form";
+import { useI18n } from "@/contexts/i18n-context";
+import { useCategories } from "@/contexts/category-context";
 import { useRequest } from "@/hooks/use-request";
-import { Locale } from "@/locales";
 import { transactionService } from "@/services/transaction.service";
-import { PlannedTransaction } from "@/types/models";
-import { TransactionType } from "@/types/transaction-type";
-import { formatCurrencyString } from "@/utils/currency";
+import type {
+  PlannedTransaction,
+  UpdateTransactionPayload,
+} from "@/types/models";
 import { formatDate } from "@/utils/time";
 
-function buildPlannedColumns(
-  t: TranslateFunction,
-  locale: Locale,
-): TableColumn<PlannedTransaction>[] {
-  return [
+export default function PlannedPage() {
+  const { t, locale } = useI18n();
+  const { categories, categoryMap } = useCategories();
+  const [selectedPlanned, setSelectedPlanned] = useState<
+    PlannedTransaction | undefined
+  >();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const {
+    call: getAllPlanned,
+    loading,
+    result: plannedTransactions,
+    error: plannedError,
+  } = useRequest({
+    callback: () => transactionService.getAllPlanned(),
+  });
+
+  useEffect(() => {
+    getAllPlanned();
+  }, []);
+
+  const openEdit = (planned: PlannedTransaction) => {
+    setSelectedPlanned(planned);
+    setIsModalOpen(true);
+  };
+
+  const openDelete = (planned: PlannedTransaction) => {
+    setSelectedPlanned(planned);
+    setIsDeleteOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPlanned(undefined);
+  };
+
+  const handleSubmit = async (payload: UpdateTransactionPayload) => {
+    if (!selectedPlanned) {
+      return;
+    }
+
+    try {
+      await transactionService.update(selectedPlanned.id, payload);
+      setIsModalOpen(false);
+      getAllPlanned();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("common.error"));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedPlanned) {
+      return;
+    }
+
+    try {
+      await transactionService.delete(selectedPlanned.id);
+      setIsDeleteOpen(false);
+      getAllPlanned();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("common.error"));
+    }
+  };
+
+  const handleMarkAsPaid = async (planned: PlannedTransaction) => {
+    try {
+      await transactionService.update(planned.id, {
+        paid_at: new Date().toISOString(),
+      });
+      getAllPlanned();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("common.error"));
+    }
+  };
+
+  const columns: TableColumn<PlannedTransaction>[] = [
     {
       key: "title",
       header: t("transactions.table.title"),
-      render: (row) => <span className="font-medium">{row.title}</span>,
+      className: "font-medium text-foreground/80",
+      render: (row) => row.title,
     },
     {
       key: "description",
       header: t("transactions.table.description"),
-      render: (row) => (
-        <span className="text-sm text-base-content/70">
-          {row.description || "—"}
-        </span>
-      ),
+      className: "text-foreground/60",
+      render: (row) => row.description || "—",
     },
     {
       key: "type",
@@ -39,63 +122,63 @@ function buildPlannedColumns(
     {
       key: "amount",
       header: t("transactions.table.amount"),
-      align: "right",
-      render: (row) => (
-        <span
-          className={`font-medium ${
-            row.type === TransactionType.EXPENSE
-              ? "text-error"
-              : "text-success"
-          }`}
-        >
-          {row.type === TransactionType.EXPENSE ? "-" : "+"}
-          {formatCurrencyString(row.amount)}
-        </span>
-      ),
+      render: (row) => <AmountCell amount={row.amount} type={row.type} />,
     },
     {
       key: "category",
       header: t("transactions.table.category"),
-      render: (row) =>
-        row.category ? (
-          <span
-            className="badge badge-outline gap-1"
-            style={{
-              borderColor: row.category.color,
-              color: row.category.color,
-            }}
-          >
-            {row.category.icon && <span>{row.category.icon}</span>}
-            {row.category.name}
-          </span>
+      render: (row) => {
+        const category = categoryMap.get(row.category_id);
+        return category ? (
+          <CategoryBadge
+            category={category}
+            className="w-full block text-center"
+          />
         ) : (
-          <span className="text-base-content/40">
-            {t("transactions.table.uncategorized")}
-          </span>
-        ),
+          <span className="text-foreground/60">—</span>
+        );
+      },
     },
     {
       key: "due_at",
       header: t("planned.table.dueAt"),
-      align: "right",
+      className: "text-foreground/80",
       render: (row) => formatDate(row.due_at, locale),
     },
+    {
+      key: "actions",
+      header: t("planned.table.actions"),
+      render: (row) => (
+        <RowActions
+          actions={[
+            ...(row.paid_at
+              ? []
+              : [
+                  {
+                    icon: CheckCircleIcon,
+                    label: t("actions.markAsPaid"),
+                    variation: "primary" as const,
+                    onClick: () => handleMarkAsPaid(row),
+                  },
+                ]),
+            {
+              icon: PencilIcon,
+              label: t("actions.edit"),
+              onClick: () => openEdit(row),
+            },
+            {
+              icon: TrashIcon,
+              label: t("actions.delete"),
+              variation: "destructive" as const,
+              onClick: () => openDelete(row),
+            },
+          ]}
+        />
+      ),
+    },
   ];
-}
 
-export default function PlannedPage() {
-  const { t, locale } = useI18n();
-  const {
-    call: getAllPlanned,
-    loading,
-    result: plannedTransactions,
-  } = useRequest({
-    callback: () => transactionService.getAllPlanned(),
-  });
-
-  useEffect(() => {
-    getAllPlanned();
-  }, []);
+  const requestError = error ?? plannedError;
 
   return (
     <div className="space-y-6">
@@ -108,11 +191,15 @@ export default function PlannedPage() {
         </p>
       </div>
 
+      {requestError ? (
+        <div className="alert alert-error">{requestError}</div>
+      ) : null}
+
       {loading ? <p>{t("common.loading")}</p> : null}
 
       {!loading ? (
         <Table
-          columns={buildPlannedColumns(t, locale)}
+          columns={columns}
           data={plannedTransactions ?? []}
           size="sm"
           zebra
@@ -120,6 +207,30 @@ export default function PlannedPage() {
           emptyState={t("planned.empty")}
         />
       ) : null}
+
+      <Modal
+        title={t("planned.form.title.edit")}
+        open={isModalOpen}
+        onClose={handleCloseModal}
+      >
+        <TransactionForm
+          categories={categories}
+          initialValues={selectedPlanned}
+          submitLabel={t("actions.save")}
+          includeDate={false}
+          onSubmit={handleSubmit}
+          onCancel={handleCloseModal}
+        />
+      </Modal>
+
+      <ConfirmModal
+        title={t("planned.delete.title")}
+        message={t("planned.delete.message")}
+        open={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDelete}
+        confirmType="destructive"
+      />
     </div>
   );
 }

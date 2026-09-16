@@ -18,6 +18,10 @@
   --secondary-foreground: #efe9f4;
 
   --destructive: #c3423f;
+  --destructive-80: #c3423fcc;
+  --destructive-60: #c3423f99;
+  --destructive-40: #c3423f66;
+  --destructive-20: #c3423f33;
   --destructive-foreground: #efe9f4;
 
   --light-gray: #d0d0d0;
@@ -42,6 +46,10 @@
   --color-secondary-20: var(--secondary-20);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-80: var(--destructive-80);
+  --color-destructive-60: var(--destructive-60);
+  --color-destructive-40: var(--destructive-40);
+  --color-destructive-20: var(--destructive-20);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-light-gray: var(--light-gray);
   --color-dark-gray: var(--dark-gray);

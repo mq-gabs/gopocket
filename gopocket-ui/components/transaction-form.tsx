@@ -34,6 +34,8 @@ interface TransactionFormProps {
   ) => void;
   onCancel?: () => void;
   submitLabel: string;
+  /** Set to false to hide the date field and leave paid_at untouched (e.g. editing a planned transaction). */
+  includeDate?: boolean;
 }
 
 export function TransactionForm({
@@ -42,6 +44,7 @@ export function TransactionForm({
   onSubmit,
   onCancel,
   submitLabel,
+  includeDate = true,
 }: TransactionFormProps) {
   const { t } = useI18n();
   const [title, setTitle] = useState(initialValues?.title ?? "");
@@ -62,14 +65,19 @@ export function TransactionForm({
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    onSubmit({
+    const payload: UpdateTransactionPayload & Partial<CreateActualTransactionPayload> = {
       title,
       description,
       amount,
       type,
       category_id: categoryId,
-      paid_at: new Date(`${transactionDate}T12:00:00`).toISOString(),
-    });
+    };
+
+    if (includeDate) {
+      payload.paid_at = new Date(`${transactionDate}T12:00:00`).toISOString();
+    }
+
+    onSubmit(payload as CreateActualTransactionPayload | UpdateTransactionPayload);
   };
 
   const categoryOptions = useMemo(() => categories, [categories]);
@@ -107,14 +115,16 @@ export function TransactionForm({
         options={buildTypeOptions(t)}
       />
 
-      <InputLabel
-        id="transaction-date"
-        label={t("transactions.form.date")}
-        type="date"
-        value={transactionDate}
-        onChange={(event) => setTransactionDate(event.target.value)}
-        required
-      />
+      {includeDate && (
+        <InputLabel
+          id="transaction-date"
+          label={t("transactions.form.date")}
+          type="date"
+          value={transactionDate}
+          onChange={(event) => setTransactionDate(event.target.value)}
+          required
+        />
+      )}
 
       <SelectLabel
         id="category"
