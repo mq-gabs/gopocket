@@ -16,7 +16,7 @@ export function CategoryBadgesCell({ categories }: CategoryBadgesCellProps) {
   const hiddenCount = categories.length - visible.length;
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-1">
+    <div className="flex flex-wrap items-center justify-right gap-1">
       {visible.map((category) => (
         <CategoryBadge key={category.id} category={category} />
       ))}

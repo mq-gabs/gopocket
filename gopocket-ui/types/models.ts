@@ -4,8 +4,6 @@ export type Category = {
   id: string;
   name: string;
   color: string;
-  icon: string;
-  type: TransactionType;
 };
 
 export type ActualTransaction = {
