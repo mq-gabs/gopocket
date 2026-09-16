@@ -8,7 +8,7 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import Table, { TableColumn } from "@/components/tables/table";
-import { RowActions } from "@/components/tables/row-actions";
+import { HoverRowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
 import { Button } from "@/components/button";
 import { CategoryBadgesCell } from "@/components/tables/category-badges-cell";
@@ -40,8 +40,11 @@ export default function PlannedPage() {
 function PlannedPageContent() {
   const { t, locale } = useI18n();
   const { categories, categoryMap } = useCategories();
-  const { state: filters, setState: setFilters, apiFilters } =
-    useTransactionFilters();
+  const {
+    state: filters,
+    setState: setFilters,
+    apiFilters,
+  } = useTransactionFilters();
   const [selectedPlanned, setSelectedPlanned] = useState<
     PlannedTransaction | undefined
   >();
@@ -164,9 +167,10 @@ function PlannedPageContent() {
     },
     {
       key: "actions",
-      header: t("planned.table.actions"),
-      render: (row) => (
-        <RowActions
+      header: "",
+      render: (row, _rowIndex, isRowHovered) => (
+        <HoverRowActions
+          isRowHovered={isRowHovered}
           actions={[
             ...(row.paid_at
               ? []
@@ -231,7 +235,6 @@ function PlannedPageContent() {
           columns={columns}
           data={plannedTransactions ?? []}
           size="sm"
-          zebra
           getRowKey={(row) => row.id}
           emptyState={t("planned.empty")}
         />

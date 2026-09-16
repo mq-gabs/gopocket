@@ -19,7 +19,7 @@ import { Button } from "@/components/button";
 import { CategoryBadgesCell } from "@/components/tables/category-badges-cell";
 import { formatDate } from "@/utils/time";
 import Table, { TableColumn } from "@/components/tables/table";
-import { RowActions } from "@/components/tables/row-actions";
+import { HoverRowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
 import { useRequest } from "@/hooks/use-request";
 import { useTransactionFilters } from "@/hooks/use-transaction-filters";
@@ -35,8 +35,11 @@ export default function TransactionsPage() {
 function TransactionsPageContent() {
   const { t, locale } = useI18n();
   const { categoryMap, categories } = useCategories();
-  const { state: filters, setState: setFilters, apiFilters } =
-    useTransactionFilters();
+  const {
+    state: filters,
+    setState: setFilters,
+    apiFilters,
+  } = useTransactionFilters();
   const [selectedTransaction, setSelectedTransaction] = useState<
     ActualTransaction | undefined
   >();
@@ -148,9 +151,10 @@ function TransactionsPageContent() {
     },
     {
       key: "actions",
-      header: t("transactions.table.actions"),
-      render: (row) => (
-        <RowActions
+      header: "",
+      render: (row, _rowIndex, isRowHovered) => (
+        <HoverRowActions
+          isRowHovered={isRowHovered}
           actions={[
             {
               icon: PencilIcon,
@@ -205,7 +209,6 @@ function TransactionsPageContent() {
           columns={columns}
           data={transactions ?? []}
           size="sm"
-          zebra
           getRowKey={(row) => row.id}
           emptyState={t("transactions.empty")}
         />

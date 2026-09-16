@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { type CategoryIcon } from "@/constants/category-icons";
 import { useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
@@ -11,7 +10,6 @@ import type {
 import { Button } from "./button";
 import { InputLabel } from "./inputs/input-label";
 import { useMyState } from "@/app/hooks/use-my-state";
-import { TransactionType } from "@/types/transaction-type";
 
 interface CategoryFormProps {
   initialValues?: Category;
@@ -28,15 +26,11 @@ export function CategoryForm({
 }: CategoryFormProps) {
   const { t } = useI18n();
   const name = useMyState<string>(initialValues?.name ?? "");
-  const [icon] = useState<CategoryIcon>(
-    (initialValues?.icon as CategoryIcon) ?? "wallet",
-  );
   const [color, setColor] = useState(initialValues?.color ?? "#09BC8A");
-  const [type] = useState(initialValues?.type ?? TransactionType.EXPENSE);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    onSubmit({ name: name.value, icon, color, type });
+    onSubmit({ name: name.value, color });
   };
 
   return (

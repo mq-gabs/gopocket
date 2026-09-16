@@ -170,7 +170,6 @@ export default function DashboardPage() {
               columns={buildRecentTransactionsColumns(t, locale)}
               data={data.recent_transactions}
               size="sm"
-              zebra
               getRowKey={(row) => row.id}
               emptyState={t("transactions.empty")}
             />

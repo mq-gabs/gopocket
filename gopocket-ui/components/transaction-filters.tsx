@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  FunnelIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { Button } from "./button";
 import { CategoryMultiSelect } from "./category-multi-select";
 import { InputLabel } from "./inputs/input-label";
@@ -52,82 +57,122 @@ export function TransactionFiltersBar({
     { value: TransactionType.INCOME, label: t("categories.form.type.income") },
   ];
 
-  const hasActiveFilters =
-    Boolean(value.q) ||
-    value.categoryIds.length > 0 ||
-    Boolean(value.type) ||
-    Boolean(value.startDate) ||
-    Boolean(value.endDate) ||
-    value.endNow;
+  const activeFilterCount =
+    (value.q ? 1 : 0) +
+    value.categoryIds.length +
+    (value.type ? 1 : 0) +
+    (value.startDate ? 1 : 0) +
+    (value.endDate || value.endNow ? 1 : 0);
+  const hasActiveFilters = activeFilterCount > 0;
+
+  const [isOpen, setIsOpen] = useState(hasActiveFilters);
+
+  const clearAll = () =>
+    onChange({
+      q: "",
+      categoryIds: [],
+      type: "",
+      startDate: "",
+      endDate: "",
+      endNow: false,
+    });
 
   return (
-    <div className="space-y-4 rounded-2xl border border-foreground/10 bg-background p-4">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <InputLabel
-          id="filter-search"
-          label={t("filters.search")}
-          placeholder={t("filters.searchPlaceholder")}
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
+    <div className="rounded-2xl border border-foreground/10 bg-background p-4">
+      <div className="flex items-center justify-between gap-4">
+        <button
+          type="button"
+          onClick={() => setIsOpen((open) => !open)}
+          className="flex cursor-pointer items-center gap-2 text-sm font-medium text-base-content"
+        >
+          <FunnelIcon className="h-4 w-4" />
+          {t("filters.title")}
+          {hasActiveFilters && (
+            <span className="rounded-full bg-primary-20 px-2 py-0.5 text-xs font-bold text-primary">
+              {activeFilterCount}
+            </span>
+          )}
+          {isOpen ? (
+            <ChevronUpIcon className="h-4 w-4" />
+          ) : (
+            <ChevronDownIcon className="h-4 w-4" />
+          )}
+        </button>
 
-        <SelectLabel
-          id="filter-type"
-          label={t("filters.type")}
-          value={value.type}
-          onChange={(event) =>
-            onChange({
-              ...value,
-              type: event.target.value as TransactionType | "",
-            })
-          }
-          options={typeOptions}
-        />
-
-        <InputLabel
-          id="filter-start-date"
-          label={t("filters.startDate")}
-          type="date"
-          value={value.startDate}
-          onChange={(event) =>
-            onChange({ ...value, startDate: event.target.value })
-          }
-        />
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor="filter-end-date"
-              className="text-sm font-medium text-base-content"
-            >
-              {t("filters.endDate")}
-            </label>
-            <label className="flex items-center gap-1 text-xs text-foreground/70">
-              <input
-                type="checkbox"
-                checked={value.endNow}
-                onChange={(event) =>
-                  onChange({ ...value, endNow: event.target.checked })
-                }
-              />
-              {t("filters.now")}
-            </label>
-          </div>
-          <input
-            id="filter-end-date"
-            type="date"
-            disabled={value.endNow}
-            value={value.endDate}
-            onChange={(event) =>
-              onChange({ ...value, endDate: event.target.value })
-            }
-            className="text-sm border border-light-gray outline-primary px-3 py-1 rounded-lg w-full disabled:opacity-50"
-          />
-        </div>
+        {hasActiveFilters && (
+          <Button type="button" variation="blank" onClick={clearAll}>
+            <XMarkIcon className="h-4 w-4" />
+            {t("filters.clear")}
+          </Button>
+        )}
       </div>
 
-      <div className="flex items-end gap-4">
-        <div className="flex-1">
+      {isOpen && (
+        <div className="mt-4 space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <InputLabel
+              id="filter-search"
+              label={t("filters.search")}
+              placeholder={t("filters.searchPlaceholder")}
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+
+            <SelectLabel
+              id="filter-type"
+              label={t("filters.type")}
+              value={value.type}
+              onChange={(event) =>
+                onChange({
+                  ...value,
+                  type: event.target.value as TransactionType | "",
+                })
+              }
+              options={typeOptions}
+            />
+
+            <InputLabel
+              id="filter-start-date"
+              label={t("filters.startDate")}
+              type="date"
+              value={value.startDate}
+              onChange={(event) =>
+                onChange({ ...value, startDate: event.target.value })
+              }
+            />
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="filter-end-date"
+                  className="text-sm font-medium text-base-content"
+                >
+                  {t("filters.endDate")}
+                </label>
+                <label className="flex items-center gap-1 text-xs text-foreground/70">
+                  <input
+                    type="checkbox"
+                    checked={value.endNow}
+                    onChange={(event) =>
+                      onChange({ ...value, endNow: event.target.checked })
+                    }
+                  />
+                  {t("filters.now")}
+                </label>
+              </div>
+              <input
+                id="filter-end-date"
+                type="date"
+                disabled={value.endNow}
+                value={value.endDate}
+                onChange={(event) =>
+                  onChange({ ...value, endDate: event.target.value })
+                }
+                className="text-sm border border-light-gray outline-primary px-3 py-1 rounded-lg w-full disabled:opacity-50"
+              />
+            </div>
+          </div>
+
           <CategoryMultiSelect
             id="filter-category"
             label={t("filters.category")}
@@ -136,27 +181,7 @@ export function TransactionFiltersBar({
             onChange={(ids) => onChange({ ...value, categoryIds: ids })}
           />
         </div>
-
-        {hasActiveFilters && (
-          <Button
-            type="button"
-            variation="blank"
-            onClick={() =>
-              onChange({
-                q: "",
-                categoryIds: [],
-                type: "",
-                startDate: "",
-                endDate: "",
-                endNow: false,
-              })
-            }
-          >
-            <XMarkIcon className="h-4 w-4" />
-            {t("filters.clear")}
-          </Button>
-        )}
-      </div>
+      )}
     </div>
   );
 }

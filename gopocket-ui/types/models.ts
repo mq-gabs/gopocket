@@ -30,15 +30,11 @@ export type PlannedTransaction = {
 export type CreateCategoryPayload = {
   name: string;
   color: string;
-  icon: string;
-  type: TransactionType;
 };
 
 export type UpdateCategoryPayload = {
   name?: string;
   color?: string;
-  icon?: string;
-  type?: TransactionType;
 };
 
 export interface CreateActualTransactionPayload {

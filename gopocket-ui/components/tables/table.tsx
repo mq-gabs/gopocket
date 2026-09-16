@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 export type TableCellValue = string | number | ReactNode;
 
@@ -9,8 +9,8 @@ export interface TableColumn<T> {
   key: keyof T | string;
   /** Column header label */
   header: string;
-  /** Optional custom renderer; if omitted, falls back to row[key] */
-  render?: (row: T, rowIndex: number) => TableCellValue;
+  /** Optional custom renderer; if omitted, falls back to row[key]. isRowHovered reflects whether the pointer is currently over this row. */
+  render?: (row: T, rowIndex: number, isRowHovered: boolean) => TableCellValue;
   /** Optional className for the <th>/<td> */
   className?: string;
   /** Optional alignment */
@@ -82,12 +82,17 @@ export default function Table<T>({
     .filter(Boolean)
     .join(" ");
 
+  const [hoveredRowKey, setHoveredRowKey] = useState<string | number | null>(
+    null,
+  );
+
   const renderCell = (
     col: TableColumn<T>,
     row: T,
     rowIndex: number,
+    isRowHovered: boolean,
   ): TableCellValue => {
-    if (col.render) return col.render(row, rowIndex);
+    if (col.render) return col.render(row, rowIndex, isRowHovered);
     const value = (row as Record<string, unknown>)[col.key as string];
     return value as TableCellValue;
   };
@@ -120,20 +125,27 @@ export default function Table<T>({
           ) : (
             data.map((row, rowIndex) => {
               const key = getRowKey ? getRowKey(row, rowIndex) : rowIndex;
+              const isRowHovered = hoveredRowKey === key;
               return (
                 <tr
                   key={key}
                   onClick={
                     onRowClick ? () => onRowClick(row, rowIndex) : undefined
                   }
-                  className={onRowClick ? "hover cursor-pointer" : ""}
+                  onMouseEnter={() => setHoveredRowKey(key)}
+                  onMouseLeave={() => setHoveredRowKey(null)}
+                  className={
+                    onRowClick
+                      ? "hover cursor-pointer"
+                      : "hover:bg-foreground/5"
+                  }
                 >
                   {columns.map((col) => (
                     <td
                       key={String(col.key)}
-                      className={`${alignClass(col.align)} ${col.className ?? ""}`}
+                      className={`relative ${alignClass(col.align)} ${col.className ?? ""}`}
                     >
-                      {renderCell(col, row, rowIndex)}
+                      {renderCell(col, row, rowIndex, isRowHovered)}
                     </td>
                   ))}
                 </tr>
