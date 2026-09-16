@@ -1,41 +1,30 @@
 "use client";
 
-import Table, { TableColumn, TableProps } from "@/components/tables/table";
+import { useEffect } from "react";
+import Table, { TableColumn } from "@/components/tables/table";
 import TransactionIcon from "@/components/transaction-icon";
-import { useI18n } from "@/contexts/i18n-context";
+import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import { useRequest } from "@/hooks/use-request";
 import { Locale } from "@/locales";
 import { transactionService } from "@/services/transaction.service";
-import { ActualTransaction, PlannedTransaction } from "@/types/models";
+import { PlannedTransaction } from "@/types/models";
 import { TransactionType } from "@/types/transaction-type";
 import { formatCurrencyString } from "@/utils/currency";
 import { formatDate } from "@/utils/time";
-import { useEffect } from "react";
 
-/**
- * Builds the default column set for an ActualTransaction table.
- * Shows: title, description, amount, category name, due at.
- * Pass `overrides` to replace/extend specific columns without
- * rewriting the whole set from scratch.
- */
-export function buildTransactionColumns({
-  overrides,
-  locale,
-}: {
-  overrides?: Partial<
-    Record<keyof ActualTransaction, Partial<TableColumn<PlannedTransaction>>>
-  >;
-  locale: Locale;
-}): TableColumn<PlannedTransaction>[] {
-  const base: TableColumn<PlannedTransaction>[] = [
+function buildPlannedColumns(
+  t: TranslateFunction,
+  locale: Locale,
+): TableColumn<PlannedTransaction>[] {
+  return [
     {
       key: "title",
-      header: "Title",
+      header: t("transactions.table.title"),
       render: (row) => <span className="font-medium">{row.title}</span>,
     },
     {
       key: "description",
-      header: "Description",
+      header: t("transactions.table.description"),
       render: (row) => (
         <span className="text-sm text-base-content/70">
           {row.description || "—"}
@@ -44,17 +33,19 @@ export function buildTransactionColumns({
     },
     {
       key: "type",
-      header: "Type",
+      header: t("transactions.table.type"),
       render: (row) => <TransactionIcon type={row.type} />,
     },
     {
       key: "amount",
-      header: "Amount",
+      header: t("transactions.table.amount"),
       align: "right",
       render: (row) => (
         <span
           className={`font-medium ${
-            row.type === TransactionType.EXPENSE ? "text-error" : "text-success"
+            row.type === TransactionType.EXPENSE
+              ? "text-error"
+              : "text-success"
           }`}
         >
           {row.type === TransactionType.EXPENSE ? "-" : "+"}
@@ -64,7 +55,7 @@ export function buildTransactionColumns({
     },
     {
       key: "category",
-      header: "Category",
+      header: t("transactions.table.category"),
       render: (row) =>
         row.category ? (
           <span
@@ -78,67 +69,57 @@ export function buildTransactionColumns({
             {row.category.name}
           </span>
         ) : (
-          <span className="text-base-content/40">Uncategorized</span>
+          <span className="text-base-content/40">
+            {t("transactions.table.uncategorized")}
+          </span>
         ),
     },
     {
       key: "due_at",
-      header: "Due At",
+      header: t("planned.table.dueAt"),
       align: "right",
       render: (row) => formatDate(row.due_at, locale),
     },
   ];
-
-  if (!overrides) return base;
-
-  return base.map((col) => {
-    const override = overrides[col.key as keyof ActualTransaction];
-    return override ? { ...col, ...override } : col;
-  });
 }
 
-/**
- * Builds full default TableProps for ActualTransaction, ready to spread
- * into <Table {...props} />. Pass `data` and any prop overrides.
- */
-export function buildTransactionTableProps(
-  data: PlannedTransaction[],
-  locale: Locale,
-  overrides?: Partial<TableProps<PlannedTransaction>>,
-): TableProps<PlannedTransaction> {
-  return {
-    columns: buildTransactionColumns({ locale }),
-    data,
-    size: "sm",
-    zebra: true,
-    getRowKey: (row) => row.id,
-    emptyState: "No transactions found",
-    ...overrides,
-  };
-}
-
-export default function ProjectionPage() {
-  const { locale } = useI18n();
+export default function PlannedPage() {
+  const { t, locale } = useI18n();
   const {
     call: getAllPlanned,
     loading,
-    result,
+    result: plannedTransactions,
   } = useRequest({
     callback: () => transactionService.getAllPlanned(),
   });
-  console.log({ result });
 
   useEffect(() => {
     getAllPlanned();
   }, []);
 
   return (
-    <div>
-      {loading && <h1>LOADING</h1>}
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-semibold text-base-content">
+          {t("planned.title")}
+        </h1>
+        <p className="mt-2 text-sm text-base-content/70">
+          {t("planned.description")}
+        </p>
+      </div>
 
-      {result && result.length > 0 && (
-        <Table {...buildTransactionTableProps(result, locale)} />
-      )}
+      {loading ? <p>{t("common.loading")}</p> : null}
+
+      {!loading ? (
+        <Table
+          columns={buildPlannedColumns(t, locale)}
+          data={plannedTransactions ?? []}
+          size="sm"
+          zebra
+          getRowKey={(row) => row.id}
+          emptyState={t("planned.empty")}
+        />
+      ) : null}
     </div>
   );
 }

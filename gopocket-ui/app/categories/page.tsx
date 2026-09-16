@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { CategoryForm } from "@/components/category-form";
 import { ConfirmModal } from "@/components/confirm-modal";
@@ -14,33 +14,29 @@ import type {
 } from "@/types/models";
 import { Button } from "@/components/button";
 import { CategoryCard } from "@/components/category-card";
+import { useRequest } from "@/hooks/use-request";
 
 export default function CategoriesPage() {
   const { t } = useI18n();
-  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<
     Category | undefined
   >();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadCategories = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await categoryService.getAll();
-      setCategories(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const {
+    call: getCategories,
+    result: categories,
+    loading,
+    error: requestError,
+  } = useRequest({
+    callback: () => categoryService.getAll(),
+  });
 
   useEffect(() => {
-    void loadCategories();
-  }, [loadCategories]);
+    getCategories();
+  }, []);
 
   const openCreate = () => {
     setSelectedCategory(undefined);
@@ -70,7 +66,7 @@ export default function CategoriesPage() {
         await categoryService.create(payload as CreateCategoryPayload);
       }
       setIsModalOpen(false);
-      await loadCategories();
+      getCategories();
     } catch (err) {
       setError(err instanceof Error ? err.message : t("common.error"));
     }
@@ -84,7 +80,7 @@ export default function CategoriesPage() {
     try {
       await categoryService.delete(selectedCategory.id);
       setIsDeleteOpen(false);
-      await loadCategories();
+      getCategories();
     } catch (err) {
       setError(err instanceof Error ? err.message : t("common.error"));
     }
@@ -94,6 +90,9 @@ export default function CategoriesPage() {
     setIsModalOpen(false);
     setSelectedCategory(undefined);
   };
+
+  const combinedError = error ?? requestError;
+  const categoryList = categories ?? [];
 
   return (
     <div className="space-y-6">
@@ -112,18 +111,20 @@ export default function CategoriesPage() {
         </Button>
       </div>
 
-      {error ? <div className="alert alert-error">{error}</div> : null}
+      {combinedError ? (
+        <div className="alert alert-error">{combinedError}</div>
+      ) : null}
 
       {loading ? <p>{t("common.loading")}</p> : null}
 
-      {!loading && categories.length === 0 ? (
+      {!loading && categoryList.length === 0 ? (
         <div className="rounded-3xl border border-base-300 bg-base-100 p-8 text-center text-base-content/70">
           {t("categories.empty")}
         </div>
       ) : null}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {categories.map((category) => (
+        {categoryList.map((category) => (
           <CategoryCard
             key={category.id}
             category={category}
@@ -144,7 +145,7 @@ export default function CategoriesPage() {
       >
         <CategoryForm
           initialValues={selectedCategory}
-          submitLabel={selectedCategory ? t("actions.save") : t("actions.save")}
+          submitLabel={t("actions.save")}
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}
         />

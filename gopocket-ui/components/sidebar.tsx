@@ -31,7 +31,7 @@ export function Sidebar() {
     },
     {
       href: "/planned",
-      label: "Planned",
+      label: t("navigation.planned"),
       icon: ClipboardDocumentListIcon,
     },
     { href: "/categories", label: t("navigation.categories"), icon: TagIcon },

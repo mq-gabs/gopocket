@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Modal } from "@/components/modal";
@@ -9,7 +9,6 @@ import { useI18n } from "@/contexts/i18n-context";
 import { categoryService } from "@/services/category.service";
 import { transactionService } from "@/services/transaction.service";
 import type {
-  Category,
   CreateActualTransactionPayload,
   ActualTransaction,
   UpdateTransactionPayload,
@@ -19,41 +18,47 @@ import { formatCurrencyString } from "@/utils/currency";
 import TransactionIcon from "@/components/transaction-icon";
 import CategoryBadge from "@/components/category-badge";
 import { formatDate } from "@/utils/time";
+import Table, { TableColumn } from "@/components/tables/table";
+import { useRequest } from "@/hooks/use-request";
 
 export default function TransactionsPage() {
   const { t, locale } = useI18n();
-  const [transactions, setTransactions] = useState<ActualTransaction[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedTransaction, setSelectedTransaction] = useState<
     ActualTransaction | undefined
   >();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const [transactionData, categoryData] = await Promise.all([
-        transactionService.getAllActual(),
-        categoryService.getAll(),
-      ]);
-      setTransactions(transactionData);
-      setCategories(categoryData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const {
+    call: getTransactions,
+    result: transactions,
+    loading: loadingTransactions,
+    error: transactionsError,
+  } = useRequest({
+    callback: () => transactionService.getAllActual(),
+  });
+
+  const {
+    call: getCategories,
+    result: categories,
+    error: categoriesError,
+  } = useRequest({
+    callback: () => categoryService.getAll(),
+  });
+
+  const loadData = () => {
+    getTransactions();
+    getCategories();
+  };
 
   useEffect(() => {
-    void loadData();
-  }, [loadData]);
+    loadData();
+  }, []);
 
   const categoryMap = useMemo(
-    () => new Map(categories.map((category) => [category.id, category])),
+    () =>
+      new Map((categories ?? []).map((category) => [category.id, category])),
     [categories],
   );
 
@@ -87,7 +92,7 @@ export default function TransactionsPage() {
         );
       }
       setIsModalOpen(false);
-      await loadData();
+      loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : t("common.error"));
     }
@@ -101,7 +106,7 @@ export default function TransactionsPage() {
     try {
       await transactionService.delete(selectedTransaction.id);
       setIsDeleteOpen(false);
-      await loadData();
+      loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : t("common.error"));
     }
@@ -111,6 +116,78 @@ export default function TransactionsPage() {
     setIsModalOpen(false);
     setSelectedTransaction(undefined);
   };
+
+  const columns: TableColumn<ActualTransaction>[] = [
+    {
+      key: "title",
+      header: t("transactions.table.title"),
+      className: "font-medium text-foreground/80",
+      render: (row) => row.title,
+    },
+    {
+      key: "description",
+      header: t("transactions.table.description"),
+      className: "text-foreground/60",
+      render: (row) => row.description,
+    },
+    {
+      key: "amount",
+      header: t("transactions.table.amount"),
+      className: "text-foreground/80",
+      render: (row) => formatCurrencyString(row.amount),
+    },
+    {
+      key: "type",
+      header: t("transactions.table.type"),
+      render: (row) => <TransactionIcon type={row.type} />,
+    },
+    {
+      key: "category",
+      header: t("transactions.table.category"),
+      render: (row) => {
+        const category = categoryMap.get(row.category_id);
+        return category ? (
+          <CategoryBadge
+            category={category}
+            className="w-full block text-center"
+          />
+        ) : (
+          <span className="text-foreground/60">—</span>
+        );
+      },
+    },
+    {
+      key: "paid_at",
+      header: t("transactions.table.date"),
+      className: "text-foreground/80",
+      render: (row) => formatDate(row.paid_at, locale),
+    },
+    {
+      key: "actions",
+      header: t("transactions.table.actions"),
+      render: (row) => (
+        <div className="flex gap-2">
+          <Button
+            className="p-1!"
+            variation="neutral"
+            onClick={() => openEdit(row)}
+          >
+            <PencilIcon className="h-4 w-4" />
+          </Button>
+          <Button
+            className="p-1!"
+            variation="destructive"
+            onClick={() => openDelete(row)}
+          >
+            <TrashIcon className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const loading = loadingTransactions;
+  const requestError = error ?? transactionsError ?? categoriesError;
 
   return (
     <div className="space-y-6">
@@ -129,83 +206,19 @@ export default function TransactionsPage() {
         </Button>
       </div>
 
-      {error ? <div className="alert alert-error">{error}</div> : null}
+      {requestError ? <div className="alert alert-error">{requestError}</div> : null}
 
       {loading ? <p>{t("common.loading")}</p> : null}
 
-      {!loading && transactions.length === 0 ? (
-        <div className="rounded-3xl border border-foreground/10 bg-background p-8 text-center text-foreground">
-          {t("transactions.empty")}
-        </div>
-      ) : null}
-
-      {!loading && transactions.length > 0 ? (
+      {!loading ? (
         <div className="overflow-x-auto rounded-xl border border-foreground/10 bg-background">
-          <table className="table">
-            <thead>
-              <tr className="text-foreground">
-                <th>{t("transactions.table.title")}</th>
-                <th>{t("transactions.table.description")}</th>
-                <th>{t("transactions.table.amount")}</th>
-                <th>{t("transactions.table.type")}</th>
-                <th>{t("transactions.table.category")}</th>
-                <th>{t("transactions.table.date")}</th>
-                <th>{t("transactions.table.actions")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((transaction) => {
-                const category = categoryMap.get(transaction.category_id);
-                return (
-                  <tr key={transaction.id}>
-                    <td className="font-medium text-foreground/80">
-                      {transaction.title}
-                    </td>
-                    <td className="text-foreground/60">
-                      {transaction.description}
-                    </td>
-                    <td className="text-foreground/80">
-                      {formatCurrencyString(transaction.amount)}
-                    </td>
-                    <td>
-                      <TransactionIcon type={transaction.type} />
-                    </td>
-                    <td>
-                      {category ? (
-                        <CategoryBadge
-                          category={category}
-                          className="w-full block text-center"
-                        />
-                      ) : (
-                        <span className="text-foreground/60">—</span>
-                      )}
-                    </td>
-                    <td className="text-foreground/80">
-                      <span>{formatDate(transaction.paid_at, locale)}</span>
-                    </td>
-                    <td>
-                      <div className="flex gap-2">
-                        <Button
-                          className="p-1!"
-                          variation="neutral"
-                          onClick={() => openEdit(transaction)}
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          className="p-1!"
-                          variation="destructive"
-                          onClick={() => openDelete(transaction)}
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <Table
+            columns={columns}
+            data={transactions ?? []}
+            zebra
+            getRowKey={(row) => row.id}
+            emptyState={t("transactions.empty")}
+          />
         </div>
       ) : null}
 
@@ -219,7 +232,7 @@ export default function TransactionsPage() {
         onClose={handleCloseModal}
       >
         <TransactionForm
-          categories={categories}
+          categories={categories ?? []}
           initialValues={selectedTransaction}
           submitLabel={t("actions.save")}
           onSubmit={handleSubmit}
