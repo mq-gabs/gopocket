@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import CategoryBadge from "@/components/category-badge";
 import { useI18n } from "@/contexts/i18n-context";
@@ -28,7 +29,15 @@ export function CategoryMultiSelect({
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const [menuPosition, setMenuPosition] = useState<{
+    top: number;
+    left: number;
+    width: number;
+    openUpward: boolean;
+  } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const selectedCategories = useMemo(
@@ -56,16 +65,49 @@ export function CategoryMultiSelect({
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as Node;
+      const insideContainer = containerRef.current?.contains(target);
+      const insideMenu = menuRef.current?.contains(target);
+      if (!insideContainer && !insideMenu) {
         setIsOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
+  // The dropdown is portaled to document.body so it can escape the dialog's
+  // `overflow-y: auto`/clipping and never gets cut off inside a scrolling
+  // modal. Since it's no longer positioned via CSS relative to the input,
+  // its position must be tracked manually against the viewport.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const estimatedMenuHeight = 192; // matches the max-h-48 dropdown height
+
+    const updatePosition = () => {
+      const anchor = anchorRef.current;
+      if (!anchor) return;
+      const rect = anchor.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openUpward =
+        spaceBelow < estimatedMenuHeight && rect.top > spaceBelow;
+      setMenuPosition({
+        top: openUpward ? rect.top : rect.bottom,
+        left: rect.left,
+        width: rect.width,
+        openUpward,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
   }, [isOpen]);
 
   const selectCategory = (categoryId: string) => {
@@ -118,7 +160,7 @@ export function CategoryMultiSelect({
         {label}
       </label>
 
-      <div className="relative">
+      <div className="relative" ref={anchorRef}>
         <div
           onClick={() => {
             setIsOpen(true);
@@ -169,31 +211,45 @@ export function CategoryMultiSelect({
           />
         </div>
 
-        {isOpen && (
-          <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-light-gray bg-background shadow-lg">
-            {options.length === 0 ? (
-              <li className="pointer-events-none px-3 py-2 text-sm text-foreground/60">
-                {t("categories.select.empty")}
-              </li>
-            ) : (
-              options.map((category, index) => (
-                <li key={category.id}>
-                  <button
-                    type="button"
-                    onClick={() => selectCategory(category.id)}
-                    onMouseEnter={() => setHighlightedIndex(index)}
-                    className={cls(
-                      "flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm",
-                      index === highlightedIndex ? "bg-primary-20" : "",
-                    )}
-                  >
-                    <CategoryBadge category={category} />
-                  </button>
-                </li>
-              ))
-            )}
-          </ul>
-        )}
+        {isOpen && menuPosition
+          ? createPortal(
+              <ul
+                ref={menuRef}
+                style={{
+                  position: "fixed",
+                  left: menuPosition.left,
+                  width: menuPosition.width,
+                  ...(menuPosition.openUpward
+                    ? { bottom: window.innerHeight - menuPosition.top + 4 }
+                    : { top: menuPosition.top + 4 }),
+                }}
+                className="z-1000 max-h-48 overflow-auto rounded-lg border border-light-gray bg-background shadow-lg"
+              >
+                {options.length === 0 ? (
+                  <li className="pointer-events-none px-3 py-2 text-sm text-foreground/60">
+                    {t("categories.select.empty")}
+                  </li>
+                ) : (
+                  options.map((category, index) => (
+                    <li key={category.id}>
+                      <button
+                        type="button"
+                        onClick={() => selectCategory(category.id)}
+                        onMouseEnter={() => setHighlightedIndex(index)}
+                        className={cls(
+                          "flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm",
+                          index === highlightedIndex ? "bg-primary-20" : "",
+                        )}
+                      >
+                        <CategoryBadge category={category} />
+                      </button>
+                    </li>
+                  ))
+                )}
+              </ul>,
+              document.body,
+            )
+          : null}
       </div>
 
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
