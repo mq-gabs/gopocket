@@ -1,6 +1,8 @@
 package transaction
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -35,6 +37,8 @@ func (e *Endpoint) RegisterRoutes(router *gin.RouterGroup) {
 	router.POST("/transactions/planned", e.createPlanned)
 	router.GET("/transactions/planned", e.listPlanned)
 	router.POST("/transactions/planned/bulk", e.createBulkPlanned)
+
+	router.POST("/transactions/import/nubank", e.importNubank)
 }
 
 func (e *Endpoint) dashboard(ctx *gin.Context) {
@@ -221,6 +225,48 @@ func (e *Endpoint) delete(ctx *gin.Context) {
 	}
 
 	ginhttp.WriteSuccess(ctx, http.StatusOK, map[string]bool{"deleted": true})
+}
+
+func (e *Endpoint) importNubank(ctx *gin.Context) {
+	fileHeader, err := ctx.FormFile("file")
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "csv file is required")
+		return
+	}
+
+	file, err := fileHeader.Open()
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "unable to read csv file")
+		return
+	}
+	defer file.Close()
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "unable to read csv file")
+		return
+	}
+
+	var dto ImportNubankConfigRequest
+	if raw := ctx.PostForm("config"); raw != "" {
+		if err := json.Unmarshal([]byte(raw), &dto); err != nil {
+			ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid import configuration")
+			return
+		}
+	}
+
+	if err := ValidateImportNubankConfig(dto); err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	jobID, err := e.service.ImportNubank(fileBytes, dto)
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ginhttp.WriteSuccess(ctx, http.StatusAccepted, ImportNubankResponse{JobID: jobID, Status: "processing"})
 }
 
 func (e *Endpoint) deleteBulk(ctx *gin.Context) {

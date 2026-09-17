@@ -97,3 +97,23 @@ func ValidateUpdateTransaction(dto UpdateTransactionRequest) error {
 
 	return vslices.Slice("categoryIds", vslices.Each(validateCategoryIDItem))(dto.CategoryIDs)
 }
+
+// ValidateImportNubankConfig validates the category ids referenced by a
+// Nubank import request. Rules with an empty term are allowed here (they are
+// dropped later, before matching) and their category ids are still checked
+// for shape.
+func ValidateImportNubankConfig(dto ImportNubankConfigRequest) error {
+	errs := make([]error, 0, len(dto.GeneralCategoryIDs)+len(dto.Rules))
+
+	for _, categoryID := range dto.GeneralCategoryIDs {
+		errs = append(errs, validateCategoryIDItem(categoryID))
+	}
+
+	for _, rule := range dto.Rules {
+		for _, categoryID := range rule.CategoryIDs {
+			errs = append(errs, validateCategoryIDItem(categoryID))
+		}
+	}
+
+	return errors.Join(errs...)
+}

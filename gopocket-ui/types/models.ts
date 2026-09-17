@@ -77,6 +77,21 @@ export type UpdateTransactionPayload = {
   paid_at?: string;
 };
 
+export type ImportRule = {
+  term: string;
+  category_ids: string[];
+};
+
+export type ImportNubankPayload = {
+  general_category_ids: string[];
+  rules: ImportRule[];
+};
+
+export type ImportJobStartedResponse = {
+  job_id: string;
+  status: string;
+};
+
 export type TransactionListFilters = {
   q?: string;
   category_ids?: string[];

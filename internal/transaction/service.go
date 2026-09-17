@@ -20,15 +20,20 @@ type Service interface {
 	CreatePlanned(dto CreatePlannedTransactionRequest) (*Transaction, error)
 	CreateBulkPlanned(dto CreateBulkPlannedTransactionsRequest) ([]Transaction, error)
 	FindAllPlanned(query ListTransactionsQuery) ([]Transaction, error)
+
+	ImportNubank(fileBytes []byte, dto ImportNubankConfigRequest) (string, error)
 }
 
 type service struct {
 	repository Repository
+	publisher  EventPublisher
 }
 
-// NewService wires a transaction service with its repository.
-func NewService(repository Repository) Service {
-	return &service{repository: repository}
+// NewService wires a transaction service with its repository. publisher
+// broadcasts realtime events (currently just import job progress) and is
+// satisfied by *realtime.Hub.
+func NewService(repository Repository, publisher EventPublisher) Service {
+	return &service{repository: repository, publisher: publisher}
 }
 
 func (s *service) Update(id string, dto UpdateTransactionRequest) (*Transaction, error) {

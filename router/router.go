@@ -3,6 +3,7 @@ package router
 import (
 	ui "gopocket/gopocket-ui"
 	"gopocket/internal/category"
+	"gopocket/internal/realtime"
 	"gopocket/internal/transaction"
 	"net/http"
 	"time"
@@ -15,6 +16,7 @@ import (
 func New(
 	categoryEndpoint *category.Endpoint,
 	transactionEndpoint *transaction.Endpoint,
+	realtimeEndpoint *realtime.Endpoint,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -47,6 +49,7 @@ func New(
 	api := r.Group("/api")
 	categoryEndpoint.RegisterRoutes(api)
 	transactionEndpoint.RegisterRoutes(api)
+	realtimeEndpoint.RegisterRoutes(api)
 
 	fs, err := ui.FS()
 	if err != nil {

@@ -6,6 +6,8 @@ import type {
   UpdateTransactionPayload,
   CreatePlannedTransactionPayload,
   CreateBulkPlannedTransactionsPayload,
+  ImportJobStartedResponse,
+  ImportNubankPayload,
   PlannedTransaction,
   TransactionListFilters,
 } from "@/types/models";
@@ -58,4 +60,13 @@ export const transactionService = {
     httpClient.get<DashboardData>(
       `/api/dashboard?mode=${mode}&date=${date}&page=${page}`,
     ),
+  importNubank: (file: File, payload: ImportNubankPayload) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("config", JSON.stringify(payload));
+    return httpClient.postForm<ImportJobStartedResponse>(
+      join(basePath, "import", "nubank"),
+      formData,
+    );
+  },
 };

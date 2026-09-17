@@ -9,6 +9,7 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import { ConfirmModal } from "@/components/confirm-modal";
+import { ImportNubankForm } from "@/components/import-nubank-form";
 import { Modal } from "@/components/modal";
 import { TransactionFiltersBar } from "@/components/transaction-filters";
 import { TransactionForm } from "@/components/transaction-form";
@@ -19,6 +20,7 @@ import type {
   Category,
   CreateActualTransactionPayload,
   ActualTransaction,
+  ImportRule,
   UpdateTransactionPayload,
 } from "@/types/models";
 import { Button } from "@/components/button";
@@ -51,6 +53,7 @@ function TransactionsPageContent() {
   >();
   const [copySource, setCopySource] = useState<ActualTransaction | undefined>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(
@@ -83,6 +86,8 @@ function TransactionsPageContent() {
     setCopySource(undefined);
     setIsModalOpen(true);
   };
+
+  const openImport = () => setIsImportModalOpen(true);
 
   const openEdit = (transaction: ActualTransaction) => {
     setSelectedTransaction(transaction);
@@ -147,6 +152,23 @@ function TransactionsPageContent() {
     setIsModalOpen(false);
     setSelectedTransaction(undefined);
     setCopySource(undefined);
+  };
+
+  const handleImportSubmit = async (
+    file: File,
+    generalCategoryIds: string[],
+    rules: ImportRule[],
+  ) => {
+    try {
+      await transactionService.importNubank(file, {
+        general_category_ids: generalCategoryIds,
+        rules,
+      });
+      setIsImportModalOpen(false);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : t("common.error");
+      toast.error(message);
+    }
   };
 
   const handleBulkDelete = async () => {
@@ -239,7 +261,16 @@ function TransactionsPageContent() {
             {t("transactions.description")}
           </p>
         </div>
-        <Button onClick={openCreate}>
+        <Button
+          onClick={openCreate}
+          actionsLabel={t("actions.more")}
+          actions={[
+            {
+              label: t("transactions.import.nubank.action"),
+              onClick: openImport,
+            },
+          ]}
+        >
           <PlusIcon className="h-5 w-5" />
           {t("actions.newTransaction")}
         </Button>
@@ -294,6 +325,19 @@ function TransactionsPageContent() {
           submitLabel={t("actions.save")}
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}
+        />
+      </Modal>
+
+      <Modal
+        title={t("transactions.import.nubank.title")}
+        open={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+      >
+        <ImportNubankForm
+          categories={categories}
+          submitLabel={t("actions.startImport")}
+          onSubmit={handleImportSubmit}
+          onCancel={() => setIsImportModalOpen(false)}
         />
       </Modal>
 
