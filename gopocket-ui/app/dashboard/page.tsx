@@ -128,7 +128,7 @@ export default function DashboardPage() {
           </section>
 
           <section className="grid gap-5 xl:grid-cols-[1.65fr_1fr]">
-            <article className="rounded-2xl border border-foreground/10 bg-background p-5">
+            <article className="rounded-2xl border border-foreground/10 bg-foreground/5 p-5">
               <div className="mb-2">
                 <h2 className="text-lg font-semibold">
                   {t("dashboard.balanceTrend")}
@@ -140,7 +140,7 @@ export default function DashboardPage() {
               </div>
               <BalanceTrend trends={data.trend} />
             </article>
-            <article className="rounded-2xl border border-foreground/10 bg-background p-5">
+            <article className="rounded-2xl border border-foreground/10 bg-foreground/5 p-5">
               <h2 className="mb-2 text-lg font-semibold">
                 {t("dashboard.expenseBreakdown")}
               </h2>
@@ -148,7 +148,7 @@ export default function DashboardPage() {
             </article>
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-foreground/10 bg-background">
+          <section className="overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/5">
             <div className="flex flex-col gap-3 border-b border-foreground/10 p-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-lg font-semibold">
