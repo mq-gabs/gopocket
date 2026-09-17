@@ -1,7 +1,12 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import {
+  PlusIcon,
+  DocumentDuplicateIcon,
+  PencilIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Modal } from "@/components/modal";
 import { TransactionFiltersBar } from "@/components/transaction-filters";
@@ -43,6 +48,7 @@ function TransactionsPageContent() {
   const [selectedTransaction, setSelectedTransaction] = useState<
     ActualTransaction | undefined
   >();
+  const [copySource, setCopySource] = useState<ActualTransaction | undefined>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,11 +68,19 @@ function TransactionsPageContent() {
 
   const openCreate = () => {
     setSelectedTransaction(undefined);
+    setCopySource(undefined);
     setIsModalOpen(true);
   };
 
   const openEdit = (transaction: ActualTransaction) => {
     setSelectedTransaction(transaction);
+    setCopySource(undefined);
+    setIsModalOpen(true);
+  };
+
+  const openCopy = (transaction: ActualTransaction) => {
+    setSelectedTransaction(undefined);
+    setCopySource(transaction);
     setIsModalOpen(true);
   };
 
@@ -113,6 +127,7 @@ function TransactionsPageContent() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedTransaction(undefined);
+    setCopySource(undefined);
   };
 
   const columns: TableColumn<ActualTransaction>[] = [
@@ -160,6 +175,11 @@ function TransactionsPageContent() {
               icon: PencilIcon,
               label: t("actions.edit"),
               onClick: () => openEdit(row),
+            },
+            {
+              icon: DocumentDuplicateIcon,
+              label: t("actions.copy"),
+              onClick: () => openCopy(row),
             },
             {
               icon: TrashIcon,
@@ -225,7 +245,8 @@ function TransactionsPageContent() {
       >
         <TransactionForm
           categories={categories}
-          initialValues={selectedTransaction}
+          initialValues={selectedTransaction ?? copySource}
+          isEditing={Boolean(selectedTransaction)}
           submitLabel={t("actions.save")}
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}

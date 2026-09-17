@@ -28,6 +28,7 @@ export const ptBr = {
   "actions.newTransaction": "Nova Transação",
   "actions.newPlanned": "Novo Planejado",
   "actions.edit": "Editar",
+  "actions.copy": "Duplicar",
   "actions.delete": "Excluir",
   "actions.markAsPaid": "Marcar como pago",
   "actions.cancel": "Cancelar",

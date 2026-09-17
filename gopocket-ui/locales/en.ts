@@ -28,6 +28,7 @@ export const en = {
   "actions.newTransaction": "New Transaction",
   "actions.newPlanned": "New Planned",
   "actions.edit": "Edit",
+  "actions.copy": "Copy",
   "actions.delete": "Delete",
   "actions.markAsPaid": "Mark as paid",
   "actions.cancel": "Cancel",

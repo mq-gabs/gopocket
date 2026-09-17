@@ -44,6 +44,13 @@ interface TransactionFormProps {
   includeDate?: boolean;
   /** Set to true to show the due date field (creating a planned transaction). */
   includeDueDate?: boolean;
+  /**
+   * Whether this form edits an existing record, as opposed to creating one
+   * (which also covers duplicating a record: initialValues is set to prefill
+   * the fields, but submitting still creates a new record). Defaults to
+   * whether initialValues is set.
+   */
+  isEditing?: boolean;
 }
 
 export function TransactionForm({
@@ -54,6 +61,7 @@ export function TransactionForm({
   submitLabel,
   includeDate = true,
   includeDueDate = false,
+  isEditing = Boolean(initialValues),
 }: TransactionFormProps) {
   const { t } = useI18n();
   const [title, setTitle] = useState(initialValues?.title ?? "");
@@ -87,7 +95,7 @@ export function TransactionForm({
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!initialValues && categoryIds.length === 0) {
+    if (!isEditing && categoryIds.length === 0) {
       setCategoryError(t("common.required"));
       return;
     }

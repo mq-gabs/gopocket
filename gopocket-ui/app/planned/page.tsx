@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import {
   CheckIcon,
+  DocumentDuplicateIcon,
   PencilIcon,
   PlusIcon,
   TrashIcon,
@@ -48,6 +49,9 @@ function PlannedPageContent() {
   const [selectedPlanned, setSelectedPlanned] = useState<
     PlannedTransaction | undefined
   >();
+  const [copySource, setCopySource] = useState<
+    PlannedTransaction | undefined
+  >();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,11 +71,19 @@ function PlannedPageContent() {
 
   const openCreate = () => {
     setSelectedPlanned(undefined);
+    setCopySource(undefined);
     setIsModalOpen(true);
   };
 
   const openEdit = (planned: PlannedTransaction) => {
     setSelectedPlanned(planned);
+    setCopySource(undefined);
+    setIsModalOpen(true);
+  };
+
+  const openCopy = (planned: PlannedTransaction) => {
+    setSelectedPlanned(undefined);
+    setCopySource(planned);
     setIsModalOpen(true);
   };
 
@@ -83,6 +95,7 @@ function PlannedPageContent() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedPlanned(undefined);
+    setCopySource(undefined);
   };
 
   const handleSubmit = async (
@@ -188,6 +201,11 @@ function PlannedPageContent() {
               onClick: () => openEdit(row),
             },
             {
+              icon: DocumentDuplicateIcon,
+              label: t("actions.copy"),
+              onClick: () => openCopy(row),
+            },
+            {
               icon: TrashIcon,
               label: t("actions.delete"),
               variation: "destructive" as const,
@@ -251,7 +269,8 @@ function PlannedPageContent() {
       >
         <TransactionForm
           categories={categories}
-          initialValues={selectedPlanned}
+          initialValues={selectedPlanned ?? copySource}
+          isEditing={Boolean(selectedPlanned)}
           submitLabel={t("actions.save")}
           includeDate={false}
           includeDueDate={!selectedPlanned}
