@@ -16,6 +16,8 @@ var (
 	validateType           = vstring.String("type", vstring.OneOf(string(transactiontype.TransactionTypeExpense), string(transactiontype.TransactionTypeIncome)))
 	validateCategoryIDItem = vstring.String("categoryId", vstring.UUIDv4())
 	validateCategoryIDs    = vslices.Slice("categoryIds", vslices.Required[string](), vslices.Each(validateCategoryIDItem))
+	validateIDItem         = vstring.String("id", vstring.UUIDv4())
+	validateIDs            = vslices.Slice("ids", vslices.Required[string](), vslices.Each(validateIDItem))
 	validatePaidAt         = vstring.String("paidAt", vstring.Required())
 	validateDueAt          = vstring.String("dueAt", vstring.Required())
 	validateDueDay         = vnumber.Number("dueDay", vnumber.InRange(1, 31))
@@ -79,6 +81,12 @@ func ValidateListTransactionsQuery(query ListTransactionsQuery) error {
 	}
 
 	return errors.Join(errs...)
+}
+
+// ValidateDeleteBulkTransactions validates a request to delete a batch of
+// transactions by id.
+func ValidateDeleteBulkTransactions(dto DeleteBulkTransactionsRequest) error {
+	return validateIDs(dto.IDs)
 }
 
 // ValidateUpdateTransaction is a placeholder validation hook for future rules.

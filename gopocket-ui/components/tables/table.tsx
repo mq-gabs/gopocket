@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { BulkAction, BulkActionsBar } from "./bulk-actions-bar";
 
 export type TableCellValue = string | number | ReactNode;
 
@@ -32,6 +33,14 @@ export interface TableProps<T> {
   emptyState?: ReactNode;
   /** Optional row click handler */
   onRowClick?: (row: T, index: number) => void;
+  /** Renders a leading checkbox column for selecting rows, plus a "select all" checkbox in the header */
+  selectable?: boolean;
+  /** Keys (from getRowKey) of the currently selected rows */
+  selectedKeys?: Set<string | number>;
+  /** Called with the full updated selection whenever it changes */
+  onSelectionChange?: (keys: Set<string | number>) => void;
+  /** Actions shown in a floating bar while rows are selected (requires selectable) */
+  bulkActions?: BulkAction[];
 }
 
 const alignClass = (align?: "left" | "center" | "right") => {
@@ -70,6 +79,10 @@ export default function Table<T>({
   getRowKey,
   emptyState,
   onRowClick,
+  selectable = false,
+  selectedKeys,
+  onSelectionChange,
+  bulkActions,
 }: TableProps<T>) {
   const tableClasses = [
     "table",
@@ -86,6 +99,38 @@ export default function Table<T>({
     null,
   );
 
+  const rowKeys = data.map((row, rowIndex) =>
+    getRowKey ? getRowKey(row, rowIndex) : rowIndex,
+  );
+  const selectedCount = selectedKeys
+    ? rowKeys.filter((key) => selectedKeys.has(key)).length
+    : 0;
+  const allSelected = rowKeys.length > 0 && selectedCount === rowKeys.length;
+  const someSelected = selectedCount > 0 && !allSelected;
+
+  const selectAllRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = someSelected;
+    }
+  }, [someSelected]);
+
+  const toggleRow = (key: string | number) => {
+    if (!onSelectionChange) return;
+    const next = new Set(selectedKeys);
+    if (next.has(key)) {
+      next.delete(key);
+    } else {
+      next.add(key);
+    }
+    onSelectionChange(next);
+  };
+
+  const toggleAll = () => {
+    if (!onSelectionChange) return;
+    onSelectionChange(allSelected ? new Set() : new Set(rowKeys));
+  };
+
   const renderCell = (
     col: TableColumn<T>,
     row: T,
@@ -98,62 +143,97 @@ export default function Table<T>({
   };
 
   return (
-    <div className="overflow-x-auto w-full">
-      <table className={tableClasses}>
-        <thead>
-          <tr>
-            {columns.map((col) => (
-              <th
-                key={String(col.key)}
-                className={`${alignClass(col.align)} ${col.className ?? ""}`}
-              >
-                {col.header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.length === 0 ? (
+    <>
+      <div className="overflow-x-auto w-full">
+        <table className={tableClasses}>
+          <thead>
             <tr>
-              <td
-                colSpan={columns.length}
-                className="text-center py-6 text-base-content/60"
-              >
-                {emptyState ?? "No data available"}
-              </td>
-            </tr>
-          ) : (
-            data.map((row, rowIndex) => {
-              const key = getRowKey ? getRowKey(row, rowIndex) : rowIndex;
-              const isRowHovered = hoveredRowKey === key;
-              return (
-                <tr
-                  key={key}
-                  onClick={
-                    onRowClick ? () => onRowClick(row, rowIndex) : undefined
-                  }
-                  onMouseEnter={() => setHoveredRowKey(key)}
-                  onMouseLeave={() => setHoveredRowKey(null)}
-                  className={
-                    onRowClick
-                      ? "hover cursor-pointer"
-                      : "hover:bg-foreground/5"
-                  }
+              {selectable ? (
+                <th className="w-10">
+                  <input
+                    ref={selectAllRef}
+                    type="checkbox"
+                    className="checkbox checkbox-sm"
+                    checked={allSelected}
+                    onChange={toggleAll}
+                    aria-label="Select all rows"
+                  />
+                </th>
+              ) : null}
+              {columns.map((col) => (
+                <th
+                  key={String(col.key)}
+                  className={`${alignClass(col.align)} ${col.className ?? ""}`}
                 >
-                  {columns.map((col) => (
-                    <td
-                      key={String(col.key)}
-                      className={`relative ${alignClass(col.align)} ${col.className ?? ""}`}
-                    >
-                      {renderCell(col, row, rowIndex, isRowHovered)}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })
-          )}
-        </tbody>
-      </table>
-    </div>
+                  {col.header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length + (selectable ? 1 : 0)}
+                  className="text-center py-6 text-base-content/60"
+                >
+                  {emptyState ?? "No data available"}
+                </td>
+              </tr>
+            ) : (
+              data.map((row, rowIndex) => {
+                const key = getRowKey ? getRowKey(row, rowIndex) : rowIndex;
+                const isRowHovered = hoveredRowKey === key;
+                return (
+                  <tr
+                    key={key}
+                    onClick={
+                      onRowClick ? () => onRowClick(row, rowIndex) : undefined
+                    }
+                    onMouseEnter={() => setHoveredRowKey(key)}
+                    onMouseLeave={() => setHoveredRowKey(null)}
+                    className={
+                      onRowClick
+                        ? "hover cursor-pointer"
+                        : "hover:bg-foreground/5"
+                    }
+                  >
+                    {selectable ? (
+                      <td
+                        className="relative"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          className="checkbox checkbox-sm"
+                          checked={selectedKeys?.has(key) ?? false}
+                          onChange={() => toggleRow(key)}
+                          aria-label="Select row"
+                        />
+                      </td>
+                    ) : null}
+                    {columns.map((col) => (
+                      <td
+                        key={String(col.key)}
+                        className={`relative ${alignClass(col.align)} ${col.className ?? ""}`}
+                      >
+                        {renderCell(col, row, rowIndex, isRowHovered)}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+      {selectable && bulkActions && bulkActions.length > 0 ? (
+        <BulkActionsBar
+          count={selectedCount}
+          actions={bulkActions}
+          onClear={() => onSelectionChange?.(new Set())}
+        />
+      ) : null}
+    </>
   );
 }

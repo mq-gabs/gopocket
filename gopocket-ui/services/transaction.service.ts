@@ -52,6 +52,8 @@ export const transactionService = {
     httpClient.patch<ActualTransaction>(`${basePath}/${id}`, payload),
   delete: (id: string) =>
     httpClient.delete<{ deleted: boolean }>(`${basePath}/${id}`),
+  deleteBulk: (ids: string[]) =>
+    httpClient.delete<{ deleted: boolean }>(join(basePath, "bulk"), { ids }),
   getDashboard: (mode: "month" | "year", date: string, page = 1) =>
     httpClient.get<DashboardData>(
       `/api/dashboard?mode=${mode}&date=${date}&page=${page}`,

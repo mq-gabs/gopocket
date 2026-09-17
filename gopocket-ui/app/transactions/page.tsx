@@ -51,6 +51,10 @@ function TransactionsPageContent() {
   const [copySource, setCopySource] = useState<ActualTransaction | undefined>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(
+    new Set(),
+  );
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -65,6 +69,13 @@ function TransactionsPageContent() {
   useEffect(() => {
     getTransactions();
   }, [apiFilters]);
+
+  // Only rows still present in the current (possibly filtered) result set
+  // count as selected, so a stale selection can never leak into a bulk
+  // action after the filters change.
+  const selectedIds = (transactions ?? [])
+    .map((transaction) => transaction.id)
+    .filter((id) => selectedKeys.has(id));
 
   const openCreate = () => {
     setSelectedTransaction(undefined);
@@ -128,6 +139,17 @@ function TransactionsPageContent() {
     setIsModalOpen(false);
     setSelectedTransaction(undefined);
     setCopySource(undefined);
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      await transactionService.deleteBulk(selectedIds);
+      setIsBulkDeleteOpen(false);
+      setSelectedKeys(new Set());
+      getTransactions();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("common.error"));
+    }
   };
 
   const columns: TableColumn<ActualTransaction>[] = [
@@ -231,6 +253,17 @@ function TransactionsPageContent() {
           size="sm"
           getRowKey={(row) => row.id}
           emptyState={t("transactions.empty")}
+          selectable
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          bulkActions={[
+            {
+              icon: TrashIcon,
+              label: t("bulkActions.deleteAll"),
+              variation: "destructive",
+              onClick: () => setIsBulkDeleteOpen(true),
+            },
+          ]}
         />
       ) : null}
 
@@ -259,6 +292,15 @@ function TransactionsPageContent() {
         open={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
+        confirmType="destructive"
+      />
+
+      <ConfirmModal
+        title={t("bulkActions.deleteTransactions.title")}
+        message={t("bulkActions.deleteTransactions.message")}
+        open={isBulkDeleteOpen}
+        onClose={() => setIsBulkDeleteOpen(false)}
+        onConfirm={handleBulkDelete}
         confirmType="destructive"
       />
     </div>

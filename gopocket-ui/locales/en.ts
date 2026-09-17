@@ -96,6 +96,15 @@ export const en = {
   "filters.endDate": "To",
   "filters.now": "Until now",
   "filters.clear": "Clear filters",
+  "bulkActions.selected": "selected",
+  "bulkActions.clear": "Clear selection",
+  "bulkActions.deleteAll": "Delete all",
+  "bulkActions.deleteTransactions.title": "Delete transactions",
+  "bulkActions.deleteTransactions.message":
+    "Are you sure you want to delete the selected transactions? This action cannot be undone.",
+  "bulkActions.deletePlanned.title": "Delete planned transactions",
+  "bulkActions.deletePlanned.message":
+    "Are you sure you want to delete the selected planned transactions? This action cannot be undone.",
   "common.required": "This field is required",
   "common.loading": "Loading...",
   "common.error": "Something went wrong",

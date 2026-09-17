@@ -25,6 +25,7 @@ func (e *Endpoint) RegisterRoutes(router *gin.RouterGroup) {
 	router.GET("/dashboard", e.dashboard)
 
 	router.PATCH("/transactions/:id", e.update)
+	router.DELETE("/transactions/bulk", e.deleteBulk)
 	router.DELETE("/transactions/:id", e.delete)
 	router.GET("/transactions/:id", e.getByID)
 
@@ -216,6 +217,26 @@ func (e *Endpoint) delete(ctx *gin.Context) {
 	id := strings.TrimSpace(ctx.Param("id"))
 	if err := e.service.Delete(id); err != nil {
 		ginhttp.WriteError(ctx, http.StatusNotFound, "transaction not found")
+		return
+	}
+
+	ginhttp.WriteSuccess(ctx, http.StatusOK, map[string]bool{"deleted": true})
+}
+
+func (e *Endpoint) deleteBulk(ctx *gin.Context) {
+	dto, err := ginhttp.ReadBody[DeleteBulkTransactionsRequest](ctx)
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	if err := ValidateDeleteBulkTransactions(*dto); err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := e.service.DeleteMany(dto.IDs); err != nil {
+		ginhttp.WriteError(ctx, http.StatusNotFound, "transactions not found")
 		return
 	}
 

@@ -24,6 +24,7 @@ type Repository interface {
 	Create(transaction *Transaction, categoryIDs []string) (*Transaction, error)
 	Update(transaction *Transaction, categoryIDs []string) (*Transaction, error)
 	Delete(id string) error
+	DeleteMany(ids []string) error
 	FindByID(id string) (*Transaction, error)
 
 	FindAllActual(filter TransactionFilter) ([]Transaction, error)
@@ -90,6 +91,17 @@ func (r *repository) setCategories(transaction *Transaction, categoryIDs []strin
 
 func (r *repository) Delete(id string) error {
 	result := r.db.Delete(&Transaction{}, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (r *repository) DeleteMany(ids []string) error {
+	result := r.db.Delete(&Transaction{}, "id IN ?", ids)
 	if result.Error != nil {
 		return result.Error
 	}

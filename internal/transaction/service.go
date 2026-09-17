@@ -9,6 +9,7 @@ import (
 type Service interface {
 	Update(id string, dto UpdateTransactionRequest) (*Transaction, error)
 	Delete(id string) error
+	DeleteMany(ids []string) error
 	FindByID(id string) (*Transaction, error)
 
 	Dashboard(query DashboardQuery) (*DashboardResponse, error)
@@ -58,6 +59,13 @@ func (s *service) Delete(id string) error {
 		return errors.New("transaction id is required")
 	}
 	return s.repository.Delete(id)
+}
+
+func (s *service) DeleteMany(ids []string) error {
+	if len(ids) == 0 {
+		return errors.New("transaction ids are required")
+	}
+	return s.repository.DeleteMany(ids)
 }
 
 func (s *service) FindByID(id string) (*Transaction, error) {

@@ -57,6 +57,10 @@ function PlannedPageContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(
+    new Set(),
+  );
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -71,6 +75,13 @@ function PlannedPageContent() {
   useEffect(() => {
     getAllPlanned();
   }, [apiFilters]);
+
+  // Only rows still present in the current (possibly filtered) result set
+  // count as selected, so a stale selection can never leak into a bulk
+  // action after the filters change.
+  const selectedIds = (plannedTransactions ?? [])
+    .map((planned) => planned.id)
+    .filter((id) => selectedKeys.has(id));
 
   const openCreate = () => {
     setSelectedPlanned(undefined);
@@ -150,6 +161,17 @@ function PlannedPageContent() {
     try {
       await transactionService.delete(selectedPlanned.id);
       setIsDeleteOpen(false);
+      getAllPlanned();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("common.error"));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      await transactionService.deleteBulk(selectedIds);
+      setIsBulkDeleteOpen(false);
+      setSelectedKeys(new Set());
       getAllPlanned();
     } catch (err) {
       setError(err instanceof Error ? err.message : t("common.error"));
@@ -287,6 +309,17 @@ function PlannedPageContent() {
           size="sm"
           getRowKey={(row) => row.id}
           emptyState={t("planned.empty")}
+          selectable
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          bulkActions={[
+            {
+              icon: TrashIcon,
+              label: t("bulkActions.deleteAll"),
+              variation: "destructive",
+              onClick: () => setIsBulkDeleteOpen(true),
+            },
+          ]}
         />
       ) : null}
 
@@ -330,6 +363,15 @@ function PlannedPageContent() {
         open={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
+        confirmType="destructive"
+      />
+
+      <ConfirmModal
+        title={t("bulkActions.deletePlanned.title")}
+        message={t("bulkActions.deletePlanned.message")}
+        open={isBulkDeleteOpen}
+        onClose={() => setIsBulkDeleteOpen(false)}
+        onConfirm={handleBulkDelete}
         confirmType="destructive"
       />
     </div>

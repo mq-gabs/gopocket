@@ -35,6 +35,12 @@ type CreateBulkPlannedTransactionsRequest struct {
 	EndMonth    string   `json:"end_month"`
 }
 
+// DeleteBulkTransactionsRequest is the request payload for deleting a batch
+// of transactions by id.
+type DeleteBulkTransactionsRequest struct {
+	IDs []string `json:"ids"`
+}
+
 // UpdateTransactionRequest is the request payload for updating a transaction.
 type UpdateTransactionRequest struct {
 	Title       string   `json:"title,omitempty"`

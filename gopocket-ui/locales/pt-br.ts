@@ -99,6 +99,15 @@ export const ptBr = {
   "filters.endDate": "Até",
   "filters.now": "Até agora",
   "filters.clear": "Limpar filtros",
+  "bulkActions.selected": "selecionado(s)",
+  "bulkActions.clear": "Limpar seleção",
+  "bulkActions.deleteAll": "Excluir todos",
+  "bulkActions.deleteTransactions.title": "Excluir registros",
+  "bulkActions.deleteTransactions.message":
+    "Tem certeza que deseja excluir os registros selecionados? Essa ação não pode ser desfeita.",
+  "bulkActions.deletePlanned.title": "Excluir registros planejados",
+  "bulkActions.deletePlanned.message":
+    "Tem certeza que deseja excluir os registros planejados selecionados? Essa ação não pode ser desfeita.",
   "common.required": "Este campo é obrigatório",
   "common.loading": "Carregando...",
   "common.error": "Algo deu errado",

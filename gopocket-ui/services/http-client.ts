@@ -33,5 +33,9 @@ export const httpClient = {
   get: <T>(path: string) => request<T>(path),
   post: <T, D = unknown>(path: string, body: D) => request<T>(path, { method: "POST", body: JSON.stringify(body) }),
   patch: <T, D = unknown>(path: string, body: D) => request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
-  delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
+  delete: <T, D = unknown>(path: string, body?: D) =>
+    request<T>(path, {
+      method: "DELETE",
+      ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+    }),
 };
