@@ -71,6 +71,10 @@ export const ptBr = {
   "transactions.delete.message":
     "Tem certeza que deseja excluir este registro?",
   "transactions.table.uncategorized": "Sem categoria",
+  "transactions.toast.created": "Registro criado com sucesso",
+  "transactions.toast.updated": "Registro atualizado com sucesso",
+  "transactions.toast.deleted": "Registro excluído com sucesso",
+  "transactions.toast.bulkDeleted": "Registros excluídos com sucesso",
   "planned.title": "Registros Planejados",
   "planned.description": "Veja antecipadamente receitas e despesas futuras.",
   "planned.empty": "Ainda não há registros planejados.",
@@ -86,6 +90,11 @@ export const ptBr = {
   "planned.bulk.preview": "registros planejados serão criados",
   "planned.bulk.invalidRange":
     "O mês final não pode ser anterior ao mês inicial",
+  "planned.toast.created": "Registro planejado criado com sucesso",
+  "planned.toast.bulkCreated": "Registros planejados criados com sucesso",
+  "planned.toast.updated": "Registro planejado atualizado com sucesso",
+  "planned.toast.deleted": "Registro planejado excluído com sucesso",
+  "planned.toast.bulkDeleted": "Registros planejados excluídos com sucesso",
   "planned.delete.title": "Excluir registro planejado",
   "planned.delete.message":
     "Tem certeza que deseja excluir este registro planejado?",

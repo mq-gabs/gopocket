@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   PlusIcon,
   DocumentDuplicateIcon,
@@ -109,15 +110,19 @@ function TransactionsPageContent() {
           selectedTransaction.id,
           payload as UpdateTransactionPayload,
         );
+        toast.success(t("transactions.toast.updated"));
       } else {
         await transactionService.createActual(
           payload as CreateActualTransactionPayload,
         );
+        toast.success(t("transactions.toast.created"));
       }
       setIsModalOpen(false);
       getTransactions();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
+      const message = err instanceof Error ? err.message : t("common.error");
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -128,10 +133,13 @@ function TransactionsPageContent() {
 
     try {
       await transactionService.delete(selectedTransaction.id);
+      toast.success(t("transactions.toast.deleted"));
       setIsDeleteOpen(false);
       getTransactions();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
+      const message = err instanceof Error ? err.message : t("common.error");
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -144,11 +152,14 @@ function TransactionsPageContent() {
   const handleBulkDelete = async () => {
     try {
       await transactionService.deleteBulk(selectedIds);
+      toast.success(t("transactions.toast.bulkDeleted"));
       setIsBulkDeleteOpen(false);
       setSelectedKeys(new Set());
       getTransactions();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
+      const message = err instanceof Error ? err.message : t("common.error");
+      setError(message);
+      toast.error(message);
     }
   };
 

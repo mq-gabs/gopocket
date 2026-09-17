@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/contexts/theme-context";
 import { CategoryProvider } from "@/contexts/category-context";
 import "./globals.css";
 import { GlobalHeader } from "@/components/global-header";
+import { AppToaster } from "@/components/app-toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function RootLayout({
                   <main className="flex-1 p-4">{children}</main>
                 </div>
               </div>
+              <AppToaster />
             </CategoryProvider>
           </I18nProvider>
         </ThemeProvider>

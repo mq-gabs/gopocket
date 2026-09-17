@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   CheckIcon,
   DocumentDuplicateIcon,
@@ -129,15 +130,19 @@ function PlannedPageContent() {
           selectedPlanned.id,
           payload as UpdateTransactionPayload,
         );
+        toast.success(t("planned.toast.updated"));
       } else {
         await transactionService.createPlanned(
           payload as CreatePlannedTransactionPayload,
         );
+        toast.success(t("planned.toast.created"));
       }
       setIsModalOpen(false);
       getAllPlanned();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
+      const message = err instanceof Error ? err.message : t("common.error");
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -146,10 +151,13 @@ function PlannedPageContent() {
   ) => {
     try {
       await transactionService.createBulkPlanned(payload);
+      toast.success(t("planned.toast.bulkCreated"));
       setIsBulkModalOpen(false);
       getAllPlanned();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
+      const message = err instanceof Error ? err.message : t("common.error");
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -160,21 +168,27 @@ function PlannedPageContent() {
 
     try {
       await transactionService.delete(selectedPlanned.id);
+      toast.success(t("planned.toast.deleted"));
       setIsDeleteOpen(false);
       getAllPlanned();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
+      const message = err instanceof Error ? err.message : t("common.error");
+      setError(message);
+      toast.error(message);
     }
   };
 
   const handleBulkDelete = async () => {
     try {
       await transactionService.deleteBulk(selectedIds);
+      toast.success(t("planned.toast.bulkDeleted"));
       setIsBulkDeleteOpen(false);
       setSelectedKeys(new Set());
       getAllPlanned();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
+      const message = err instanceof Error ? err.message : t("common.error");
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -185,7 +199,9 @@ function PlannedPageContent() {
       });
       getAllPlanned();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
+      const message = err instanceof Error ? err.message : t("common.error");
+      setError(message);
+      toast.error(message);
     }
   };
 
