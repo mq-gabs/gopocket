@@ -13,13 +13,9 @@ export function AmountCell({ amount, type, className = "" }: AmountCellProps) {
 
   return (
     <span
-      className={cls(
-        "font-medium",
-        isExpense ? "text-destructive-60" : "text-primary-60",
-        className,
-      )}
+      className={cls("font-medium", isExpense ? "" : "text-primary", className)}
     >
-      {isExpense ? "-" : "+"}
+      {isExpense ? "" : "+"}
       {formatCurrencyString(amount)}
     </span>
   );
