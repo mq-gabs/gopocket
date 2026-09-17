@@ -17,6 +17,7 @@ type Service interface {
 	FindAllActual(query ListTransactionsQuery) ([]Transaction, error)
 
 	CreatePlanned(dto CreatePlannedTransactionRequest) (*Transaction, error)
+	CreateBulkPlanned(dto CreateBulkPlannedTransactionsRequest) ([]Transaction, error)
 	FindAllPlanned(query ListTransactionsQuery) ([]Transaction, error)
 }
 
@@ -82,4 +83,22 @@ func (s *service) CreatePlanned(dto CreatePlannedTransactionRequest) (*Transacti
 
 func (s *service) FindAllPlanned(query ListTransactionsQuery) ([]Transaction, error) {
 	return s.repository.FindAllPlanned(toTransactionFilter(query))
+}
+
+func (s *service) CreateBulkPlanned(dto CreateBulkPlannedTransactionsRequest) ([]Transaction, error) {
+	models, err := CreateBulkPlannedRequestToModels(dto)
+	if err != nil {
+		return nil, err
+	}
+
+	created := make([]Transaction, 0, len(models))
+	for _, model := range models {
+		result, err := s.repository.Create(&model, dto.CategoryIDs)
+		if err != nil {
+			return nil, err
+		}
+		created = append(created, *result)
+	}
+
+	return created, nil
 }

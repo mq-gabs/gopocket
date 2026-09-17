@@ -21,6 +21,20 @@ type CreatePlannedTransactionRequest struct {
 	DueAt       string   `json:"due_at"`
 }
 
+// CreateBulkPlannedTransactionsRequest is the request payload for creating a
+// batch of planned transactions, one per month in [StartMonth, EndMonth],
+// all due on DueDay. StartMonth/EndMonth use the "YYYY-MM" format.
+type CreateBulkPlannedTransactionsRequest struct {
+	Title       string   `json:"title"`
+	Description string   `json:"description,omitempty"`
+	Amount      int      `json:"amount"`
+	Type        string   `json:"type"`
+	CategoryIDs []string `json:"category_ids"`
+	DueDay      int      `json:"due_day"`
+	StartMonth  string   `json:"start_month"`
+	EndMonth    string   `json:"end_month"`
+}
+
 // UpdateTransactionRequest is the request payload for updating a transaction.
 type UpdateTransactionRequest struct {
 	Title       string   `json:"title,omitempty"`

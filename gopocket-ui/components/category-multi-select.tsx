@@ -72,6 +72,16 @@ export function CategoryMultiSelect({
     onChange([...selectedIds, categoryId]);
     setQuery("");
     setHighlightedIndex(0);
+
+    // Nothing left to pick: close instead of leaving an empty dropdown open,
+    // which would otherwise sit on top of (and swallow clicks meant for)
+    // whatever is rendered below the field, such as a form's submit button.
+    const remaining = options.filter((category) => category.id !== categoryId);
+    if (remaining.length === 0) {
+      setIsOpen(false);
+      return;
+    }
+
     inputRef.current?.focus();
   };
 
@@ -162,7 +172,7 @@ export function CategoryMultiSelect({
         {isOpen && (
           <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-light-gray bg-background shadow-lg">
             {options.length === 0 ? (
-              <li className="px-3 py-2 text-sm text-foreground/60">
+              <li className="pointer-events-none px-3 py-2 text-sm text-foreground/60">
                 {t("categories.select.empty")}
               </li>
             ) : (

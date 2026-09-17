@@ -11,6 +11,7 @@ import {
 import Table, { TableColumn } from "@/components/tables/table";
 import { HoverRowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
+import { BulkPlannedForm } from "@/components/bulk-planned-form";
 import { Button } from "@/components/button";
 import { CategoryBadgesCell } from "@/components/tables/category-badges-cell";
 import { ConfirmModal } from "@/components/confirm-modal";
@@ -24,6 +25,7 @@ import { useTransactionFilters } from "@/hooks/use-transaction-filters";
 import { transactionService } from "@/services/transaction.service";
 import type {
   Category,
+  CreateBulkPlannedTransactionsPayload,
   CreatePlannedTransactionPayload,
   PlannedTransaction,
   UpdateTransactionPayload,
@@ -53,6 +55,7 @@ function PlannedPageContent() {
     PlannedTransaction | undefined
   >();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,10 +95,18 @@ function PlannedPageContent() {
     setIsDeleteOpen(true);
   };
 
+  const openBulkCreate = () => {
+    setIsBulkModalOpen(true);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedPlanned(undefined);
     setCopySource(undefined);
+  };
+
+  const handleCloseBulkModal = () => {
+    setIsBulkModalOpen(false);
   };
 
   const handleSubmit = async (
@@ -113,6 +124,18 @@ function PlannedPageContent() {
         );
       }
       setIsModalOpen(false);
+      getAllPlanned();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("common.error"));
+    }
+  };
+
+  const handleBulkSubmit = async (
+    payload: CreateBulkPlannedTransactionsPayload,
+  ) => {
+    try {
+      await transactionService.createBulkPlanned(payload);
+      setIsBulkModalOpen(false);
       getAllPlanned();
     } catch (err) {
       setError(err instanceof Error ? err.message : t("common.error"));
@@ -230,7 +253,16 @@ function PlannedPageContent() {
             {t("planned.description")}
           </p>
         </div>
-        <Button onClick={openCreate}>
+        <Button
+          onClick={openCreate}
+          actionsLabel={t("actions.more")}
+          actions={[
+            {
+              label: t("planned.bulk.action"),
+              onClick: openBulkCreate,
+            },
+          ]}
+        >
           <PlusIcon className="h-5 w-5" />
           {t("actions.newPlanned")}
         </Button>
@@ -276,6 +308,19 @@ function PlannedPageContent() {
           includeDueDate={!selectedPlanned}
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}
+        />
+      </Modal>
+
+      <Modal
+        title={t("planned.bulk.title")}
+        open={isBulkModalOpen}
+        onClose={handleCloseBulkModal}
+      >
+        <BulkPlannedForm
+          categories={categories}
+          submitLabel={t("actions.save")}
+          onSubmit={handleBulkSubmit}
+          onCancel={handleCloseBulkModal}
         />
       </Modal>
 

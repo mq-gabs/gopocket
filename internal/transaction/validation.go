@@ -18,6 +18,9 @@ var (
 	validateCategoryIDs    = vslices.Slice("categoryIds", vslices.Required[string](), vslices.Each(validateCategoryIDItem))
 	validatePaidAt         = vstring.String("paidAt", vstring.Required())
 	validateDueAt          = vstring.String("dueAt", vstring.Required())
+	validateDueDay         = vnumber.Number("dueDay", vnumber.InRange(1, 31))
+	validateStartMonth     = vstring.String("startMonth", vstring.Required(), vstring.Pattern(`^\d{4}-(0[1-9]|1[0-2])$`))
+	validateEndMonth       = vstring.String("endMonth", vstring.Required(), vstring.Pattern(`^\d{4}-(0[1-9]|1[0-2])$`))
 )
 
 // ValidateCreateActualTransaction is a placeholder validation hook for future rules.
@@ -43,6 +46,22 @@ func ValidateCreatePlannedTransaction(dto CreatePlannedTransactionRequest) error
 		validateType(dto.Type),
 		validateCategoryIDs(dto.CategoryIDs),
 		validateDueAt(dto.DueAt),
+	)
+}
+
+// ValidateCreateBulkPlannedTransactions validates a request to create a batch
+// of planned transactions across a month range. The chronological ordering of
+// StartMonth/EndMonth is checked separately, once they are parsed.
+func ValidateCreateBulkPlannedTransactions(dto CreateBulkPlannedTransactionsRequest) error {
+	return errors.Join(
+		validateTitle(dto.Title),
+		validateDescription(dto.Description),
+		validateAmount(dto.Amount),
+		validateType(dto.Type),
+		validateCategoryIDs(dto.CategoryIDs),
+		validateDueDay(dto.DueDay),
+		validateStartMonth(dto.StartMonth),
+		validateEndMonth(dto.EndMonth),
 	)
 }
 

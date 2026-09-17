@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"fmt"
 	"gopocket/internal/transaction/transactiontype"
 	"strings"
 	"time"
@@ -56,6 +57,56 @@ func CreatePlannedRequestToModel(dto CreatePlannedTransactionRequest) Transactio
 		PaidAt:      parseOptionalTransactionDate(dto.PaidAt),
 		DueAt:       *parseTransactionDate(dto.DueAt),
 	}
+}
+
+// CreateBulkPlannedRequestToModels expands a bulk request into one planned
+// transaction per month in [StartMonth, EndMonth] (inclusive), each due on
+// DueDay (clamped to the last day of shorter months) and titled with an
+// "(index/total)" suffix, e.g. "Installment (2/5)".
+func CreateBulkPlannedRequestToModels(dto CreateBulkPlannedTransactionsRequest) ([]Transaction, error) {
+	start, err := time.Parse("2006-01", dto.StartMonth)
+	if err != nil {
+		return nil, fmt.Errorf("start_month must be in YYYY-MM format")
+	}
+	end, err := time.Parse("2006-01", dto.EndMonth)
+	if err != nil {
+		return nil, fmt.Errorf("end_month must be in YYYY-MM format")
+	}
+	if end.Before(start) {
+		return nil, fmt.Errorf("end_month must not be before start_month")
+	}
+
+	total := monthsBetweenInclusive(start, end)
+	models := make([]Transaction, 0, total)
+	cursor := start
+	for index := 1; index <= total; index++ {
+		models = append(models, Transaction{
+			Title:       fmt.Sprintf("%s (%d/%d)", dto.Title, index, total),
+			Description: dto.Description,
+			Amount:      dto.Amount,
+			Type:        transactiontype.TransactionType(dto.Type),
+			PaidAt:      nil,
+			DueAt:       dueDateInMonth(cursor.Year(), cursor.Month(), dto.DueDay),
+		})
+		cursor = cursor.AddDate(0, 1, 0)
+	}
+
+	return models, nil
+}
+
+func monthsBetweenInclusive(start, end time.Time) int {
+	return (end.Year()-start.Year())*12 + int(end.Month()-start.Month()) + 1
+}
+
+// dueDateInMonth builds a noon-UTC timestamp for the given day within
+// year/month, clamping to the month's last day (e.g. day 31 in April becomes
+// April 30) instead of overflowing into the next month.
+func dueDateInMonth(year int, month time.Month, day int) time.Time {
+	lastDay := time.Date(year, month+1, 1, 0, 0, 0, 0, time.UTC).AddDate(0, 0, -1).Day()
+	if day > lastDay {
+		day = lastDay
+	}
+	return time.Date(year, month, day, 12, 0, 0, 0, time.UTC)
 }
 
 // toTransactionFilter parses raw query parameters into a repository-ready

@@ -33,6 +33,7 @@ func (e *Endpoint) RegisterRoutes(router *gin.RouterGroup) {
 
 	router.POST("/transactions/planned", e.createPlanned)
 	router.GET("/transactions/planned", e.listPlanned)
+	router.POST("/transactions/planned/bulk", e.createBulkPlanned)
 }
 
 func (e *Endpoint) dashboard(ctx *gin.Context) {
@@ -85,6 +86,32 @@ func (e *Endpoint) createPlanned(ctx *gin.Context) {
 	}
 
 	ginhttp.WriteSuccess(ctx, http.StatusCreated, ToResponse(model))
+}
+
+func (e *Endpoint) createBulkPlanned(ctx *gin.Context) {
+	dto, err := ginhttp.ReadBody[CreateBulkPlannedTransactionsRequest](ctx)
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	if err := ValidateCreateBulkPlannedTransactions(*dto); err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	models, err := e.service.CreateBulkPlanned(*dto)
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	responses := make([]TransactionResponse, 0, len(models))
+	for _, model := range models {
+		responses = append(responses, ToResponse(&model))
+	}
+
+	ginhttp.WriteSuccess(ctx, http.StatusCreated, responses)
 }
 
 func (e *Endpoint) getByID(ctx *gin.Context) {

@@ -5,6 +5,7 @@ import type {
   CreateActualTransactionPayload,
   UpdateTransactionPayload,
   CreatePlannedTransactionPayload,
+  CreateBulkPlannedTransactionsPayload,
   PlannedTransaction,
   TransactionListFilters,
 } from "@/types/models";
@@ -15,6 +16,7 @@ const basePath = "/api/transactions";
 
 const basePathActual = join(basePath, "actual");
 const basePathPlanned = join(basePath, "planned");
+const basePathPlannedBulk = join(basePathPlanned, "bulk");
 
 const buildListQuery = (filters?: TransactionListFilters): string => {
   if (!filters) return "";
@@ -44,6 +46,8 @@ export const transactionService = {
     httpClient.post<ActualTransaction>(basePathActual, payload),
   createPlanned: (payload: CreatePlannedTransactionPayload) =>
     httpClient.post<ActualTransaction>(basePathPlanned, payload),
+  createBulkPlanned: (payload: CreateBulkPlannedTransactionsPayload) =>
+    httpClient.post<PlannedTransaction[]>(basePathPlannedBulk, payload),
   update: (id: string, payload: UpdateTransactionPayload) =>
     httpClient.patch<ActualTransaction>(`${basePath}/${id}`, payload),
   delete: (id: string) =>

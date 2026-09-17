@@ -55,6 +55,19 @@ export interface CreatePlannedTransactionPayload {
   due_at: string;
 }
 
+export interface CreateBulkPlannedTransactionsPayload {
+  title: string;
+  description: string;
+  amount: number;
+  type: TransactionType;
+  category_ids: string[];
+  due_day: number;
+  /** "YYYY-MM" */
+  start_month: string;
+  /** "YYYY-MM" */
+  end_month: string;
+}
+
 export type UpdateTransactionPayload = {
   title?: string;
   description?: string;
