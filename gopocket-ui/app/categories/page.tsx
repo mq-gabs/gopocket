@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { CategoryForm } from "@/components/category-form";
 import { ConfirmModal } from "@/components/confirm-modal";
@@ -59,13 +60,17 @@ export default function CategoriesPage() {
           selectedCategory.id,
           payload as UpdateCategoryPayload,
         );
+        toast.success(t("categories.toast.updated"));
       } else {
         await categoryService.create(payload as CreateCategoryPayload);
+        toast.success(t("categories.toast.created"));
       }
       setIsModalOpen(false);
       getCategories();
     } catch (err) {
-      setError(getErrorMessage(err, t));
+      const message = getErrorMessage(err, t);
+      setError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -79,10 +84,13 @@ export default function CategoriesPage() {
     setSubmitting(true);
     try {
       await categoryService.delete(selectedCategory.id);
+      toast.success(t("categories.toast.deleted"));
       setIsDeleteOpen(false);
       getCategories();
     } catch (err) {
-      setError(getErrorMessage(err, t));
+      const message = getErrorMessage(err, t);
+      setError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
