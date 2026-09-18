@@ -73,7 +73,8 @@ export function DatePicker({
   // calendar-date always works with a full day; a "month" picker just
   // anchors on the first of that month and discards the day part again once
   // the user clicks one.
-  const calendarValue = granularity === "month" && value ? `${value}-01` : value;
+  const calendarValue =
+    granularity === "month" && value ? `${value}-01` : value;
 
   // Read inside the native "change" listener without needing it in a
   // dependency array (see the callback ref below for why that matters here).
@@ -180,7 +181,7 @@ export function DatePicker({
     : "";
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`} ref={containerRef}>
+    <div className={`flex flex-col gap-2  ${className}`} ref={containerRef}>
       {label && (
         <label htmlFor={id} className="text-sm font-medium text-base-content">
           {label}
@@ -194,7 +195,7 @@ export function DatePicker({
         aria-label={ariaLabel}
         disabled={disabled}
         onClick={() => setIsOpen((open) => !open)}
-        className="flex w-full items-center justify-between gap-2 rounded-lg border border-light-gray px-3 py-1 text-left text-sm outline-primary disabled:opacity-50"
+        className="flex w-full items-center justify-between gap-2 rounded-lg border border-light-gray px-3 py-1 text-left text-sm outline-primary disabled:opacity-50 cursor-pointer"
       >
         <span className={displayValue ? "" : "text-foreground/40"}>
           {displayValue || "—"}

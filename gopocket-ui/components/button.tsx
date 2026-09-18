@@ -17,7 +17,7 @@ const mapVariationToClasses: Record<ButtonVariation, string> = {
   destructive: "bg-destructive/20 text-destructive border border-destructive",
   neutral: "bg-light-gray/50 text-foreground border bordr-light-gray",
   blank:
-    "hover:bg-light-gray/50 border text-foreground border-transparent hover:border-light-gray",
+    "hover:bg-foreground/5 border text-foreground border-transparent hover:border-foreground/20",
 };
 const getClassByVariation = (variation: ButtonVariation): string =>
   mapVariationToClasses[variation] || mapVariationToClasses["primary"];

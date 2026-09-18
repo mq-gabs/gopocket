@@ -15,7 +15,7 @@ export function NotificationBell() {
         type="button"
         tabIndex={0}
         aria-label={t("notifications.title")}
-        className="relative flex items-center justify-center rounded-lg p-1.5 text-foreground hover:bg-light-gray/50"
+        className="relative flex items-center justify-center rounded-lg p-1.5 text-foreground hover:bg-light-gray/50 cursor-pointer"
       >
         <BellIcon className="h-5 w-5" />
         {activeCount > 0 && (

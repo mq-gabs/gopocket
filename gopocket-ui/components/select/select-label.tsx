@@ -10,18 +10,18 @@ interface SelectLabelProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: SelectOption[];
 }
 
-interface LabelProps  {
-  label: SelectOption['label']
+interface LabelProps {
+  label: SelectOption["label"];
 }
 
 function Label({ label }: LabelProps) {
-  if (typeof label === 'string') {
-    return <Fragment>{label}</Fragment>
+  if (typeof label === "string") {
+    return <Fragment>{label}</Fragment>;
   }
 
-  const Label = label
+  const Label = label;
 
-  return <Label />
+  return <Label />;
 }
 
 export function SelectLabel({
@@ -39,12 +39,16 @@ export function SelectLabel({
 
       <select
         id={id}
-        className={`text-sm border border-light-gray outline-primary px-3! py-1! rounded-lg w-full ${className} `}
+        className={`text-sm border border-light-gray outline-primary px-3! py-1! rounded-lg w-full cursor-pointer ${className}`}
         {...props}
       >
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
-           <Label label={option.label} />
+          <option
+            key={option.value}
+            value={option.value}
+            className="text-foreground bg-background"
+          >
+            <Label label={option.label} />
           </option>
         ))}
       </select>

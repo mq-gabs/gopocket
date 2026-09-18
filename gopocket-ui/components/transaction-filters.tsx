@@ -81,7 +81,8 @@ export function TransactionFiltersBar({
   return (
     <div className="rounded-2xl border border-foreground/10 bg-background p-4">
       <div className="flex items-center justify-between gap-4">
-        <button
+        <Button
+          variation="blank"
           type="button"
           onClick={() => setIsOpen((open) => !open)}
           className="flex cursor-pointer items-center gap-2 text-sm font-medium text-base-content"
@@ -98,7 +99,7 @@ export function TransactionFiltersBar({
           ) : (
             <ChevronDownIcon className="h-4 w-4" />
           )}
-        </button>
+        </Button>
 
         {hasActiveFilters && (
           <Button type="button" variation="blank" onClick={clearAll}>
