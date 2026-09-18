@@ -19,6 +19,7 @@ export const ptBr = {
   "dashboard.viewAll": "Ver todos os registros",
   "dashboard.date": "Data",
   "dashboard.invalidYear": "Insira um ano válido",
+  "dashboard.emptyData": "Não há dados",
   "theme.label": "Tema",
   "theme.light": "Claro",
   "theme.dark": "Escuro",
@@ -81,7 +82,8 @@ export const ptBr = {
   "transactions.import.nubank.action": "Importar do Nubank",
   "transactions.import.nubank.title": "Importar do Nubank",
   "transactions.import.nubank.file": "Arquivo CSV",
-  "transactions.import.nubank.generalCategories": "Categorias (aplicadas a todos)",
+  "transactions.import.nubank.generalCategories":
+    "Categorias (aplicadas a todos)",
   "transactions.import.nubank.rules": "Categorias condicionais",
   "transactions.import.nubank.addRule": "Adicionar regra",
   "transactions.import.nubank.term": "Termo",
@@ -139,7 +141,8 @@ export const ptBr = {
   "common.required": "Este campo é obrigatório",
   "common.loading": "Carregando...",
   "common.error": "Algo deu errado",
-  "errors.invalidRequestBody": "A solicitação parece estar incorreta. Tente novamente.",
+  "errors.invalidRequestBody":
+    "A solicitação parece estar incorreta. Tente novamente.",
   "errors.validationFailed": "Verifique as informações preenchidas.",
   "errors.internalError": "Algo deu errado do nosso lado. Tente novamente.",
   "errors.categoryNotFound": "Essa categoria não foi encontrada.",

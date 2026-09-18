@@ -41,7 +41,10 @@ export function Modal({ title, open, onClose, children }: ModalProps) {
         </div>
         {children}
       </div>
-      <div onClick={onClose} className="modal-backdrop bg-black/50"></div>
+      <div
+        onClick={onClose}
+        className="modal-backdrop bg-black/50 backdrop-blur-sm"
+      ></div>
     </dialog>
   );
 }

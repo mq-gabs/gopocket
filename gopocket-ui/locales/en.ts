@@ -19,6 +19,7 @@ export const en = {
   "dashboard.viewAll": "View all transactions",
   "dashboard.date": "Date",
   "dashboard.invalidYear": "Insert a valid year",
+  "dashboard.emptyData": "No data available",
   "theme.label": "Theme",
   "theme.light": "Light",
   "theme.dark": "Dark",
@@ -71,7 +72,8 @@ export const en = {
   "transactions.table.category": "Category",
   "transactions.table.date": "Date",
   "transactions.delete.title": "Delete transaction",
-  "transactions.delete.message": "Are you sure you want to delete this transaction?",
+  "transactions.delete.message":
+    "Are you sure you want to delete this transaction?",
   "transactions.table.uncategorized": "Uncategorized",
   "transactions.toast.created": "Transaction created successfully",
   "transactions.toast.updated": "Transaction updated successfully",
@@ -85,7 +87,8 @@ export const en = {
   "transactions.import.nubank.addRule": "Add rule",
   "transactions.import.nubank.term": "Term",
   "planned.title": "Planned Transactions",
-  "planned.description": "Preview upcoming income and expenses before they happen.",
+  "planned.description":
+    "Preview upcoming income and expenses before they happen.",
   "planned.empty": "No planned transactions yet.",
   "planned.table.dueAt": "Due At",
   "planned.form.title.create": "Create planned transaction",
@@ -106,9 +109,11 @@ export const en = {
   "planned.toast.markedPaid": "Planned transaction marked as paid",
   "planned.toast.bulkMarkedPaid": "Planned transactions marked as paid",
   "planned.delete.title": "Delete planned transaction",
-  "planned.delete.message": "Are you sure you want to delete this planned transaction?",
+  "planned.delete.message":
+    "Are you sure you want to delete this planned transaction?",
   "planned.markPaid.title": "Mark as paid",
-  "planned.markPaid.message": "Are you sure you want to mark this planned transaction as paid?",
+  "planned.markPaid.message":
+    "Are you sure you want to mark this planned transaction as paid?",
   "filters.title": "Filters",
   "filters.search": "Search",
   "filters.searchPlaceholder": "Search by title or description",
@@ -135,7 +140,8 @@ export const en = {
   "common.required": "This field is required",
   "common.loading": "Loading...",
   "common.error": "Something went wrong",
-  "errors.invalidRequestBody": "That request looks malformed. Please try again.",
+  "errors.invalidRequestBody":
+    "That request looks malformed. Please try again.",
   "errors.validationFailed": "Please check the information you entered.",
   "errors.internalError": "Something went wrong on our end. Please try again.",
   "errors.categoryNotFound": "That category could not be found.",

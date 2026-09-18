@@ -11,12 +11,19 @@ type SplittedExpenses = {
   amounts: number[];
 };
 
+const prefixCurrency = (val: string | number) => `$ ${val}`;
+
+const orderByAmount = (expenses: DashboardExpense[]) =>
+  expenses.sort((a, b) => b.amount - a.amount);
+
 const buildExpenseChart = ({
   expenses,
 }: {
   expenses: DashboardExpense[];
 }): ApexOptions => {
-  const { amounts, categories } = expenses.reduce(
+  const orderedExpenses = orderByAmount(expenses);
+
+  const { amounts, categories } = orderedExpenses.reduce(
     (acc, curr) => {
       return {
         amounts: [...acc.amounts, formatCurrentyScale(curr.amount)],
@@ -30,8 +37,21 @@ const buildExpenseChart = ({
     chart: {
       type: "donut",
     },
+    plotOptions: {
+      pie: {
+        borderRadius: 12,
+      },
+    },
+    stroke: {
+      width: 0,
+    },
     series: amounts,
     labels: categories,
+    yaxis: {
+      labels: {
+        formatter: prefixCurrency,
+      },
+    },
   };
 };
 

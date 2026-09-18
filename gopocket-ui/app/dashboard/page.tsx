@@ -23,18 +23,21 @@ import { formatCurrencyString } from "@/utils/currency";
 import { formatDate } from "@/utils/time";
 import { getErrorMessage } from "@/utils/api-error";
 import BalanceTrend from "@/components/charts/balance-trend-chart";
-import ExpenseChart from "@/components/charts/expenses-chart";
 import Table, { TableColumn } from "@/components/tables/table";
 import { AmountCell } from "@/components/amount-cell";
+import EmptyChart from "@/components/charts/empty-chart";
 
 const currentMonth = new Date().toISOString().slice(0, 7);
 const currentYear = currentMonth.slice(0, 4);
-
 const YEAR_DEBOUNCE_MS = 400;
 const isValidYear = (raw: string): boolean => {
   const year = Number(raw);
   return /^\d{4}$/.test(raw.trim()) && year >= 2000 && year <= 2100;
 };
+const isDataEmpty = (data: DashboardData | null): boolean =>
+  data === null
+    ? true
+    : data.summary.total_expenses === 0 && data.summary.total_income === 0;
 
 export default function DashboardPage() {
   const { t, locale } = useI18n();
@@ -113,6 +116,8 @@ export default function DashboardPage() {
   ): ButtonVariation => {
     return mode === target ? "primary" : "blank";
   };
+
+  const isEmpty = isDataEmpty(data);
 
   return (
     <div className="space-y-7">
@@ -199,8 +204,8 @@ export default function DashboardPage() {
             />
           </section>
 
-          <section className="grid gap-5 xl:grid-cols-[1.65fr_1fr]">
-            <article className="rounded-2xl border border-foreground/10 bg-foreground/5 p-5">
+          <section className="">
+            <article className="rounded-2xl border border-foreground/10 bg-foreground/5 p-5 flex flex-col">
               <div className="mb-2">
                 <h2 className="text-lg font-semibold">
                   {t("dashboard.balanceTrend")}
@@ -210,14 +215,22 @@ export default function DashboardPage() {
                   {formatDate(data.end_date, locale)}
                 </p>
               </div>
-              <BalanceTrend trends={data.trend} />
+              {isEmpty ? (
+                <EmptyChart className="min-h-50" />
+              ) : (
+                <BalanceTrend trends={data.trend} />
+              )}
             </article>
-            <article className="rounded-2xl border border-foreground/10 bg-foreground/5 p-5">
+            {/* <article className="rounded-2xl border border-foreground/10 bg-foreground/5 p-5 flex flex-col">
               <h2 className="mb-2 text-lg font-semibold">
                 {t("dashboard.expenseBreakdown")}
               </h2>
-              <ExpenseChart expenses={data.expenses} />
-            </article>
+              {isEmpty ? (
+                <EmptyChart />
+              ) : (
+                <ExpenseChart expenses={data.expenses} />
+              )}
+            </article> */}
           </section>
 
           <section className="overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/5">

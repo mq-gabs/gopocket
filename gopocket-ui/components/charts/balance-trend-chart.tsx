@@ -1,6 +1,6 @@
 "use client";
 
-import { useI18n } from "@/contexts/i18n-context";
+import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import { Locale } from "@/locales";
 import { DashboardTrend } from "@/types/models";
 import { formatCurrentyScale } from "@/utils/currency";
@@ -11,12 +11,16 @@ import BaseChart from "./base-chart";
 
 type SplittedTrend = { balances: number[]; labels: string[] };
 
+const prefixCurrency = (val: string | number) => `$ ${val}`;
+
 const buildTrendChartOptions = ({
   trends,
   locale,
+  t,
 }: {
   trends: DashboardTrend[];
   locale: Locale;
+  t: TranslateFunction;
 }): ApexOptions => {
   const { balances, labels } = trends.reduce(
     (acc, curr) => {
@@ -30,17 +34,32 @@ const buildTrendChartOptions = ({
 
   return {
     chart: {
-      type: "line",
+      type: "bar",
+      height: 400,
     },
 
     series: [
       {
-        name: "Trend",
+        name: t("dashboard.balanceTrend"),
         data: balances,
+        color: "var(--secondary)",
       },
     ],
+    plotOptions: {
+      bar: {
+        borderRadius: 8,
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
     xaxis: {
       categories: labels,
+    },
+    yaxis: {
+      labels: {
+        formatter: prefixCurrency,
+      },
     },
   };
 };
@@ -52,9 +71,9 @@ interface IBalanceTrend {
 export default function BalanceTrend({ trends }: IBalanceTrend) {
   if (!trends) return <></>;
 
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const options = useMemo(
-    () => buildTrendChartOptions({ trends, locale }),
+    () => buildTrendChartOptions({ trends, locale, t }),
     [trends],
   );
 
