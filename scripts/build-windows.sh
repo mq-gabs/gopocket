@@ -9,7 +9,10 @@ echo "Building $APP_NAME for Windows..."
 
 mkdir -p "$OUTPUT_DIR"
 
-GOOS=windows GOARCH=amd64 CGO_ENABLED=0 \
+GOOS=windows \
+GOARCH=amd64 \
+CGO_ENABLED=1 \
+CC=x86_64-w64-mingw32-gcc \
 go build \
   -trimpath \
   -ldflags="-s -w" \
