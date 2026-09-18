@@ -15,6 +15,7 @@ import type {
 } from "@/types/models";
 import { Button } from "@/components/button";
 import { CategoryCard } from "@/components/category-card";
+import { getErrorMessage } from "@/utils/api-error";
 
 export default function CategoriesPage() {
   const { t } = useI18n();
@@ -61,7 +62,7 @@ export default function CategoriesPage() {
       setIsModalOpen(false);
       getCategories();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
+      setError(getErrorMessage(err, t));
     }
   };
 
@@ -75,7 +76,7 @@ export default function CategoriesPage() {
       setIsDeleteOpen(false);
       getCategories();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("common.error"));
+      setError(getErrorMessage(err, t));
     }
   };
 

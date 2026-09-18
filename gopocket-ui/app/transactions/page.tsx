@@ -31,6 +31,7 @@ import { HoverRowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
 import { useRequest } from "@/hooks/use-request";
 import { useTransactionFilters } from "@/hooks/use-transaction-filters";
+import { getErrorMessage, translateErrorKey } from "@/utils/api-error";
 
 export default function TransactionsPage() {
   return (
@@ -66,6 +67,7 @@ function TransactionsPageContent() {
     result: transactions,
     loading,
     error: transactionsError,
+    errorKey: transactionsErrorKey,
   } = useRequest({
     callback: () => transactionService.getAllActual(apiFilters),
   });
@@ -125,7 +127,7 @@ function TransactionsPageContent() {
       setIsModalOpen(false);
       getTransactions();
     } catch (err) {
-      const message = err instanceof Error ? err.message : t("common.error");
+      const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
     }
@@ -142,7 +144,7 @@ function TransactionsPageContent() {
       setIsDeleteOpen(false);
       getTransactions();
     } catch (err) {
-      const message = err instanceof Error ? err.message : t("common.error");
+      const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
     }
@@ -166,7 +168,7 @@ function TransactionsPageContent() {
       });
       setIsImportModalOpen(false);
     } catch (err) {
-      const message = err instanceof Error ? err.message : t("common.error");
+      const message = getErrorMessage(err, t);
       toast.error(message);
     }
   };
@@ -179,7 +181,7 @@ function TransactionsPageContent() {
       setSelectedKeys(new Set());
       getTransactions();
     } catch (err) {
-      const message = err instanceof Error ? err.message : t("common.error");
+      const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
     }
@@ -248,7 +250,8 @@ function TransactionsPageContent() {
     },
   ];
 
-  const requestError = error ?? transactionsError;
+  const requestError =
+    error ?? (transactionsError ? translateErrorKey(transactionsErrorKey, t) : null);
 
   return (
     <div className="space-y-6">

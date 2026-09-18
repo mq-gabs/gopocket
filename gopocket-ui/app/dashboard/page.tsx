@@ -20,6 +20,7 @@ import type {
 } from "@/types/models";
 import { formatCurrencyString } from "@/utils/currency";
 import { formatDate } from "@/utils/time";
+import { getErrorMessage } from "@/utils/api-error";
 import BalanceTrend from "@/components/charts/balance-trend-chart";
 import ExpenseChart from "@/components/charts/expenses-chart";
 import Table, { TableColumn } from "@/components/tables/table";
@@ -77,7 +78,7 @@ export default function DashboardPage() {
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : t("common.error"));
+        setError(getErrorMessage(err, t));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

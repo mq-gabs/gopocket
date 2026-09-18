@@ -1,9 +1,11 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo } from "react";
+import { useI18n } from "./i18n-context";
 import { useRequest } from "@/hooks/use-request";
 import { categoryService } from "@/services/category.service";
 import type { Category } from "@/types/models";
+import { translateErrorKey } from "@/utils/api-error";
 
 interface CategoryContextValue {
   categories: Category[];
@@ -18,7 +20,8 @@ const CategoryContext = createContext<CategoryContextValue | undefined>(
 );
 
 export function CategoryProvider({ children }: { children: React.ReactNode }) {
-  const { call, result, loading, error } = useRequest({
+  const { t } = useI18n();
+  const { call, result, loading, error, errorKey } = useRequest({
     callback: () => categoryService.getAll(),
   });
 
@@ -27,6 +30,7 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const categories = useMemo(() => result ?? [], [result]);
+  const translatedError = error ? translateErrorKey(errorKey, t) : null;
 
   const value = useMemo<CategoryContextValue>(
     () => ({
@@ -35,10 +39,10 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
         categories.map((category) => [category.id, category]),
       ),
       loading,
-      error,
+      error: translatedError,
       refetch: call,
     }),
-    [categories, loading, error],
+    [categories, loading, translatedError],
   );
 
   return (

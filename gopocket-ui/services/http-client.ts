@@ -2,12 +2,18 @@ export interface ApiResponse<T> {
   status: boolean;
   data?: T;
   error?: string;
+  /** Stable identifier the frontend translates instead of showing `error` directly. */
+  key?: string;
 }
 
 export class HttpError extends Error {
-  constructor(message: string) {
+  /** Matches ApiResponse.key — see utils/api-error.ts for the translation lookup. */
+  key?: string;
+
+  constructor(message: string, key?: string) {
     super(message);
     this.name = "HttpError";
+    this.key = key;
   }
 }
 
@@ -18,7 +24,7 @@ async function unwrap<T>(response: Response): Promise<T> {
   const payload = (await response.json()) as ApiResponse<T>;
 
   if (!response.ok || payload.status === false) {
-    throw new HttpError(payload.error ?? "Request failed");
+    throw new HttpError(payload.error ?? "Request failed", payload.key);
   }
 
   return payload.data as T;

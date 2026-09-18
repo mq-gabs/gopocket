@@ -32,6 +32,7 @@ import type {
   UpdateTransactionPayload,
 } from "@/types/models";
 import { formatDate } from "@/utils/time";
+import { getErrorMessage, translateErrorKey } from "@/utils/api-error";
 
 export default function PlannedPage() {
   return (
@@ -69,6 +70,7 @@ function PlannedPageContent() {
     loading,
     result: plannedTransactions,
     error: plannedError,
+    errorKey: plannedErrorKey,
   } = useRequest({
     callback: () => transactionService.getAllPlanned(apiFilters),
   });
@@ -140,7 +142,7 @@ function PlannedPageContent() {
       setIsModalOpen(false);
       getAllPlanned();
     } catch (err) {
-      const message = err instanceof Error ? err.message : t("common.error");
+      const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
     }
@@ -155,7 +157,7 @@ function PlannedPageContent() {
       setIsBulkModalOpen(false);
       getAllPlanned();
     } catch (err) {
-      const message = err instanceof Error ? err.message : t("common.error");
+      const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
     }
@@ -172,7 +174,7 @@ function PlannedPageContent() {
       setIsDeleteOpen(false);
       getAllPlanned();
     } catch (err) {
-      const message = err instanceof Error ? err.message : t("common.error");
+      const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
     }
@@ -186,7 +188,7 @@ function PlannedPageContent() {
       setSelectedKeys(new Set());
       getAllPlanned();
     } catch (err) {
-      const message = err instanceof Error ? err.message : t("common.error");
+      const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
     }
@@ -199,7 +201,7 @@ function PlannedPageContent() {
       });
       getAllPlanned();
     } catch (err) {
-      const message = err instanceof Error ? err.message : t("common.error");
+      const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
     }
@@ -278,7 +280,8 @@ function PlannedPageContent() {
     },
   ];
 
-  const requestError = error ?? plannedError;
+  const requestError =
+    error ?? (plannedError ? translateErrorKey(plannedErrorKey, t) : null);
 
   return (
     <div className="space-y-6">

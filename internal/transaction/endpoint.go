@@ -12,6 +12,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	keyTransactionNotFound  = "transaction_not_found"
+	keyTransactionsNotFound = "transactions_not_found"
+	keyCSVFileRequired      = "csv_file_required"
+	keyCSVFileUnreadable    = "csv_file_unreadable"
+	keyInvalidCSV           = "invalid_csv"
+)
+
 // Endpoint handles HTTP traffic for transactions.
 type Endpoint struct {
 	service Service
@@ -45,7 +53,7 @@ func (e *Endpoint) dashboard(ctx *gin.Context) {
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	data, err := e.service.Dashboard(DashboardQuery{Mode: ctx.Query("mode"), Date: ctx.Query("date"), Page: page})
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
 		return
 	}
 	ginhttp.WriteSuccess(ctx, http.StatusOK, data)
@@ -54,18 +62,18 @@ func (e *Endpoint) dashboard(ctx *gin.Context) {
 func (e *Endpoint) createActual(ctx *gin.Context) {
 	dto, err := ginhttp.ReadBody[CreateActualTransactionRequest](ctx)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body")
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body", ginhttp.KeyInvalidRequestBody)
 		return
 	}
 
 	if err := ValidateCreateActualTransaction(*dto); err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
 		return
 	}
 
 	model, err := e.service.CreateActual(*dto)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error())
+		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error(), ginhttp.KeyInternalError)
 		return
 	}
 
@@ -75,18 +83,18 @@ func (e *Endpoint) createActual(ctx *gin.Context) {
 func (e *Endpoint) createPlanned(ctx *gin.Context) {
 	dto, err := ginhttp.ReadBody[CreatePlannedTransactionRequest](ctx)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body")
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body", ginhttp.KeyInvalidRequestBody)
 		return
 	}
 
 	if err := ValidateCreatePlannedTransaction(*dto); err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
 		return
 	}
 
 	model, err := e.service.CreatePlanned(*dto)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error())
+		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error(), ginhttp.KeyInternalError)
 		return
 	}
 
@@ -96,18 +104,18 @@ func (e *Endpoint) createPlanned(ctx *gin.Context) {
 func (e *Endpoint) createBulkPlanned(ctx *gin.Context) {
 	dto, err := ginhttp.ReadBody[CreateBulkPlannedTransactionsRequest](ctx)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body")
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body", ginhttp.KeyInvalidRequestBody)
 		return
 	}
 
 	if err := ValidateCreateBulkPlannedTransactions(*dto); err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
 		return
 	}
 
 	models, err := e.service.CreateBulkPlanned(*dto)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
 		return
 	}
 
@@ -123,7 +131,7 @@ func (e *Endpoint) getByID(ctx *gin.Context) {
 	id := strings.TrimSpace(ctx.Param("id"))
 	model, err := e.service.FindByID(id)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusNotFound, "transaction not found")
+		ginhttp.WriteError(ctx, http.StatusNotFound, "transaction not found", keyTransactionNotFound)
 		return
 	}
 
@@ -133,13 +141,13 @@ func (e *Endpoint) getByID(ctx *gin.Context) {
 func (e *Endpoint) listActual(ctx *gin.Context) {
 	query := parseListTransactionsQuery(ctx)
 	if err := ValidateListTransactionsQuery(query); err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
 		return
 	}
 
 	models, err := e.service.FindAllActual(query)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error())
+		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error(), ginhttp.KeyInternalError)
 		return
 	}
 
@@ -154,13 +162,13 @@ func (e *Endpoint) listActual(ctx *gin.Context) {
 func (e *Endpoint) listPlanned(ctx *gin.Context) {
 	query := parseListTransactionsQuery(ctx)
 	if err := ValidateListTransactionsQuery(query); err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
 		return
 	}
 
 	models, err := e.service.FindAllPlanned(query)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error())
+		ginhttp.WriteError(ctx, http.StatusInternalServerError, err.Error(), ginhttp.KeyInternalError)
 		return
 	}
 
@@ -199,18 +207,18 @@ func (e *Endpoint) update(ctx *gin.Context) {
 	id := strings.TrimSpace(ctx.Param("id"))
 	dto, err := ginhttp.ReadBody[UpdateTransactionRequest](ctx)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body")
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body", ginhttp.KeyInvalidRequestBody)
 		return
 	}
 
 	if err := ValidateUpdateTransaction(*dto); err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
 		return
 	}
 
 	model, err := e.service.Update(id, *dto)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusNotFound, "transaction not found")
+		ginhttp.WriteError(ctx, http.StatusNotFound, "transaction not found", keyTransactionNotFound)
 		return
 	}
 
@@ -220,7 +228,7 @@ func (e *Endpoint) update(ctx *gin.Context) {
 func (e *Endpoint) delete(ctx *gin.Context) {
 	id := strings.TrimSpace(ctx.Param("id"))
 	if err := e.service.Delete(id); err != nil {
-		ginhttp.WriteError(ctx, http.StatusNotFound, "transaction not found")
+		ginhttp.WriteError(ctx, http.StatusNotFound, "transaction not found", keyTransactionNotFound)
 		return
 	}
 
@@ -230,39 +238,39 @@ func (e *Endpoint) delete(ctx *gin.Context) {
 func (e *Endpoint) importNubank(ctx *gin.Context) {
 	fileHeader, err := ctx.FormFile("file")
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, "csv file is required")
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "csv file is required", keyCSVFileRequired)
 		return
 	}
 
 	file, err := fileHeader.Open()
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, "unable to read csv file")
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "unable to read csv file", keyCSVFileUnreadable)
 		return
 	}
 	defer file.Close()
 
 	fileBytes, err := io.ReadAll(file)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, "unable to read csv file")
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "unable to read csv file", keyCSVFileUnreadable)
 		return
 	}
 
 	var dto ImportNubankConfigRequest
 	if raw := ctx.PostForm("config"); raw != "" {
 		if err := json.Unmarshal([]byte(raw), &dto); err != nil {
-			ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid import configuration")
+			ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid import configuration", ginhttp.KeyInvalidRequestBody)
 			return
 		}
 	}
 
 	if err := ValidateImportNubankConfig(dto); err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
 		return
 	}
 
 	jobID, err := e.service.ImportNubank(fileBytes, dto)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), keyInvalidCSV)
 		return
 	}
 
@@ -272,17 +280,17 @@ func (e *Endpoint) importNubank(ctx *gin.Context) {
 func (e *Endpoint) deleteBulk(ctx *gin.Context) {
 	dto, err := ginhttp.ReadBody[DeleteBulkTransactionsRequest](ctx)
 	if err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body")
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body", ginhttp.KeyInvalidRequestBody)
 		return
 	}
 
 	if err := ValidateDeleteBulkTransactions(*dto); err != nil {
-		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error())
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
 		return
 	}
 
 	if err := e.service.DeleteMany(dto.IDs); err != nil {
-		ginhttp.WriteError(ctx, http.StatusNotFound, "transactions not found")
+		ginhttp.WriteError(ctx, http.StatusNotFound, "transactions not found", keyTransactionsNotFound)
 		return
 	}
 
