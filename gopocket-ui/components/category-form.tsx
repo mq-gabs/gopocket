@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
@@ -16,6 +17,7 @@ interface CategoryFormProps {
   onSubmit: (payload: CreateCategoryPayload | UpdateCategoryPayload) => void;
   onCancel?: () => void;
   submitLabel: string;
+  loading?: boolean;
 }
 
 export function CategoryForm({
@@ -23,6 +25,7 @@ export function CategoryForm({
   onSubmit,
   submitLabel,
   onCancel,
+  loading = false,
 }: CategoryFormProps) {
   const { t } = useI18n();
   const name = useMyState<string>(initialValues?.name ?? "");
@@ -56,7 +59,16 @@ export function CategoryForm({
             {t("actions.cancel")}
           </Button>
         )}
-        <Button type="submit">{submitLabel}</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? (
+            <>
+              <ArrowPathIcon className="h-4 w-4 animate-spin" />
+              {t("actions.saving")}
+            </>
+          ) : (
+            submitLabel
+          )}
+        </Button>
       </div>
     </form>
   );

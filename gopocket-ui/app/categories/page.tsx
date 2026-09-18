@@ -32,6 +32,7 @@ export default function CategoriesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const openCreate = () => {
     setSelectedCategory(undefined);
@@ -51,6 +52,7 @@ export default function CategoriesPage() {
   const handleSubmit = async (
     payload: CreateCategoryPayload | UpdateCategoryPayload,
   ) => {
+    setSubmitting(true);
     try {
       if (selectedCategory) {
         await categoryService.update(
@@ -64,6 +66,8 @@ export default function CategoriesPage() {
       getCategories();
     } catch (err) {
       setError(getErrorMessage(err, t));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -72,12 +76,15 @@ export default function CategoriesPage() {
       return;
     }
 
+    setSubmitting(true);
     try {
       await categoryService.delete(selectedCategory.id);
       setIsDeleteOpen(false);
       getCategories();
     } catch (err) {
       setError(getErrorMessage(err, t));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -145,6 +152,7 @@ export default function CategoriesPage() {
           submitLabel={t("actions.save")}
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}
+          loading={submitting}
         />
       </Modal>
 
@@ -155,6 +163,7 @@ export default function CategoriesPage() {
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
         confirmType="destructive"
+        loading={submitting}
       />
     </div>
   );

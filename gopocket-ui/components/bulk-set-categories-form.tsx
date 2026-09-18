@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
 import type { Category } from "@/types/models";
 import { Button } from "./button";
@@ -12,6 +13,7 @@ interface BulkSetCategoriesFormProps {
   submitLabel: string;
   onSubmit: (categoryIds: string[]) => void;
   onCancel?: () => void;
+  loading?: boolean;
 }
 
 export function BulkSetCategoriesForm({
@@ -20,6 +22,7 @@ export function BulkSetCategoriesForm({
   submitLabel,
   onSubmit,
   onCancel,
+  loading = false,
 }: BulkSetCategoriesFormProps) {
   const { t } = useI18n();
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
@@ -64,7 +67,16 @@ export function BulkSetCategoriesForm({
             {t("actions.cancel")}
           </Button>
         )}
-        <Button type="submit">{submitLabel}</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? (
+            <>
+              <ArrowPathIcon className="h-4 w-4 animate-spin" />
+              {t("actions.saving")}
+            </>
+          ) : (
+            submitLabel
+          )}
+        </Button>
       </div>
     </form>
   );

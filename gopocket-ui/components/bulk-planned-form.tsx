@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
@@ -21,6 +22,7 @@ interface BulkPlannedFormProps {
   onSubmit: (payload: CreateBulkPlannedTransactionsPayload) => void;
   onCancel?: () => void;
   submitLabel: string;
+  loading?: boolean;
 }
 
 const currentMonth = new Date().toISOString().slice(0, 7);
@@ -39,6 +41,7 @@ export function BulkPlannedForm({
   onSubmit,
   onCancel,
   submitLabel,
+  loading = false,
 }: BulkPlannedFormProps) {
   const { t } = useI18n();
   const [title, setTitle] = useState("");
@@ -174,7 +177,16 @@ export function BulkPlannedForm({
             {t("actions.cancel")}
           </Button>
         )}
-        <Button type="submit">{submitLabel}</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? (
+            <>
+              <ArrowPathIcon className="h-4 w-4 animate-spin" />
+              {t("actions.saving")}
+            </>
+          ) : (
+            submitLabel
+          )}
+        </Button>
       </div>
     </form>
   );

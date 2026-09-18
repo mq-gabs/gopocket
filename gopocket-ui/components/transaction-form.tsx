@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import type {
   Category,
@@ -52,6 +53,7 @@ interface TransactionFormProps {
    * whether initialValues is set.
    */
   isEditing?: boolean;
+  loading?: boolean;
 }
 
 export function TransactionForm({
@@ -63,6 +65,7 @@ export function TransactionForm({
   includeDate = true,
   includeDueDate = false,
   isEditing = Boolean(initialValues),
+  loading = false,
 }: TransactionFormProps) {
   const { t } = useI18n();
   const [title, setTitle] = useState(initialValues?.title ?? "");
@@ -195,7 +198,16 @@ export function TransactionForm({
             {t("actions.cancel")}
           </Button>
         )}
-        <Button type="submit">{submitLabel}</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? (
+            <>
+              <ArrowPathIcon className="h-4 w-4 animate-spin" />
+              {t("actions.saving")}
+            </>
+          ) : (
+            submitLabel
+          )}
+        </Button>
       </div>
     </form>
   );

@@ -58,6 +58,8 @@ export function Button({
   const baseClasses = clsx({
     "text-sm hover:brightness-120 font-bold cursor-pointer px-3 py-1 rounded-xl  flex items-center justify-center gap-2": true,
     "not-hover:bg-transparent not-hover:border-transparent": smooth,
+    "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:brightness-100":
+      true,
   });
   const variationClasses = getClassByVariation(variation);
 

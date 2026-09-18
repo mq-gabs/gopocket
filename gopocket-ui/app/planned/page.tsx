@@ -71,6 +71,7 @@ function PlannedPageContent() {
     new Set(),
   );
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     call: getAllPlanned,
@@ -138,6 +139,7 @@ function PlannedPageContent() {
   const handleSubmit = async (
     payload: CreatePlannedTransactionPayload | UpdateTransactionPayload,
   ) => {
+    setSubmitting(true);
     try {
       if (selectedPlanned) {
         await transactionService.update(
@@ -157,12 +159,15 @@ function PlannedPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleBulkSubmit = async (
     payload: CreateBulkPlannedTransactionsPayload,
   ) => {
+    setSubmitting(true);
     try {
       await transactionService.createBulkPlanned(payload);
       toast.success(t("planned.toast.bulkCreated"));
@@ -172,6 +177,8 @@ function PlannedPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -180,6 +187,7 @@ function PlannedPageContent() {
       return;
     }
 
+    setSubmitting(true);
     try {
       await transactionService.delete(selectedPlanned.id);
       toast.success(t("planned.toast.deleted"));
@@ -189,10 +197,13 @@ function PlannedPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleBulkDelete = async () => {
+    setSubmitting(true);
     try {
       await transactionService.deleteBulk(selectedIds);
       toast.success(t("planned.toast.bulkDeleted"));
@@ -203,6 +214,8 @@ function PlannedPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -211,6 +224,7 @@ function PlannedPageContent() {
       return;
     }
 
+    setSubmitting(true);
     try {
       await transactionService.update(selectedPlanned.id, {
         paid_at: new Date().toISOString(),
@@ -222,10 +236,13 @@ function PlannedPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleBulkMarkAsPaid = async () => {
+    setSubmitting(true);
     try {
       await transactionService.markManyPaid(selectedIds);
       toast.success(t("planned.toast.bulkMarkedPaid"));
@@ -236,10 +253,13 @@ function PlannedPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleBulkSetCategories = async (categoryIds: string[]) => {
+    setSubmitting(true);
     try {
       await transactionService.setCategoriesBulk(selectedIds, categoryIds);
       toast.success(t("bulkActions.setCategories.toast"));
@@ -250,6 +270,8 @@ function PlannedPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -420,6 +442,7 @@ function PlannedPageContent() {
           includeDueDate={!selectedPlanned}
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}
+          loading={submitting}
         />
       </Modal>
 
@@ -433,6 +456,7 @@ function PlannedPageContent() {
           submitLabel={t("actions.save")}
           onSubmit={handleBulkSubmit}
           onCancel={handleCloseBulkModal}
+          loading={submitting}
         />
       </Modal>
 
@@ -443,6 +467,7 @@ function PlannedPageContent() {
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
         confirmType="destructive"
+        loading={submitting}
       />
 
       <ConfirmModal
@@ -452,6 +477,7 @@ function PlannedPageContent() {
         onClose={() => setIsBulkDeleteOpen(false)}
         onConfirm={handleBulkDelete}
         confirmType="destructive"
+        loading={submitting}
       />
 
       <ConfirmModal
@@ -460,6 +486,7 @@ function PlannedPageContent() {
         open={isMarkPaidOpen}
         onClose={() => setIsMarkPaidOpen(false)}
         onConfirm={handleMarkAsPaid}
+        loading={submitting}
       />
 
       <ConfirmModal
@@ -468,6 +495,7 @@ function PlannedPageContent() {
         open={isBulkMarkPaidOpen}
         onClose={() => setIsBulkMarkPaidOpen(false)}
         onConfirm={handleBulkMarkAsPaid}
+        loading={submitting}
       />
 
       <Modal
@@ -481,6 +509,7 @@ function PlannedPageContent() {
           submitLabel={t("actions.save")}
           onSubmit={handleBulkSetCategories}
           onCancel={() => setIsBulkSetCategoriesOpen(false)}
+          loading={submitting}
         />
       </Modal>
     </div>

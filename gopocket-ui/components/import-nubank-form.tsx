@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
 import type { Category, ImportRule } from "@/types/models";
 import { Button } from "./button";
@@ -155,7 +155,14 @@ export function ImportNubankForm({
           {t("actions.cancel")}
         </Button>
         <Button type="submit" disabled={submitting}>
-          {submitLabel}
+          {submitting ? (
+            <>
+              <ArrowPathIcon className="h-4 w-4 animate-spin" />
+              {t("actions.importing")}
+            </>
+          ) : (
+            submitLabel
+          )}
         </Button>
       </div>
     </form>

@@ -66,6 +66,7 @@ function TransactionsPageContent() {
     new Set(),
   );
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     call: getTransactions,
@@ -116,6 +117,7 @@ function TransactionsPageContent() {
   const handleSubmit = async (
     payload: CreateActualTransactionPayload | UpdateTransactionPayload,
   ) => {
+    setSubmitting(true);
     try {
       if (selectedTransaction) {
         await transactionService.update(
@@ -135,6 +137,8 @@ function TransactionsPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -143,6 +147,7 @@ function TransactionsPageContent() {
       return;
     }
 
+    setSubmitting(true);
     try {
       await transactionService.delete(selectedTransaction.id);
       toast.success(t("transactions.toast.deleted"));
@@ -152,6 +157,8 @@ function TransactionsPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -179,6 +186,7 @@ function TransactionsPageContent() {
   };
 
   const handleBulkDelete = async () => {
+    setSubmitting(true);
     try {
       await transactionService.deleteBulk(selectedIds);
       toast.success(t("transactions.toast.bulkDeleted"));
@@ -189,10 +197,13 @@ function TransactionsPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleBulkSetCategories = async (categoryIds: string[]) => {
+    setSubmitting(true);
     try {
       await transactionService.setCategoriesBulk(selectedIds, categoryIds);
       toast.success(t("bulkActions.setCategories.toast"));
@@ -203,6 +214,8 @@ function TransactionsPageContent() {
       const message = getErrorMessage(err, t);
       setError(message);
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -355,6 +368,7 @@ function TransactionsPageContent() {
           submitLabel={t("actions.save")}
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}
+          loading={submitting}
         />
       </Modal>
 
@@ -378,6 +392,7 @@ function TransactionsPageContent() {
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
         confirmType="destructive"
+        loading={submitting}
       />
 
       <ConfirmModal
@@ -387,6 +402,7 @@ function TransactionsPageContent() {
         onClose={() => setIsBulkDeleteOpen(false)}
         onConfirm={handleBulkDelete}
         confirmType="destructive"
+        loading={submitting}
       />
 
       <Modal
@@ -400,6 +416,7 @@ function TransactionsPageContent() {
           submitLabel={t("actions.save")}
           onSubmit={handleBulkSetCategories}
           onCancel={() => setIsBulkSetCategoriesOpen(false)}
+          loading={submitting}
         />
       </Modal>
     </div>
