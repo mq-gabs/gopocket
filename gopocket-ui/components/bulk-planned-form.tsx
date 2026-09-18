@@ -10,6 +10,7 @@ import { Button } from "./button";
 import { buildTypeOptions } from "./transaction-form";
 import { CategoryMultiSelect } from "./category-multi-select";
 import { CurrencyInput } from "./inputs/currency-input";
+import { DatePicker } from "./inputs/date-picker";
 import { InputLabel } from "./inputs/input-label";
 import { SelectLabel } from "./select/select-label";
 import { TextareaLabel } from "./textarea/textarea-label";
@@ -132,20 +133,20 @@ export function BulkPlannedForm({
       />
 
       <div className="grid grid-cols-2 gap-4">
-        <InputLabel
+        <DatePicker
           id="bulk-start-month"
           label={t("planned.bulk.startMonth")}
-          type="month"
+          granularity="month"
           value={startMonth}
-          onChange={(event) => setStartMonth(event.target.value)}
+          onChange={setStartMonth}
           required
         />
-        <InputLabel
+        <DatePicker
           id="bulk-end-month"
           label={t("planned.bulk.endMonth")}
-          type="month"
+          granularity="month"
           value={endMonth}
-          onChange={(event) => setEndMonth(event.target.value)}
+          onChange={setEndMonth}
           required
         />
       </div>

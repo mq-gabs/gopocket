@@ -9,6 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "./button";
 import { CategoryMultiSelect } from "./category-multi-select";
+import { DatePicker } from "./inputs/date-picker";
 import { InputLabel } from "./inputs/input-label";
 import { SelectLabel } from "./select/select-label";
 import { useI18n } from "@/contexts/i18n-context";
@@ -131,14 +132,11 @@ export function TransactionFiltersBar({
               options={typeOptions}
             />
 
-            <InputLabel
+            <DatePicker
               id="filter-start-date"
               label={t("filters.startDate")}
-              type="date"
               value={value.startDate}
-              onChange={(event) =>
-                onChange({ ...value, startDate: event.target.value })
-              }
+              onChange={(startDate) => onChange({ ...value, startDate })}
             />
 
             <div className="flex flex-col gap-2">
@@ -160,15 +158,11 @@ export function TransactionFiltersBar({
                   {t("filters.now")}
                 </label>
               </div>
-              <input
+              <DatePicker
                 id="filter-end-date"
-                type="date"
                 disabled={value.endNow}
                 value={value.endDate}
-                onChange={(event) =>
-                  onChange({ ...value, endDate: event.target.value })
-                }
-                className="text-sm border border-light-gray outline-primary px-3 py-1 rounded-lg w-full disabled:opacity-50"
+                onChange={(endDate) => onChange({ ...value, endDate })}
               />
             </div>
           </div>

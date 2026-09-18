@@ -14,6 +14,7 @@ import { Button } from "./button";
 import { SelectLabel } from "./select/select-label";
 import { CategoryMultiSelect } from "./category-multi-select";
 import { CurrencyInput } from "./inputs/currency-input";
+import { DatePicker } from "./inputs/date-picker";
 import { InputLabel } from "./inputs/input-label";
 import { TextareaLabel } from "./textarea/textarea-label";
 import { TransactionType } from "@/types/transaction-type";
@@ -160,23 +161,21 @@ export function TransactionForm({
       />
 
       {includeDate && (
-        <InputLabel
+        <DatePicker
           id="transaction-date"
           label={t("transactions.form.date")}
-          type="date"
           value={transactionDate}
-          onChange={(event) => setTransactionDate(event.target.value)}
+          onChange={setTransactionDate}
           required
         />
       )}
 
       {includeDueDate && (
-        <InputLabel
+        <DatePicker
           id="transaction-due-date"
           label={t("planned.form.dueAt")}
-          type="date"
           value={dueDate}
-          onChange={(event) => setDueDate(event.target.value)}
+          onChange={setDueDate}
           required
         />
       )}

@@ -9,6 +9,7 @@ import {
   BanknotesIcon,
 } from "@heroicons/react/24/outline";
 import { Button, ButtonVariation } from "@/components/button";
+import { DatePicker } from "@/components/inputs/date-picker";
 import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import type { Locale } from "@/locales";
 import { transactionService } from "@/services/transaction.service";
@@ -27,6 +28,12 @@ import { AmountCell } from "@/components/amount-cell";
 const currentMonth = new Date().toISOString().slice(0, 7);
 const currentYear = currentMonth.slice(0, 4);
 
+const YEAR_DEBOUNCE_MS = 400;
+const isValidYear = (raw: string): boolean => {
+  const year = Number(raw);
+  return /^\d{4}$/.test(raw.trim()) && year >= 2000 && year <= 2100;
+};
+
 export default function DashboardPage() {
   const { t, locale } = useI18n();
   const [mode, setMode] = useState<DashboardMode>("month");
@@ -36,19 +43,56 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // The year field is free text, so it goes through a separate, debounced,
+  // client-validated buffer instead of updating `date` (and firing a
+  // request) on every keystroke — an out-of-range/incomplete year should
+  // never reach the API at all.
+  const [yearInput, setYearInput] = useState(currentYear);
+  const [yearError, setYearError] = useState<string | null>(null);
+
   useEffect(() => {
-    void transactionService
+    if (mode !== "year") return;
+
+    const handle = setTimeout(() => {
+      if (isValidYear(yearInput)) {
+        setYearError(null);
+        setDate(yearInput);
+      } else {
+        setYearError(t("dashboard.invalidYear"));
+      }
+    }, YEAR_DEBOUNCE_MS);
+
+    return () => clearTimeout(handle);
+  }, [yearInput, mode, t]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    transactionService
       .getDashboard(mode, date)
-      .then(setData)
-      .catch((err: unknown) =>
-        setError(err instanceof Error ? err.message : t("common.error")),
-      )
-      .finally(() => setLoading(false));
+      .then((result) => {
+        if (cancelled) return;
+        setData(result);
+        setError(null);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : t("common.error"));
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [date, mode, t]);
 
   const changeMode = (nextMode: DashboardMode) => {
     setMode(nextMode);
     setDate(nextMode === "year" ? currentYear : currentMonth);
+    setYearInput(currentYear);
+    setYearError(null);
   };
 
   const getButtonVariation = (
@@ -69,30 +113,43 @@ export default function DashboardPage() {
             {t("dashboard.description")}
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-2xl border border-foreground/20 py-1 px-1">
-          <Button
-            onClick={() => changeMode("month")}
-            variation={getButtonVariation(mode, "month")}
-          >
-            {t("dashboard.month")}
-          </Button>
-          <Button
-            onClick={() => changeMode("year")}
-            variation={getButtonVariation(mode, "year")}
-          >
-            {t("dashboard.year")}
-          </Button>
-          <input
-            aria-label={
-              mode === "month" ? t("dashboard.month") : t("dashboard.year")
-            }
-            type={mode === "month" ? "month" : "number"}
-            min={mode === "year" ? "2000" : undefined}
-            max={mode === "year" ? "2100" : undefined}
-            value={date}
-            onChange={(event) => setDate(event.target.value)}
-            className="w-40 rounded-xl border border-foreground/20 px-2 py-1 text-sm"
-          />
+        <div className="flex flex-col items-end gap-1">
+          <div className="flex items-center gap-2 rounded-2xl border border-foreground/20 py-1 px-1">
+            <Button
+              onClick={() => changeMode("month")}
+              variation={getButtonVariation(mode, "month")}
+            >
+              {t("dashboard.month")}
+            </Button>
+            <Button
+              onClick={() => changeMode("year")}
+              variation={getButtonVariation(mode, "year")}
+            >
+              {t("dashboard.year")}
+            </Button>
+            {mode === "month" ? (
+              <DatePicker
+                ariaLabel={t("dashboard.month")}
+                granularity="month"
+                value={date}
+                onChange={setDate}
+                className="w-40"
+              />
+            ) : (
+              <input
+                aria-label={t("dashboard.year")}
+                type="number"
+                min="2000"
+                max="2100"
+                value={yearInput}
+                onChange={(event) => setYearInput(event.target.value)}
+                className="w-40 rounded-xl border border-foreground/20 px-2 py-1 text-sm"
+              />
+            )}
+          </div>
+          {mode === "year" && yearError ? (
+            <p className="text-[10px] text-destructive">{yearError}</p>
+          ) : null}
         </div>
       </header>
 

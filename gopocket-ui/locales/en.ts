@@ -18,6 +18,7 @@ export const en = {
   "dashboard.transactionsInPeriod": "transactions in this period",
   "dashboard.viewAll": "View all transactions",
   "dashboard.date": "Date",
+  "dashboard.invalidYear": "Insert a valid year",
   "theme.label": "Theme",
   "theme.light": "Light",
   "theme.dark": "Dark",
