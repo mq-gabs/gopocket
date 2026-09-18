@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { BulkAction, BulkActionsBar } from "./bulk-actions-bar";
+import { Skeleton } from "../skeleton";
 
 export type TableCellValue = string | number | ReactNode;
 
@@ -41,6 +42,10 @@ export interface TableProps<T> {
   onSelectionChange?: (keys: Set<string | number>) => void;
   /** Actions shown in a floating bar while rows are selected (requires selectable) */
   bulkActions?: BulkAction[];
+  /** Renders skeleton rows instead of data while a fetch is in flight */
+  loading?: boolean;
+  /** Number of skeleton rows to render while loading (default 5) */
+  skeletonRowCount?: number;
 }
 
 const alignClass = (align?: "left" | "center" | "right") => {
@@ -83,6 +88,8 @@ export default function Table<T>({
   selectedKeys,
   onSelectionChange,
   bulkActions,
+  loading = false,
+  skeletonRowCount = 10,
 }: TableProps<T>) {
   const tableClasses = [
     "table",
@@ -171,7 +178,22 @@ export default function Table<T>({
             </tr>
           </thead>
           <tbody>
-            {data.length === 0 ? (
+            {loading ? (
+              Array.from({ length: skeletonRowCount }).map((_, rowIndex) => (
+                <tr key={`skeleton-${rowIndex}`}>
+                  {selectable ? (
+                    <td>
+                      <Skeleton className="h-4 w-4 rounded" />
+                    </td>
+                  ) : null}
+                  {columns.map((col) => (
+                    <td key={String(col.key)} className={alignClass(col.align)}>
+                      <Skeleton className="h-4 w-full max-w-32 rounded" />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : data.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length + (selectable ? 1 : 0)}

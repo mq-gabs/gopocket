@@ -26,6 +26,7 @@ import BalanceTrend from "@/components/charts/balance-trend-chart";
 import Table, { TableColumn } from "@/components/tables/table";
 import { AmountCell } from "@/components/amount-cell";
 import EmptyChart from "@/components/charts/empty-chart";
+import { Skeleton } from "@/components/skeleton";
 
 const currentMonth = new Date().toISOString().slice(0, 7);
 const currentYear = currentMonth.slice(0, 4);
@@ -174,11 +175,42 @@ export default function DashboardPage() {
       </header>
 
       {error ? <div className="alert alert-error">{error}</div> : null}
-      {loading && !data ? (
-        <p className="text-sm text-base-content/65">{t("common.loading")}</p>
+      {loading ? (
+        <>
+          <section className="grid gap-4 md:grid-cols-3">
+            <SummaryCardSkeleton />
+            <SummaryCardSkeleton />
+            <SummaryCardSkeleton />
+          </section>
+
+          <section>
+            <article className="rounded-2xl border border-foreground/10 bg-foreground/5 p-5 flex flex-col">
+              <div className="mb-2 space-y-2">
+                <Skeleton className="h-5 w-40 rounded" />
+                <Skeleton className="h-4 w-56 rounded" />
+              </div>
+              <Skeleton className="h-100 w-full rounded-xl" />
+            </article>
+          </section>
+
+          <section className="overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/5">
+            <div className="flex flex-col gap-3 border-b border-foreground/10 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-48 rounded" />
+                <Skeleton className="h-4 w-32 rounded" />
+              </div>
+            </div>
+            <Table
+              columns={buildRecentTransactionsColumns(t, locale)}
+              data={[]}
+              size="sm"
+              loading
+            />
+          </section>
+        </>
       ) : null}
 
-      {data ? (
+      {data && !loading ? (
         <>
           <section className="grid gap-4 md:grid-cols-3">
             <SummaryCard
@@ -318,6 +350,20 @@ function SummaryCard({
       <p className={`mt-1 text-2xl font-semibold text-right ${accent}`}>
         {formatCurrencyString(value)}
       </p>
+    </article>
+  );
+}
+
+function SummaryCardSkeleton() {
+  return (
+    <article className="rounded-2xl border border-foreground/10 bg-background p-5">
+      <div className="flex gap-2 items-center mb-6">
+        <Skeleton className="h-10 w-10 rounded-xl" />
+        <Skeleton className="h-4 w-20 rounded" />
+      </div>
+      <div className="flex justify-end">
+        <Skeleton className="h-6 w-24 rounded" />
+      </div>
     </article>
   );
 }

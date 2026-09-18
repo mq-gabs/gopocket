@@ -149,7 +149,6 @@ export const ptBr = {
   "bulkActions.setCategories.title": "Definir categorias",
   "bulkActions.setCategories.toast": "Categorias atualizadas",
   "common.required": "Este campo é obrigatório",
-  "common.loading": "Carregando...",
   "common.error": "Algo deu errado",
   "errors.invalidRequestBody":
     "A solicitação parece estar incorreta. Tente novamente.",

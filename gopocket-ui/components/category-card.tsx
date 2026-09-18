@@ -3,6 +3,7 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button } from "./button";
 import { Category } from "@/types/models";
 import CategoryBadge from "./category-badge";
+import { Skeleton } from "./skeleton";
 
 interface CategoryCardProps {
   category: Category;
@@ -41,6 +42,22 @@ export function CategoryCard({
         >
           <TrashIcon className="h-4 w-4" />
         </Button>
+      </div>
+    </div>
+  );
+}
+
+export function CategoryCardSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-xl bg-foreground/5 p-4 border border-foreground/15">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-6 w-28 rounded-lg" />
+        </div>
+      </div>
+      <div className="mt-6 flex justify-end gap-2">
+        <Skeleton className="h-6 w-6 rounded-lg" />
+        <Skeleton className="h-6 w-6 rounded-lg" />
       </div>
     </div>
   );

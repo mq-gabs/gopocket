@@ -15,7 +15,7 @@ import type {
   UpdateCategoryPayload,
 } from "@/types/models";
 import { Button } from "@/components/button";
-import { CategoryCard } from "@/components/category-card";
+import { CategoryCard, CategoryCardSkeleton } from "@/components/category-card";
 import { RefreshButton } from "@/components/refresh-button";
 import { getErrorMessage } from "@/utils/api-error";
 
@@ -127,8 +127,6 @@ export default function CategoriesPage() {
         <div className="alert alert-error">{combinedError}</div>
       ) : null}
 
-      {loading ? <p>{t("common.loading")}</p> : null}
-
       {!loading && categories.length === 0 ? (
         <div className="rounded-3xl border border-base-300 bg-base-100 p-8 text-center text-base-content/70">
           {t("categories.empty")}
@@ -136,14 +134,18 @@ export default function CategoriesPage() {
       ) : null}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {categories.map((category) => (
-          <CategoryCard
-            key={category.id}
-            category={category}
-            onEdit={() => openEdit(category)}
-            onDelete={() => openDelete(category)}
-          />
-        ))}
+        {loading
+          ? Array.from({ length: 6 }).map((_, index) => (
+              <CategoryCardSkeleton key={index} />
+            ))
+          : categories.map((category) => (
+              <CategoryCard
+                key={category.id}
+                category={category}
+                onEdit={() => openEdit(category)}
+                onDelete={() => openDelete(category)}
+              />
+            ))}
       </div>
 
       <Modal

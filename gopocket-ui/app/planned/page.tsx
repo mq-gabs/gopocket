@@ -390,39 +390,36 @@ function PlannedPageContent() {
         <div className="alert alert-error">{requestError}</div>
       ) : null}
 
-      {loading ? <p>{t("common.loading")}</p> : null}
-
-      {!loading ? (
-        <Table
-          columns={columns}
-          data={plannedTransactions ?? []}
-          size="sm"
-          getRowKey={(row) => row.id}
-          emptyState={t("planned.empty")}
-          selectable
-          selectedKeys={selectedKeys}
-          onSelectionChange={setSelectedKeys}
-          bulkActions={[
-            {
-              icon: CheckIcon,
-              label: t("bulkActions.markPaid"),
-              variation: "primary",
-              onClick: () => setIsBulkMarkPaidOpen(true),
-            },
-            {
-              icon: TagIcon,
-              label: t("bulkActions.setCategories"),
-              onClick: () => setIsBulkSetCategoriesOpen(true),
-            },
-            {
-              icon: TrashIcon,
-              label: t("bulkActions.deleteAll"),
-              variation: "destructive",
-              onClick: () => setIsBulkDeleteOpen(true),
-            },
-          ]}
-        />
-      ) : null}
+      <Table
+        columns={columns}
+        data={plannedTransactions ?? []}
+        size="sm"
+        getRowKey={(row) => row.id}
+        emptyState={t("planned.empty")}
+        selectable
+        selectedKeys={selectedKeys}
+        onSelectionChange={setSelectedKeys}
+        loading={loading}
+        bulkActions={[
+          {
+            icon: CheckIcon,
+            label: t("bulkActions.markPaid"),
+            variation: "primary",
+            onClick: () => setIsBulkMarkPaidOpen(true),
+          },
+          {
+            icon: TagIcon,
+            label: t("bulkActions.setCategories"),
+            onClick: () => setIsBulkSetCategoriesOpen(true),
+          },
+          {
+            icon: TrashIcon,
+            label: t("bulkActions.deleteAll"),
+            variation: "destructive",
+            onClick: () => setIsBulkDeleteOpen(true),
+          },
+        ]}
+      />
 
       <Modal
         title={

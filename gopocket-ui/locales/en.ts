@@ -148,7 +148,6 @@ export const en = {
   "bulkActions.setCategories.title": "Set categories",
   "bulkActions.setCategories.toast": "Categories updated",
   "common.required": "This field is required",
-  "common.loading": "Loading...",
   "common.error": "Something went wrong",
   "errors.invalidRequestBody":
     "That request looks malformed. Please try again.",
