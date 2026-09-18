@@ -25,6 +25,7 @@ type Repository interface {
 	Update(transaction *Transaction, categoryIDs []string) (*Transaction, error)
 	Delete(id string) error
 	DeleteMany(ids []string) error
+	MarkManyPaid(ids []string, paidAt time.Time) error
 	FindByID(id string) (*Transaction, error)
 
 	FindAllActual(filter TransactionFilter) ([]Transaction, error)
@@ -102,6 +103,17 @@ func (r *repository) Delete(id string) error {
 
 func (r *repository) DeleteMany(ids []string) error {
 	result := r.db.Delete(&Transaction{}, "id IN ?", ids)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (r *repository) MarkManyPaid(ids []string, paidAt time.Time) error {
+	result := r.db.Model(&Transaction{}).Where("id IN ?", ids).Update("paid_at", paidAt)
 	if result.Error != nil {
 		return result.Error
 	}

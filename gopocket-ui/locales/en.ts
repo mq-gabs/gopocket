@@ -102,8 +102,12 @@ export const en = {
   "planned.toast.updated": "Planned transaction updated successfully",
   "planned.toast.deleted": "Planned transaction deleted successfully",
   "planned.toast.bulkDeleted": "Planned transactions deleted successfully",
+  "planned.toast.markedPaid": "Planned transaction marked as paid",
+  "planned.toast.bulkMarkedPaid": "Planned transactions marked as paid",
   "planned.delete.title": "Delete planned transaction",
   "planned.delete.message": "Are you sure you want to delete this planned transaction?",
+  "planned.markPaid.title": "Mark as paid",
+  "planned.markPaid.message": "Are you sure you want to mark this planned transaction as paid?",
   "filters.title": "Filters",
   "filters.search": "Search",
   "filters.searchPlaceholder": "Search by title or description",
@@ -123,6 +127,10 @@ export const en = {
   "bulkActions.deletePlanned.title": "Delete planned transactions",
   "bulkActions.deletePlanned.message":
     "Are you sure you want to delete the selected planned transactions? This action cannot be undone.",
+  "bulkActions.markPaid": "Mark as paid",
+  "bulkActions.markPaidPlanned.title": "Mark planned transactions as paid",
+  "bulkActions.markPaidPlanned.message":
+    "Are you sure you want to mark the selected planned transactions as paid?",
   "common.required": "This field is required",
   "common.loading": "Loading...",
   "common.error": "Something went wrong",

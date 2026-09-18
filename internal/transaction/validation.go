@@ -89,6 +89,12 @@ func ValidateDeleteBulkTransactions(dto DeleteBulkTransactionsRequest) error {
 	return validateIDs(dto.IDs)
 }
 
+// ValidateMarkPaidBulkTransactions validates a request to mark a batch of
+// transactions as paid by id.
+func ValidateMarkPaidBulkTransactions(dto MarkPaidBulkTransactionsRequest) error {
+	return validateIDs(dto.IDs)
+}
+
 // ValidateUpdateTransaction is a placeholder validation hook for future rules.
 func ValidateUpdateTransaction(dto UpdateTransactionRequest) error {
 	if dto.CategoryIDs == nil {

@@ -104,9 +104,14 @@ export const ptBr = {
   "planned.toast.updated": "Registro planejado atualizado com sucesso",
   "planned.toast.deleted": "Registro planejado excluído com sucesso",
   "planned.toast.bulkDeleted": "Registros planejados excluídos com sucesso",
+  "planned.toast.markedPaid": "Registro planejado marcado como pago",
+  "planned.toast.bulkMarkedPaid": "Registros planejados marcados como pagos",
   "planned.delete.title": "Excluir registro planejado",
   "planned.delete.message":
     "Tem certeza que deseja excluir este registro planejado?",
+  "planned.markPaid.title": "Marcar como pago",
+  "planned.markPaid.message":
+    "Tem certeza que deseja marcar este registro planejado como pago?",
   "filters.title": "Filtros",
   "filters.search": "Buscar",
   "filters.searchPlaceholder": "Buscar por título ou descrição",
@@ -126,6 +131,10 @@ export const ptBr = {
   "bulkActions.deletePlanned.title": "Excluir registros planejados",
   "bulkActions.deletePlanned.message":
     "Tem certeza que deseja excluir os registros planejados selecionados? Essa ação não pode ser desfeita.",
+  "bulkActions.markPaid": "Marcar como pago",
+  "bulkActions.markPaidPlanned.title": "Marcar registros planejados como pagos",
+  "bulkActions.markPaidPlanned.message":
+    "Tem certeza que deseja marcar os registros planejados selecionados como pagos?",
   "common.required": "Este campo é obrigatório",
   "common.loading": "Carregando...",
   "common.error": "Algo deu errado",

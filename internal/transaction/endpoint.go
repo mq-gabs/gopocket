@@ -34,6 +34,7 @@ func NewEndpoint(service Service) *Endpoint {
 func (e *Endpoint) RegisterRoutes(router *gin.RouterGroup) {
 	router.GET("/dashboard", e.dashboard)
 
+	router.PATCH("/transactions/bulk/mark-paid", e.markBulkPaid)
 	router.PATCH("/transactions/:id", e.update)
 	router.DELETE("/transactions/bulk", e.deleteBulk)
 	router.DELETE("/transactions/:id", e.delete)
@@ -295,4 +296,24 @@ func (e *Endpoint) deleteBulk(ctx *gin.Context) {
 	}
 
 	ginhttp.WriteSuccess(ctx, http.StatusOK, map[string]bool{"deleted": true})
+}
+
+func (e *Endpoint) markBulkPaid(ctx *gin.Context) {
+	dto, err := ginhttp.ReadBody[MarkPaidBulkTransactionsRequest](ctx)
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body", ginhttp.KeyInvalidRequestBody)
+		return
+	}
+
+	if err := ValidateMarkPaidBulkTransactions(*dto); err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
+		return
+	}
+
+	if err := e.service.MarkManyPaid(dto.IDs); err != nil {
+		ginhttp.WriteError(ctx, http.StatusNotFound, "transactions not found", keyTransactionsNotFound)
+		return
+	}
+
+	ginhttp.WriteSuccess(ctx, http.StatusOK, map[string]bool{"marked": true})
 }

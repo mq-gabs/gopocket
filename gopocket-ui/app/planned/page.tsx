@@ -60,6 +60,8 @@ function PlannedPageContent() {
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+  const [isMarkPaidOpen, setIsMarkPaidOpen] = useState(false);
+  const [isBulkMarkPaidOpen, setIsBulkMarkPaidOpen] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(
     new Set(),
   );
@@ -107,6 +109,11 @@ function PlannedPageContent() {
   const openDelete = (planned: PlannedTransaction) => {
     setSelectedPlanned(planned);
     setIsDeleteOpen(true);
+  };
+
+  const openMarkAsPaid = (planned: PlannedTransaction) => {
+    setSelectedPlanned(planned);
+    setIsMarkPaidOpen(true);
   };
 
   const openBulkCreate = () => {
@@ -194,11 +201,31 @@ function PlannedPageContent() {
     }
   };
 
-  const handleMarkAsPaid = async (planned: PlannedTransaction) => {
+  const handleMarkAsPaid = async () => {
+    if (!selectedPlanned) {
+      return;
+    }
+
     try {
-      await transactionService.update(planned.id, {
+      await transactionService.update(selectedPlanned.id, {
         paid_at: new Date().toISOString(),
       });
+      toast.success(t("planned.toast.markedPaid"));
+      setIsMarkPaidOpen(false);
+      getAllPlanned();
+    } catch (err) {
+      const message = getErrorMessage(err, t);
+      setError(message);
+      toast.error(message);
+    }
+  };
+
+  const handleBulkMarkAsPaid = async () => {
+    try {
+      await transactionService.markManyPaid(selectedIds);
+      toast.success(t("planned.toast.bulkMarkedPaid"));
+      setIsBulkMarkPaidOpen(false);
+      setSelectedKeys(new Set());
       getAllPlanned();
     } catch (err) {
       const message = getErrorMessage(err, t);
@@ -255,7 +282,7 @@ function PlannedPageContent() {
                     icon: CheckIcon,
                     label: t("actions.markAsPaid"),
                     variation: "primary" as const,
-                    onClick: () => handleMarkAsPaid(row),
+                    onClick: () => openMarkAsPaid(row),
                   },
                 ]),
             {
@@ -333,6 +360,12 @@ function PlannedPageContent() {
           onSelectionChange={setSelectedKeys}
           bulkActions={[
             {
+              icon: CheckIcon,
+              label: t("bulkActions.markPaid"),
+              variation: "primary",
+              onClick: () => setIsBulkMarkPaidOpen(true),
+            },
+            {
               icon: TrashIcon,
               label: t("bulkActions.deleteAll"),
               variation: "destructive",
@@ -392,6 +425,22 @@ function PlannedPageContent() {
         onClose={() => setIsBulkDeleteOpen(false)}
         onConfirm={handleBulkDelete}
         confirmType="destructive"
+      />
+
+      <ConfirmModal
+        title={t("planned.markPaid.title")}
+        message={t("planned.markPaid.message")}
+        open={isMarkPaidOpen}
+        onClose={() => setIsMarkPaidOpen(false)}
+        onConfirm={handleMarkAsPaid}
+      />
+
+      <ConfirmModal
+        title={t("bulkActions.markPaidPlanned.title")}
+        message={t("bulkActions.markPaidPlanned.message")}
+        open={isBulkMarkPaidOpen}
+        onClose={() => setIsBulkMarkPaidOpen(false)}
+        onConfirm={handleBulkMarkAsPaid}
       />
     </div>
   );

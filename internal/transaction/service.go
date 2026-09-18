@@ -3,6 +3,7 @@ package transaction
 import (
 	"errors"
 	"gopocket/internal/transaction/transactiontype"
+	"time"
 )
 
 // Service encapsulates transaction business logic.
@@ -10,6 +11,7 @@ type Service interface {
 	Update(id string, dto UpdateTransactionRequest) (*Transaction, error)
 	Delete(id string) error
 	DeleteMany(ids []string) error
+	MarkManyPaid(ids []string) error
 	FindByID(id string) (*Transaction, error)
 
 	Dashboard(query DashboardQuery) (*DashboardResponse, error)
@@ -71,6 +73,13 @@ func (s *service) DeleteMany(ids []string) error {
 		return errors.New("transaction ids are required")
 	}
 	return s.repository.DeleteMany(ids)
+}
+
+func (s *service) MarkManyPaid(ids []string) error {
+	if len(ids) == 0 {
+		return errors.New("transaction ids are required")
+	}
+	return s.repository.MarkManyPaid(ids, time.Now())
 }
 
 func (s *service) FindByID(id string) (*Transaction, error) {

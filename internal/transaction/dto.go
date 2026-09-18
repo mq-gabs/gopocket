@@ -41,6 +41,12 @@ type DeleteBulkTransactionsRequest struct {
 	IDs []string `json:"ids"`
 }
 
+// MarkPaidBulkTransactionsRequest is the request payload for marking a batch
+// of transactions as paid by id.
+type MarkPaidBulkTransactionsRequest struct {
+	IDs []string `json:"ids"`
+}
+
 // UpdateTransactionRequest is the request payload for updating a transaction.
 type UpdateTransactionRequest struct {
 	Title       string   `json:"title,omitempty"`
