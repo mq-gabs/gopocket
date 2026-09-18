@@ -26,6 +26,7 @@ type Repository interface {
 	Delete(id string) error
 	DeleteMany(ids []string) error
 	MarkManyPaid(ids []string, paidAt time.Time) error
+	AddCategoriesMany(ids []string, categoryIDs []string) error
 	FindByID(id string) (*Transaction, error)
 
 	FindAllActual(filter TransactionFilter) ([]Transaction, error)
@@ -120,6 +121,48 @@ func (r *repository) MarkManyPaid(ids []string, paidAt time.Time) error {
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
 	}
+	return nil
+}
+
+// AddCategoriesMany adds the given categories to each of the given
+// transactions, skipping any category a transaction already has so no
+// duplicate association is created.
+func (r *repository) AddCategoriesMany(ids []string, categoryIDs []string) error {
+	var transactions []Transaction
+	if err := r.db.Preload("Categories").Where("id IN ?", ids).Find(&transactions).Error; err != nil {
+		return err
+	}
+	if len(transactions) == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	var categoriesToAdd []category.Category
+	if err := r.db.Where("id IN ?", categoryIDs).Find(&categoriesToAdd).Error; err != nil {
+		return err
+	}
+
+	for i := range transactions {
+		existing := make(map[string]bool, len(transactions[i].Categories))
+		for _, existingCategory := range transactions[i].Categories {
+			existing[existingCategory.ID] = true
+		}
+
+		var toAppend []category.Category
+		for _, categoryToAdd := range categoriesToAdd {
+			if !existing[categoryToAdd.ID] {
+				toAppend = append(toAppend, categoryToAdd)
+			}
+		}
+
+		if len(toAppend) == 0 {
+			continue
+		}
+
+		if err := r.db.Model(&transactions[i]).Association("Categories").Append(toAppend); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

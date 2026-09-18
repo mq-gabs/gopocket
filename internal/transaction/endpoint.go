@@ -35,6 +35,7 @@ func (e *Endpoint) RegisterRoutes(router *gin.RouterGroup) {
 	router.GET("/dashboard", e.dashboard)
 
 	router.PATCH("/transactions/bulk/mark-paid", e.markBulkPaid)
+	router.PATCH("/transactions/bulk/set-categories", e.setBulkCategories)
 	router.PATCH("/transactions/:id", e.update)
 	router.DELETE("/transactions/bulk", e.deleteBulk)
 	router.DELETE("/transactions/:id", e.delete)
@@ -316,4 +317,24 @@ func (e *Endpoint) markBulkPaid(ctx *gin.Context) {
 	}
 
 	ginhttp.WriteSuccess(ctx, http.StatusOK, map[string]bool{"marked": true})
+}
+
+func (e *Endpoint) setBulkCategories(ctx *gin.Context) {
+	dto, err := ginhttp.ReadBody[SetCategoriesBulkTransactionsRequest](ctx)
+	if err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, "invalid request body", ginhttp.KeyInvalidRequestBody)
+		return
+	}
+
+	if err := ValidateSetCategoriesBulkTransactions(*dto); err != nil {
+		ginhttp.WriteError(ctx, http.StatusBadRequest, err.Error(), ginhttp.KeyValidationFailed)
+		return
+	}
+
+	if err := e.service.SetCategoriesMany(dto.IDs, dto.CategoryIDs); err != nil {
+		ginhttp.WriteError(ctx, http.StatusNotFound, "transactions not found", keyTransactionsNotFound)
+		return
+	}
+
+	ginhttp.WriteSuccess(ctx, http.StatusOK, map[string]bool{"updated": true})
 }

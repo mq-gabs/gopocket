@@ -95,6 +95,15 @@ func ValidateMarkPaidBulkTransactions(dto MarkPaidBulkTransactionsRequest) error
 	return validateIDs(dto.IDs)
 }
 
+// ValidateSetCategoriesBulkTransactions validates a request to add a set of
+// categories to a batch of transactions by id.
+func ValidateSetCategoriesBulkTransactions(dto SetCategoriesBulkTransactionsRequest) error {
+	return errors.Join(
+		validateIDs(dto.IDs),
+		validateCategoryIDs(dto.CategoryIDs),
+	)
+}
+
 // ValidateUpdateTransaction is a placeholder validation hook for future rules.
 func ValidateUpdateTransaction(dto UpdateTransactionRequest) error {
 	if dto.CategoryIDs == nil {

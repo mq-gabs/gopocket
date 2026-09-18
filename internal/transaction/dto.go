@@ -47,6 +47,14 @@ type MarkPaidBulkTransactionsRequest struct {
 	IDs []string `json:"ids"`
 }
 
+// SetCategoriesBulkTransactionsRequest is the request payload for adding a
+// set of categories to a batch of transactions by id. Categories the
+// transaction already has are left as-is.
+type SetCategoriesBulkTransactionsRequest struct {
+	IDs         []string `json:"ids"`
+	CategoryIDs []string `json:"category_ids"`
+}
+
 // UpdateTransactionRequest is the request payload for updating a transaction.
 type UpdateTransactionRequest struct {
 	Title       string   `json:"title,omitempty"`

@@ -137,6 +137,9 @@ export const en = {
   "bulkActions.markPaidPlanned.title": "Mark planned transactions as paid",
   "bulkActions.markPaidPlanned.message":
     "Are you sure you want to mark the selected planned transactions as paid?",
+  "bulkActions.setCategories": "Set categories",
+  "bulkActions.setCategories.title": "Set categories",
+  "bulkActions.setCategories.toast": "Categories updated",
   "common.required": "This field is required",
   "common.loading": "Loading...",
   "common.error": "Something went wrong",

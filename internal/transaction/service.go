@@ -12,6 +12,7 @@ type Service interface {
 	Delete(id string) error
 	DeleteMany(ids []string) error
 	MarkManyPaid(ids []string) error
+	SetCategoriesMany(ids []string, categoryIDs []string) error
 	FindByID(id string) (*Transaction, error)
 
 	Dashboard(query DashboardQuery) (*DashboardResponse, error)
@@ -80,6 +81,16 @@ func (s *service) MarkManyPaid(ids []string) error {
 		return errors.New("transaction ids are required")
 	}
 	return s.repository.MarkManyPaid(ids, time.Now())
+}
+
+func (s *service) SetCategoriesMany(ids []string, categoryIDs []string) error {
+	if len(ids) == 0 {
+		return errors.New("transaction ids are required")
+	}
+	if len(categoryIDs) == 0 {
+		return errors.New("category ids are required")
+	}
+	return s.repository.AddCategoriesMany(ids, categoryIDs)
 }
 
 func (s *service) FindByID(id string) (*Transaction, error) {

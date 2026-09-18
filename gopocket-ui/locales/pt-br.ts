@@ -138,6 +138,9 @@ export const ptBr = {
   "bulkActions.markPaidPlanned.title": "Marcar registros planejados como pagos",
   "bulkActions.markPaidPlanned.message":
     "Tem certeza que deseja marcar os registros planejados selecionados como pagos?",
+  "bulkActions.setCategories": "Definir categorias",
+  "bulkActions.setCategories.title": "Definir categorias",
+  "bulkActions.setCategories.toast": "Categorias atualizadas",
   "common.required": "Este campo é obrigatório",
   "common.loading": "Carregando...",
   "common.error": "Algo deu errado",

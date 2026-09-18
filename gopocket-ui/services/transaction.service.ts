@@ -60,6 +60,11 @@ export const transactionService = {
     httpClient.patch<{ marked: boolean }>(join(basePath, "bulk", "mark-paid"), {
       ids,
     }),
+  setCategoriesBulk: (ids: string[], categoryIds: string[]) =>
+    httpClient.patch<{ updated: boolean }>(
+      join(basePath, "bulk", "set-categories"),
+      { ids, category_ids: categoryIds },
+    ),
   getDashboard: (mode: "month" | "year", date: string, page = 1) =>
     httpClient.get<DashboardData>(
       `/api/dashboard?mode=${mode}&date=${date}&page=${page}`,

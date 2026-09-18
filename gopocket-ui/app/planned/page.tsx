@@ -7,12 +7,14 @@ import {
   DocumentDuplicateIcon,
   PencilIcon,
   PlusIcon,
+  TagIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import Table, { TableColumn } from "@/components/tables/table";
 import { HoverRowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
 import { BulkPlannedForm } from "@/components/bulk-planned-form";
+import { BulkSetCategoriesForm } from "@/components/bulk-set-categories-form";
 import { Button } from "@/components/button";
 import { CategoryBadgesCell } from "@/components/tables/category-badges-cell";
 import { ConfirmModal } from "@/components/confirm-modal";
@@ -63,6 +65,8 @@ function PlannedPageContent() {
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
   const [isMarkPaidOpen, setIsMarkPaidOpen] = useState(false);
   const [isBulkMarkPaidOpen, setIsBulkMarkPaidOpen] = useState(false);
+  const [isBulkSetCategoriesOpen, setIsBulkSetCategoriesOpen] =
+    useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(
     new Set(),
   );
@@ -235,6 +239,20 @@ function PlannedPageContent() {
     }
   };
 
+  const handleBulkSetCategories = async (categoryIds: string[]) => {
+    try {
+      await transactionService.setCategoriesBulk(selectedIds, categoryIds);
+      toast.success(t("bulkActions.setCategories.toast"));
+      setIsBulkSetCategoriesOpen(false);
+      setSelectedKeys(new Set());
+      getAllPlanned();
+    } catch (err) {
+      const message = getErrorMessage(err, t);
+      setError(message);
+      toast.error(message);
+    }
+  };
+
   const columns: TableColumn<PlannedTransaction>[] = [
     {
       key: "title",
@@ -370,6 +388,11 @@ function PlannedPageContent() {
               onClick: () => setIsBulkMarkPaidOpen(true),
             },
             {
+              icon: TagIcon,
+              label: t("bulkActions.setCategories"),
+              onClick: () => setIsBulkSetCategoriesOpen(true),
+            },
+            {
               icon: TrashIcon,
               label: t("bulkActions.deleteAll"),
               variation: "destructive",
@@ -446,6 +469,20 @@ function PlannedPageContent() {
         onClose={() => setIsBulkMarkPaidOpen(false)}
         onConfirm={handleBulkMarkAsPaid}
       />
+
+      <Modal
+        title={t("bulkActions.setCategories.title")}
+        open={isBulkSetCategoriesOpen}
+        onClose={() => setIsBulkSetCategoriesOpen(false)}
+      >
+        <BulkSetCategoriesForm
+          count={selectedIds.length}
+          categories={categories}
+          submitLabel={t("actions.save")}
+          onSubmit={handleBulkSetCategories}
+          onCancel={() => setIsBulkSetCategoriesOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }

@@ -6,8 +6,10 @@ import {
   PlusIcon,
   DocumentDuplicateIcon,
   PencilIcon,
+  TagIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
+import { BulkSetCategoriesForm } from "@/components/bulk-set-categories-form";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { ImportNubankForm } from "@/components/import-nubank-form";
 import { Modal } from "@/components/modal";
@@ -58,6 +60,8 @@ function TransactionsPageContent() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+  const [isBulkSetCategoriesOpen, setIsBulkSetCategoriesOpen] =
+    useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(
     new Set(),
   );
@@ -188,6 +192,20 @@ function TransactionsPageContent() {
     }
   };
 
+  const handleBulkSetCategories = async (categoryIds: string[]) => {
+    try {
+      await transactionService.setCategoriesBulk(selectedIds, categoryIds);
+      toast.success(t("bulkActions.setCategories.toast"));
+      setIsBulkSetCategoriesOpen(false);
+      setSelectedKeys(new Set());
+      getTransactions();
+    } catch (err) {
+      const message = getErrorMessage(err, t);
+      setError(message);
+      toast.error(message);
+    }
+  };
+
   const columns: TableColumn<ActualTransaction>[] = [
     {
       key: "title",
@@ -307,6 +325,11 @@ function TransactionsPageContent() {
           onSelectionChange={setSelectedKeys}
           bulkActions={[
             {
+              icon: TagIcon,
+              label: t("bulkActions.setCategories"),
+              onClick: () => setIsBulkSetCategoriesOpen(true),
+            },
+            {
               icon: TrashIcon,
               label: t("bulkActions.deleteAll"),
               variation: "destructive",
@@ -365,6 +388,20 @@ function TransactionsPageContent() {
         onConfirm={handleBulkDelete}
         confirmType="destructive"
       />
+
+      <Modal
+        title={t("bulkActions.setCategories.title")}
+        open={isBulkSetCategoriesOpen}
+        onClose={() => setIsBulkSetCategoriesOpen(false)}
+      >
+        <BulkSetCategoriesForm
+          count={selectedIds.length}
+          categories={categories}
+          submitLabel={t("actions.save")}
+          onSubmit={handleBulkSetCategories}
+          onCancel={() => setIsBulkSetCategoriesOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }
