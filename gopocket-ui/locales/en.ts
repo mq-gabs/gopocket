@@ -37,6 +37,7 @@ export const en = {
   "actions.confirm": "Confirm",
   "actions.save": "Save",
   "actions.startImport": "Start import",
+  "actions.refresh": "Refresh",
   "categories.title": "Categories",
   "categories.description": "Organize your spending and income by category.",
   "categories.empty": "No categories yet.",

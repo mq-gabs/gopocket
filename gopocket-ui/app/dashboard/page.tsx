@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button, ButtonVariation } from "@/components/button";
 import { DatePicker } from "@/components/inputs/date-picker";
+import { RefreshButton } from "@/components/refresh-button";
 import { TranslateFunction, useI18n } from "@/contexts/i18n-context";
 import type { Locale } from "@/locales";
 import { transactionService } from "@/services/transaction.service";
@@ -43,6 +44,7 @@ export default function DashboardPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState(0);
 
   // The year field is free text, so it goes through a separate, debounced,
   // client-validated buffer instead of updating `date` (and firing a
@@ -87,7 +89,16 @@ export default function DashboardPage() {
     return () => {
       cancelled = true;
     };
-  }, [date, mode, t]);
+  }, [date, mode, t, refreshToken]);
+
+  // A plain click handler, not an effect — setting `loading` here (rather
+  // than inside the effect) is what makes the button's own spinner reflect
+  // an in-flight fetch without re-triggering the "no data yet" loading text
+  // on every date/mode change (guarded by `!data` below).
+  const handleRefresh = () => {
+    setLoading(true);
+    setRefreshToken((token) => token + 1);
+  };
 
   const changeMode = (nextMode: DashboardMode) => {
     setMode(nextMode);
@@ -115,38 +126,41 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <div className="flex items-center gap-2 rounded-2xl border border-foreground/20 py-1 px-1">
-            <Button
-              onClick={() => changeMode("month")}
-              variation={getButtonVariation(mode, "month")}
-            >
-              {t("dashboard.month")}
-            </Button>
-            <Button
-              onClick={() => changeMode("year")}
-              variation={getButtonVariation(mode, "year")}
-            >
-              {t("dashboard.year")}
-            </Button>
-            {mode === "month" ? (
-              <DatePicker
-                ariaLabel={t("dashboard.month")}
-                granularity="month"
-                value={date}
-                onChange={setDate}
-                className="w-40"
-              />
-            ) : (
-              <input
-                aria-label={t("dashboard.year")}
-                type="number"
-                min="2000"
-                max="2100"
-                value={yearInput}
-                onChange={(event) => setYearInput(event.target.value)}
-                className="w-40 rounded-xl border border-foreground/20 px-2 py-1 text-sm"
-              />
-            )}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-2xl border border-foreground/20 py-1 px-1">
+              <Button
+                onClick={() => changeMode("month")}
+                variation={getButtonVariation(mode, "month")}
+              >
+                {t("dashboard.month")}
+              </Button>
+              <Button
+                onClick={() => changeMode("year")}
+                variation={getButtonVariation(mode, "year")}
+              >
+                {t("dashboard.year")}
+              </Button>
+              {mode === "month" ? (
+                <DatePicker
+                  ariaLabel={t("dashboard.month")}
+                  granularity="month"
+                  value={date}
+                  onChange={setDate}
+                  className="w-40"
+                />
+              ) : (
+                <input
+                  aria-label={t("dashboard.year")}
+                  type="number"
+                  min="2000"
+                  max="2100"
+                  value={yearInput}
+                  onChange={(event) => setYearInput(event.target.value)}
+                  className="w-40 rounded-xl border border-foreground/20 px-2 py-1 text-sm"
+                />
+              )}
+            </div>
+            <RefreshButton onClick={handleRefresh} loading={loading} />
           </div>
           {mode === "year" && yearError ? (
             <p className="text-[10px] text-destructive">{yearError}</p>

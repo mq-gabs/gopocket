@@ -17,6 +17,7 @@ import { Button } from "@/components/button";
 import { CategoryBadgesCell } from "@/components/tables/category-badges-cell";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { Modal } from "@/components/modal";
+import { RefreshButton } from "@/components/refresh-button";
 import { TransactionFiltersBar } from "@/components/transaction-filters";
 import { TransactionForm } from "@/components/transaction-form";
 import { useI18n } from "@/contexts/i18n-context";
@@ -321,19 +322,22 @@ function PlannedPageContent() {
             {t("planned.description")}
           </p>
         </div>
-        <Button
-          onClick={openCreate}
-          actionsLabel={t("actions.more")}
-          actions={[
-            {
-              label: t("planned.bulk.action"),
-              onClick: openBulkCreate,
-            },
-          ]}
-        >
-          <PlusIcon className="h-5 w-5" />
-          {t("actions.newPlanned")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <RefreshButton onClick={getAllPlanned} loading={loading} />
+          <Button
+            onClick={openCreate}
+            actionsLabel={t("actions.more")}
+            actions={[
+              {
+                label: t("planned.bulk.action"),
+                onClick: openBulkCreate,
+              },
+            ]}
+          >
+            <PlusIcon className="h-5 w-5" />
+            {t("actions.newPlanned")}
+          </Button>
+        </div>
       </div>
 
       <TransactionFiltersBar

@@ -15,6 +15,7 @@ import type {
 } from "@/types/models";
 import { Button } from "@/components/button";
 import { CategoryCard } from "@/components/category-card";
+import { RefreshButton } from "@/components/refresh-button";
 import { getErrorMessage } from "@/utils/api-error";
 
 export default function CategoriesPage() {
@@ -98,10 +99,13 @@ export default function CategoriesPage() {
             {t("categories.description")}
           </p>
         </div>
-        <Button onClick={openCreate}>
-          <PlusIcon className="h-5 w-5" />
-          {t("actions.newCategory")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <RefreshButton onClick={getCategories} loading={loading} />
+          <Button onClick={openCreate}>
+            <PlusIcon className="h-5 w-5" />
+            {t("actions.newCategory")}
+          </Button>
+        </div>
       </div>
 
       {combinedError ? (

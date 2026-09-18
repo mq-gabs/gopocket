@@ -29,6 +29,7 @@ import { formatDate } from "@/utils/time";
 import Table, { TableColumn } from "@/components/tables/table";
 import { HoverRowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
+import { RefreshButton } from "@/components/refresh-button";
 import { useRequest } from "@/hooks/use-request";
 import { useTransactionFilters } from "@/hooks/use-transaction-filters";
 import { getErrorMessage, translateErrorKey } from "@/utils/api-error";
@@ -264,19 +265,22 @@ function TransactionsPageContent() {
             {t("transactions.description")}
           </p>
         </div>
-        <Button
-          onClick={openCreate}
-          actionsLabel={t("actions.more")}
-          actions={[
-            {
-              label: t("transactions.import.nubank.action"),
-              onClick: openImport,
-            },
-          ]}
-        >
-          <PlusIcon className="h-5 w-5" />
-          {t("actions.newTransaction")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <RefreshButton onClick={getTransactions} loading={loading} />
+          <Button
+            onClick={openCreate}
+            actionsLabel={t("actions.more")}
+            actions={[
+              {
+                label: t("transactions.import.nubank.action"),
+                onClick: openImport,
+              },
+            ]}
+          >
+            <PlusIcon className="h-5 w-5" />
+            {t("actions.newTransaction")}
+          </Button>
+        </div>
       </div>
 
       <TransactionFiltersBar
