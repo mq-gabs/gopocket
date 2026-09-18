@@ -26,9 +26,9 @@ export default function RootLayout({
           <I18nProvider>
             <CategoryProvider>
               <NotificationProvider>
-                <div className="flex min-h-screen">
+                <div className="flex min-h-screen max-h-screen">
                   <Sidebar />
-                  <div className="flex min-h-screen flex-1 flex-col">
+                  <div className="flex min-h-screen max-h-screen flex-1 flex-col overflow-y-auto">
                     <GlobalHeader />
                     <main className="flex-1 p-4">{children}</main>
                   </div>
