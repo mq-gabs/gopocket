@@ -13,7 +13,11 @@ export function AmountCell({ amount, type, className = "" }: AmountCellProps) {
 
   return (
     <span
-      className={cls("font-medium", isExpense ? "" : "text-primary", className)}
+      className={cls(
+        "font-medium whitespace-nowrap",
+        isExpense ? "" : "text-primary",
+        className,
+      )}
     >
       {isExpense ? "" : "+"}
       {formatCurrencyString(amount)}
