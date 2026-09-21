@@ -6,9 +6,11 @@ import {
   PlusIcon,
   DocumentDuplicateIcon,
   PencilIcon,
+  FlagIcon,
   TagIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
+import { BulkLinkGoalsForm } from "@/components/bulk-link-goals-form";
 import { BulkSetCategoriesForm } from "@/components/bulk-set-categories-form";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { ImportNubankForm } from "@/components/import-nubank-form";
@@ -17,6 +19,7 @@ import { TransactionFiltersBar } from "@/components/transaction-filters";
 import { TransactionForm } from "@/components/transaction-form";
 import { useI18n } from "@/contexts/i18n-context";
 import { useCategories } from "@/contexts/category-context";
+import { goalService } from "@/services/goal.service";
 import { transactionService } from "@/services/transaction.service";
 import type {
   Category,
@@ -62,6 +65,7 @@ function TransactionsPageContent() {
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
   const [isBulkSetCategoriesOpen, setIsBulkSetCategoriesOpen] =
     useState(false);
+  const [isBulkLinkGoalsOpen, setIsBulkLinkGoalsOpen] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(
     new Set(),
   );
@@ -219,6 +223,22 @@ function TransactionsPageContent() {
     }
   };
 
+  const handleBulkLinkGoals = async (goalIds: string[]) => {
+    setSubmitting(true);
+    try {
+      await goalService.linkTransactions(goalIds, selectedIds);
+      toast.success(t("bulkActions.linkGoals.toast"));
+      setIsBulkLinkGoalsOpen(false);
+      setSelectedKeys(new Set());
+    } catch (err) {
+      const message = getErrorMessage(err, t);
+      setError(message);
+      toast.error(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const columns: TableColumn<ActualTransaction>[] = [
     {
       key: "title",
@@ -341,6 +361,11 @@ function TransactionsPageContent() {
             onClick: () => setIsBulkSetCategoriesOpen(true),
           },
           {
+            icon: FlagIcon,
+            label: t("bulkActions.linkGoals"),
+            onClick: () => setIsBulkLinkGoalsOpen(true),
+          },
+          {
             icon: TrashIcon,
             label: t("bulkActions.deleteAll"),
             variation: "destructive",
@@ -413,6 +438,20 @@ function TransactionsPageContent() {
           submitLabel={t("actions.save")}
           onSubmit={handleBulkSetCategories}
           onCancel={() => setIsBulkSetCategoriesOpen(false)}
+          loading={submitting}
+        />
+      </Modal>
+
+      <Modal
+        title={t("bulkActions.linkGoals.title")}
+        open={isBulkLinkGoalsOpen}
+        onClose={() => setIsBulkLinkGoalsOpen(false)}
+      >
+        <BulkLinkGoalsForm
+          count={selectedIds.length}
+          submitLabel={t("actions.save")}
+          onSubmit={handleBulkLinkGoals}
+          onCancel={() => setIsBulkLinkGoalsOpen(false)}
           loading={submitting}
         />
       </Modal>

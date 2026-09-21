@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gopocket/database"
 	categorypkg "gopocket/internal/category"
+	goalpkg "gopocket/internal/goal"
 	"gopocket/internal/realtime"
 	transactionpkg "gopocket/internal/transaction"
 	"gopocket/router"
@@ -27,7 +28,11 @@ func main() {
 	transactionService := transactionpkg.NewService(transactionRepository, hub)
 	transactionEndpoint := transactionpkg.NewEndpoint(transactionService)
 
-	r := router.New(categoryEndpoint, transactionEndpoint, realtimeEndpoint)
+	goalRepository := goalpkg.NewRepository(db)
+	goalService := goalpkg.NewService(goalRepository)
+	goalEndpoint := goalpkg.NewEndpoint(goalService)
+
+	r := router.New(categoryEndpoint, transactionEndpoint, goalEndpoint, realtimeEndpoint)
 
 	fmt.Println("GoPocket server running on http://localhost:8080")
 	if err := r.Run(":8080"); err != nil {

@@ -7,6 +7,7 @@ import {
   DocumentDuplicateIcon,
   PencilIcon,
   PlusIcon,
+  FlagIcon,
   TagIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
@@ -14,6 +15,7 @@ import Table, { TableColumn } from "@/components/tables/table";
 import { HoverRowActions } from "@/components/tables/row-actions";
 import { AmountCell } from "@/components/amount-cell";
 import { BulkPlannedForm } from "@/components/bulk-planned-form";
+import { BulkLinkGoalsForm } from "@/components/bulk-link-goals-form";
 import { BulkSetCategoriesForm } from "@/components/bulk-set-categories-form";
 import { Button } from "@/components/button";
 import { CategoryBadgesCell } from "@/components/tables/category-badges-cell";
@@ -26,6 +28,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useCategories } from "@/contexts/category-context";
 import { useRequest } from "@/hooks/use-request";
 import { useTransactionFilters } from "@/hooks/use-transaction-filters";
+import { goalService } from "@/services/goal.service";
 import { transactionService } from "@/services/transaction.service";
 import type {
   Category,
@@ -67,6 +70,7 @@ function PlannedPageContent() {
   const [isBulkMarkPaidOpen, setIsBulkMarkPaidOpen] = useState(false);
   const [isBulkSetCategoriesOpen, setIsBulkSetCategoriesOpen] =
     useState(false);
+  const [isBulkLinkGoalsOpen, setIsBulkLinkGoalsOpen] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(
     new Set(),
   );
@@ -275,6 +279,22 @@ function PlannedPageContent() {
     }
   };
 
+  const handleBulkLinkGoals = async (goalIds: string[]) => {
+    setSubmitting(true);
+    try {
+      await goalService.linkTransactions(goalIds, selectedIds);
+      toast.success(t("bulkActions.linkGoals.toast"));
+      setIsBulkLinkGoalsOpen(false);
+      setSelectedKeys(new Set());
+    } catch (err) {
+      const message = getErrorMessage(err, t);
+      setError(message);
+      toast.error(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const columns: TableColumn<PlannedTransaction>[] = [
     {
       key: "title",
@@ -413,6 +433,11 @@ function PlannedPageContent() {
             onClick: () => setIsBulkSetCategoriesOpen(true),
           },
           {
+            icon: FlagIcon,
+            label: t("bulkActions.linkGoals"),
+            onClick: () => setIsBulkLinkGoalsOpen(true),
+          },
+          {
             icon: TrashIcon,
             label: t("bulkActions.deleteAll"),
             variation: "destructive",
@@ -506,6 +531,20 @@ function PlannedPageContent() {
           submitLabel={t("actions.save")}
           onSubmit={handleBulkSetCategories}
           onCancel={() => setIsBulkSetCategoriesOpen(false)}
+          loading={submitting}
+        />
+      </Modal>
+
+      <Modal
+        title={t("bulkActions.linkGoals.title")}
+        open={isBulkLinkGoalsOpen}
+        onClose={() => setIsBulkLinkGoalsOpen(false)}
+      >
+        <BulkLinkGoalsForm
+          count={selectedIds.length}
+          submitLabel={t("actions.save")}
+          onSubmit={handleBulkLinkGoals}
+          onCancel={() => setIsBulkLinkGoalsOpen(false)}
           loading={submitting}
         />
       </Modal>

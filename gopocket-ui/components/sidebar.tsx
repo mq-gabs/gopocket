@@ -6,6 +6,7 @@ import {
   BanknotesIcon,
   ChartBarIcon,
   ClipboardDocumentListIcon,
+  FlagIcon,
   TagIcon,
 } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
@@ -34,6 +35,7 @@ export function Sidebar() {
       label: t("navigation.planned"),
       icon: ClipboardDocumentListIcon,
     },
+    { href: "/goals", label: t("navigation.goals"), icon: FlagIcon },
     { href: "/categories", label: t("navigation.categories"), icon: TagIcon },
   ];
 

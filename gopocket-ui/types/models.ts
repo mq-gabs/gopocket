@@ -124,3 +124,37 @@ export type DashboardData = {
   total_transactions: number;
   total_pages: number;
 };
+
+export type Goal = {
+  id: string;
+  name: string;
+  description: string;
+  /** Cents. */
+  total_amount: number;
+  /** "YYYY-MM-DD", or null for a goal with no deadline. */
+  due_at: string | null;
+  /** Cents: sum of linked transactions already paid. */
+  paid_amount: number;
+  /** Cents: sum of linked planned (unpaid) transactions. */
+  committed_amount: number;
+  /** Cents: what is neither paid nor committed yet. */
+  remaining_amount: number;
+  /** 0-100; together with committed_percent never exceeds 100. */
+  paid_percent: number;
+  committed_percent: number;
+  /** Null without a due date; negative once overdue. */
+  days_left: number | null;
+  /** Cents per month needed to cover remaining_amount by the due date; null without a due date or once overdue. */
+  monthly_needed: number | null;
+  transaction_count: number;
+};
+
+export type CreateGoalPayload = {
+  name: string;
+  description: string;
+  total_amount: number;
+  due_at: string | null;
+};
+
+/** Replaces every field, so a null due_at clears the deadline. */
+export type UpdateGoalPayload = CreateGoalPayload;

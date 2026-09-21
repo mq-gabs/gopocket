@@ -10,6 +10,8 @@ const ERROR_KEY_MESSAGES: Record<string, TranslationKey> = {
   validation_failed: "errors.validationFailed",
   internal_error: "errors.internalError",
   category_not_found: "errors.categoryNotFound",
+  goal_not_found: "errors.goalNotFound",
+  goals_not_found: "errors.goalsNotFound",
   transaction_not_found: "errors.transactionNotFound",
   transactions_not_found: "errors.transactionsNotFound",
   csv_file_required: "errors.csvFileRequired",

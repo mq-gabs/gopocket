@@ -2,6 +2,7 @@ package database
 
 import (
 	"gopocket/internal/category"
+	"gopocket/internal/goal"
 	"gopocket/internal/transaction"
 
 	"gorm.io/driver/sqlite"
@@ -15,7 +16,7 @@ func New(path string) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if err := db.AutoMigrate(&category.Category{}, &transaction.Transaction{}); err != nil {
+	if err := db.AutoMigrate(&category.Category{}, &transaction.Transaction{}, &goal.Goal{}); err != nil {
 		return nil, err
 	}
 
