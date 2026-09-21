@@ -147,20 +147,40 @@ function PlannedPageContent() {
 
   const handleSubmit = async (
     payload: CreatePlannedTransactionPayload | UpdateTransactionPayload,
+    goalIds?: string[],
   ) => {
     setSubmitting(true);
     try {
-      if (selectedPlanned) {
-        await transactionService.update(
-          selectedPlanned.id,
-          payload as UpdateTransactionPayload,
-        );
-        toast.success(t("planned.toast.updated"));
+      const saved = selectedPlanned
+        ? await transactionService.update(
+            selectedPlanned.id,
+            payload as UpdateTransactionPayload,
+          )
+        : await transactionService.createPlanned(
+            payload as CreatePlannedTransactionPayload,
+          );
+
+      // The transaction is saved from here on, so a goals failure must not
+      // leave the form open (a retry would create a duplicate).
+      let goalsFailed = false;
+      if (goalIds !== undefined) {
+        try {
+          await goalService.setTransactionGoals(saved.id, goalIds);
+        } catch {
+          goalsFailed = true;
+        }
+      }
+
+      if (goalsFailed) {
+        toast.error(t("goals.toast.linkFailed"));
       } else {
-        await transactionService.createPlanned(
-          payload as CreatePlannedTransactionPayload,
+        toast.success(
+          t(
+            selectedPlanned
+              ? "planned.toast.updated"
+              : "planned.toast.created",
+          ),
         );
-        toast.success(t("planned.toast.created"));
       }
       setIsModalOpen(false);
       getAllPlanned();
@@ -175,11 +195,30 @@ function PlannedPageContent() {
 
   const handleBulkSubmit = async (
     payload: CreateBulkPlannedTransactionsPayload,
+    goalIds: string[],
   ) => {
     setSubmitting(true);
     try {
-      await transactionService.createBulkPlanned(payload);
-      toast.success(t("planned.toast.bulkCreated"));
+      const created = await transactionService.createBulkPlanned(payload);
+
+      // The installments exist from here on; see handleSubmit.
+      let goalsFailed = false;
+      if (goalIds.length > 0) {
+        try {
+          await goalService.linkTransactions(
+            goalIds,
+            created.map((planned) => planned.id),
+          );
+        } catch {
+          goalsFailed = true;
+        }
+      }
+
+      if (goalsFailed) {
+        toast.error(t("goals.toast.linkFailedBulk"));
+      } else {
+        toast.success(t("planned.toast.bulkCreated"));
+      }
       setIsBulkModalOpen(false);
       getAllPlanned();
     } catch (err) {

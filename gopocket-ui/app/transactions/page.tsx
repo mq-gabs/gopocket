@@ -125,20 +125,40 @@ function TransactionsPageContent() {
 
   const handleSubmit = async (
     payload: CreateActualTransactionPayload | UpdateTransactionPayload,
+    goalIds?: string[],
   ) => {
     setSubmitting(true);
     try {
-      if (selectedTransaction) {
-        await transactionService.update(
-          selectedTransaction.id,
-          payload as UpdateTransactionPayload,
-        );
-        toast.success(t("transactions.toast.updated"));
+      const saved = selectedTransaction
+        ? await transactionService.update(
+            selectedTransaction.id,
+            payload as UpdateTransactionPayload,
+          )
+        : await transactionService.createActual(
+            payload as CreateActualTransactionPayload,
+          );
+
+      // The transaction is saved from here on, so a goals failure must not
+      // leave the form open (a retry would create a duplicate).
+      let goalsFailed = false;
+      if (goalIds !== undefined) {
+        try {
+          await goalService.setTransactionGoals(saved.id, goalIds);
+        } catch {
+          goalsFailed = true;
+        }
+      }
+
+      if (goalsFailed) {
+        toast.error(t("goals.toast.linkFailed"));
       } else {
-        await transactionService.createActual(
-          payload as CreateActualTransactionPayload,
+        toast.success(
+          t(
+            selectedTransaction
+              ? "transactions.toast.updated"
+              : "transactions.toast.created",
+          ),
         );
-        toast.success(t("transactions.toast.created"));
       }
       setIsModalOpen(false);
       getTransactions();

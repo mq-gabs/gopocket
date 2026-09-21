@@ -11,17 +11,23 @@ import type {
 import { Button } from "./button";
 import { buildTypeOptions } from "./transaction-form";
 import { CategoryMultiSelect } from "./category-multi-select";
+import { GoalSelectField } from "./goal-select-field";
 import { CurrencyInput } from "./inputs/currency-input";
 import { DatePicker } from "./inputs/date-picker";
 import { InputLabel } from "./inputs/input-label";
 import { SelectLabel } from "./select/select-label";
 import { TextareaLabel } from "./textarea/textarea-label";
+import { useGoalSelection } from "@/hooks/use-goal-selection";
 import { formatCurrencyString } from "@/utils/currency";
 import { TransactionType } from "@/types/transaction-type";
 
 interface BulkPlannedFormProps {
   categories: Category[];
-  onSubmit: (payload: CreateBulkPlannedTransactionsPayload) => void;
+  /** goalIds: the goals to link every created installment to (possibly empty). */
+  onSubmit: (
+    payload: CreateBulkPlannedTransactionsPayload,
+    goalIds: string[],
+  ) => void;
   onCancel?: () => void;
   submitLabel: string;
   loading?: boolean;
@@ -39,6 +45,7 @@ export function BulkPlannedForm({
   loading = false,
 }: BulkPlannedFormProps) {
   const { t } = useI18n();
+  const goalSelection = useGoalSelection();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
@@ -79,15 +86,18 @@ export function BulkPlannedForm({
       return;
     }
 
-    onSubmit({
-      title,
-      description,
-      amount,
-      type,
-      category_ids: categoryIds,
-      installments,
-      first_due_at: firstDueAt,
-    });
+    onSubmit(
+      {
+        title,
+        description,
+        amount,
+        type,
+        category_ids: categoryIds,
+        installments,
+        first_due_at: firstDueAt,
+      },
+      goalSelection.selectedIds,
+    );
   };
 
   return (
@@ -162,6 +172,8 @@ export function BulkPlannedForm({
         onChange={handleCategoryChange}
         error={categoryError ?? undefined}
       />
+
+      <GoalSelectField selection={goalSelection} />
 
       <div className="flex justify-end gap-2">
         {onCancel && (

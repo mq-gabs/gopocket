@@ -17,6 +17,9 @@ type Service interface {
 	FindTransactions(goalID string) ([]transaction.Transaction, error)
 	LinkTransactions(dto LinkTransactionsRequest) error
 	UnlinkTransaction(goalID string, transactionID string) error
+
+	FindGoalIDsByTransaction(transactionID string) ([]string, error)
+	SetTransactionGoals(transactionID string, dto SetTransactionGoalsRequest) error
 }
 
 type service struct {
@@ -89,4 +92,12 @@ func (s *service) LinkTransactions(dto LinkTransactionsRequest) error {
 
 func (s *service) UnlinkTransaction(goalID string, transactionID string) error {
 	return s.repository.UnlinkTransaction(goalID, transactionID)
+}
+
+func (s *service) FindGoalIDsByTransaction(transactionID string) ([]string, error) {
+	return s.repository.FindGoalIDsByTransaction(transactionID)
+}
+
+func (s *service) SetTransactionGoals(transactionID string, dto SetTransactionGoalsRequest) error {
+	return s.repository.SetTransactionGoals(transactionID, dto.GoalIDs)
 }

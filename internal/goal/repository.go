@@ -7,6 +7,7 @@ import (
 	"gopocket/models"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // ErrGoalsNotFound is returned when none of the requested goals exist.
@@ -26,6 +27,9 @@ type Repository interface {
 	FindTransactions(goalID string) ([]transaction.Transaction, error)
 	LinkTransactions(goalIDs []string, transactionIDs []string) error
 	UnlinkTransaction(goalID string, transactionID string) error
+
+	FindGoalIDsByTransaction(transactionID string) ([]string, error)
+	SetTransactionGoals(transactionID string, goalIDs []string) error
 }
 
 type repository struct {
@@ -154,5 +158,82 @@ func (r *repository) UnlinkTransaction(goalID string, transactionID string) erro
 
 	return r.db.Model(&goal).Association("Transactions").Delete(&transaction.Transaction{
 		BaseModel: models.BaseModel{ID: transactionID},
+	})
+}
+
+// goalTransaction is a row of the goal_transactions join table, declared only
+// to write to it directly (the schema itself comes from Goal's many2many).
+type goalTransaction struct {
+	GoalID        string `gorm:"column:goal_id;primaryKey"`
+	TransactionID string `gorm:"column:transaction_id;primaryKey"`
+}
+
+func (goalTransaction) TableName() string { return "goal_transactions" }
+
+func (r *repository) transactionExists(tx *gorm.DB, transactionID string) error {
+	var count int64
+	if err := tx.Model(&transaction.Transaction{}).Where("id = ?", transactionID).Count(&count).Error; err != nil {
+		return err
+	}
+	if count == 0 {
+		return ErrTransactionsNotFound
+	}
+	return nil
+}
+
+// FindGoalIDsByTransaction lists the ids of the (non-deleted) goals a
+// transaction is linked to.
+func (r *repository) FindGoalIDsByTransaction(transactionID string) ([]string, error) {
+	if err := r.transactionExists(r.db, transactionID); err != nil {
+		return nil, err
+	}
+
+	ids := []string{}
+	err := r.db.Model(&Goal{}).
+		Where("id IN (?)", r.db.Table("goal_transactions").Select("goal_id").Where("transaction_id = ?", transactionID)).
+		Pluck("id", &ids).Error
+	if err != nil {
+		return nil, err
+	}
+	return ids, nil
+}
+
+// SetTransactionGoals makes the given goals the transaction's complete set of
+// goals: links to goals not listed are removed, missing links are added, and
+// links that already exist are kept. Ids that match no goal are ignored, but
+// a non-empty list matching none at all is an error.
+func (r *repository) SetTransactionGoals(transactionID string, goalIDs []string) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := r.transactionExists(tx, transactionID); err != nil {
+			return err
+		}
+
+		var keepIDs []string
+		if len(goalIDs) > 0 {
+			if err := tx.Model(&Goal{}).Where("id IN ?", goalIDs).Pluck("id", &keepIDs).Error; err != nil {
+				return err
+			}
+			if len(keepIDs) == 0 {
+				return ErrGoalsNotFound
+			}
+		}
+
+		remove := tx.Where("transaction_id = ?", transactionID)
+		if len(keepIDs) > 0 {
+			remove = remove.Where("goal_id NOT IN ?", keepIDs)
+		}
+		if err := remove.Delete(&goalTransaction{}).Error; err != nil {
+			return err
+		}
+
+		if len(keepIDs) == 0 {
+			return nil
+		}
+
+		rows := make([]goalTransaction, 0, len(keepIDs))
+		for _, goalID := range keepIDs {
+			rows = append(rows, goalTransaction{GoalID: goalID, TransactionID: transactionID})
+		}
+		return tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&rows).Error
 	})
 }

@@ -6,8 +6,8 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useRequest } from "@/hooks/use-request";
 import { goalService } from "@/services/goal.service";
 import { translateErrorKey } from "@/utils/api-error";
-import { formatCurrencyString } from "@/utils/currency";
 import { Button } from "./button";
+import { GoalCheckList } from "./goal-check-list";
 import { Skeleton } from "./skeleton";
 
 interface BulkLinkGoalsFormProps {
@@ -95,30 +95,11 @@ export function BulkLinkGoalsForm({
       ) : null}
 
       {goals && goals.length > 0 ? (
-        <ul className="max-h-72 space-y-2 overflow-y-auto">
-          {goals.map((goal) => (
-            <li key={goal.id}>
-              <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-foreground/10 px-3 py-2 hover:bg-foreground/5">
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-sm"
-                  checked={selectedIds.has(goal.id)}
-                  onChange={() => toggle(goal.id)}
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium">
-                    {goal.name}
-                  </span>
-                  <span className="block text-xs text-foreground/60">
-                    {formatCurrencyString(goal.paid_amount)}{" "}
-                    {t("goals.summary.of")}{" "}
-                    {formatCurrencyString(goal.total_amount)}
-                  </span>
-                </span>
-              </label>
-            </li>
-          ))}
-        </ul>
+        <GoalCheckList
+          goals={goals}
+          selectedIds={[...selectedIds]}
+          onToggle={toggle}
+        />
       ) : null}
 
       <div className="flex justify-end gap-2">

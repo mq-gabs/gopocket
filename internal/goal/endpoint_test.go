@@ -124,3 +124,51 @@ func TestEndpoint_GoalLifecycle(t *testing.T) {
 		t.Errorf("get deleted: got %d %q", code, res.Key)
 	}
 }
+
+// The goal endpoint registers /transactions/:id/goals next to the transaction
+// endpoint's own /transactions routes; gin panics at registration if they
+// conflict, so build both on one router.
+func TestEndpoint_TransactionGoalsRoutesCoexistWithTransactionRoutes(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	repo, db := newTestRepository(t)
+	router := gin.New()
+	api := router.Group("/api")
+	transaction.NewEndpoint(transaction.NewService(transaction.NewRepository(db), nil)).RegisterRoutes(api)
+	NewEndpoint(NewService(repo)).RegisterRoutes(api)
+
+	tx := transaction.Transaction{Title: "t", Amount: 100, Type: "EXPENSE"}
+	db.Create(&tx)
+
+	code, res := call(t, router, "POST", "/api/goals", map[string]any{"name": "Trip", "total_amount": 1000})
+	if code != http.StatusCreated {
+		t.Fatalf("create goal: %d", code)
+	}
+	var goal GoalResponse
+	_ = json.Unmarshal(res.Data, &goal)
+
+	if code, _ := call(t, router, "PUT", "/api/transactions/"+tx.ID+"/goals", map[string]any{"goal_ids": []string{goal.ID}}); code != 200 {
+		t.Fatalf("set goals: %d", code)
+	}
+
+	_, res = call(t, router, "GET", "/api/transactions/"+tx.ID+"/goals", nil)
+	var ids []string
+	_ = json.Unmarshal(res.Data, &ids)
+	if len(ids) != 1 || ids[0] != goal.ID {
+		t.Errorf("goal ids = %v, want [%s]", ids, goal.ID)
+	}
+
+	// Existing transaction routes still resolve.
+	if code, _ := call(t, router, "GET", "/api/transactions/"+tx.ID, nil); code != 200 {
+		t.Errorf("get transaction: %d", code)
+	}
+
+	if code, res := call(t, router, "GET", "/api/transactions/"+"00000000-0000-4000-8000-000000000000"+"/goals", nil); code != 404 || res.Key != "transaction_not_found" {
+		t.Errorf("unknown transaction: %d %q", code, res.Key)
+	}
+	if code, res := call(t, router, "PUT", "/api/transactions/"+tx.ID+"/goals", map[string]any{"goal_ids": []string{"nope"}}); code != 400 || res.Key != "validation_failed" {
+		t.Errorf("bad goal id: %d %q", code, res.Key)
+	}
+	if code, _ := call(t, router, "PUT", "/api/transactions/"+tx.ID+"/goals", map[string]any{"goal_ids": []string{}}); code != 200 {
+		t.Errorf("clear goals: %d", code)
+	}
+}

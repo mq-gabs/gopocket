@@ -57,6 +57,7 @@ export const httpClient = {
   get: <T>(path: string) => request<T>(path),
   post: <T, D = unknown>(path: string, body: D) => request<T>(path, { method: "POST", body: JSON.stringify(body) }),
   postForm: <T>(path: string, formData: FormData) => requestForm<T>(path, formData),
+  put: <T, D = unknown>(path: string, body: D) => request<T>(path, { method: "PUT", body: JSON.stringify(body) }),
   patch: <T, D = unknown>(path: string, body: D) => request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: <T, D = unknown>(path: string, body?: D) =>
     request<T>(path, {

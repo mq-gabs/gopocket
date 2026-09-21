@@ -32,4 +32,13 @@ export const goalService = {
       goal_ids: goalIds,
       transaction_ids: transactionIds,
     }),
+  /** Ids of the goals a single transaction is linked to. */
+  getTransactionGoalIds: (transactionId: string) =>
+    httpClient.get<string[]>(`/api/transactions/${transactionId}/goals`),
+  /** Replaces the transaction's goals: unlisted links are removed, an empty list unlinks all. */
+  setTransactionGoals: (transactionId: string, goalIds: string[]) =>
+    httpClient.put<{ updated: boolean }>(
+      `/api/transactions/${transactionId}/goals`,
+      { goal_ids: goalIds },
+    ),
 };

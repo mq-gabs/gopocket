@@ -186,6 +186,11 @@ export const en = {
   "goals.toast.updated": "Goal updated successfully",
   "goals.toast.deleted": "Goal deleted successfully",
   "goals.toast.unlinked": "Transaction removed from the goal",
+  "goals.form.field": "Goals (optional)",
+  "goals.toast.linkFailed":
+    "Saved, but the goals could not be updated. Edit it to try again.",
+  "goals.toast.linkFailedBulk":
+    "Created, but the goals could not be linked. Select the installments and use Add to goals to try again.",
   "goals.summary.paid": "Paid",
   "goals.summary.committed": "Committed",
   "goals.summary.committedHint":

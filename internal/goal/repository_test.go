@@ -127,3 +127,84 @@ func TestRepository_FindAllOrdersByDueDateNilLast(t *testing.T) {
 		}
 	}
 }
+
+func TestRepository_SetTransactionGoalsReplacesTheSet(t *testing.T) {
+	repo, db := newTestRepository(t)
+
+	tx := transaction.Transaction{Title: "t", Amount: 100, Type: "expense"}
+	if err := db.Create(&tx).Error; err != nil {
+		t.Fatal(err)
+	}
+	other := transaction.Transaction{Title: "other", Amount: 50, Type: "expense"}
+	if err := db.Create(&other).Error; err != nil {
+		t.Fatal(err)
+	}
+	a, _ := repo.Create(&Goal{Name: "a", TotalAmount: 10})
+	b, _ := repo.Create(&Goal{Name: "b", TotalAmount: 10})
+	c, _ := repo.Create(&Goal{Name: "c", TotalAmount: 10})
+
+	// Another transaction linked to goal a must be unaffected throughout.
+	if err := repo.LinkTransactions([]string{a.ID}, []string{other.ID}); err != nil {
+		t.Fatal(err)
+	}
+
+	ids := func() map[string]bool {
+		found, err := repo.FindGoalIDsByTransaction(tx.ID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		set := map[string]bool{}
+		for _, id := range found {
+			set[id] = true
+		}
+		return set
+	}
+
+	if got := ids(); len(got) != 0 {
+		t.Fatalf("initial goals = %v, want none", got)
+	}
+
+	if err := repo.SetTransactionGoals(tx.ID, []string{a.ID, b.ID}); err != nil {
+		t.Fatal(err)
+	}
+	if got := ids(); len(got) != 2 || !got[a.ID] || !got[b.ID] {
+		t.Fatalf("after set [a b] = %v", got)
+	}
+
+	// Replace: keep b, drop a, add c. Re-sending b must not duplicate it.
+	if err := repo.SetTransactionGoals(tx.ID, []string{b.ID, c.ID}); err != nil {
+		t.Fatal(err)
+	}
+	if got := ids(); len(got) != 2 || !got[b.ID] || !got[c.ID] {
+		t.Fatalf("after set [b c] = %v", got)
+	}
+
+	// A soft-deleted goal no longer shows up.
+	if err := db.Delete(&Goal{}, "id = ?", c.ID).Error; err != nil {
+		t.Fatal(err)
+	}
+	if got := ids(); len(got) != 1 || !got[b.ID] {
+		t.Fatalf("after deleting c = %v", got)
+	}
+
+	// Empty list unlinks everything.
+	if err := repo.SetTransactionGoals(tx.ID, []string{}); err != nil {
+		t.Fatal(err)
+	}
+	if got := ids(); len(got) != 0 {
+		t.Fatalf("after clearing = %v", got)
+	}
+
+	// The other transaction's link to goal a is untouched.
+	loaded, _ := repo.FindByID(a.ID)
+	if len(loaded.Transactions) != 1 || loaded.Transactions[0].ID != other.ID {
+		t.Errorf("goal a transactions = %+v, want only the other transaction", loaded.Transactions)
+	}
+
+	if err := repo.SetTransactionGoals(uuid.NewString(), []string{a.ID}); !errors.Is(err, ErrTransactionsNotFound) {
+		t.Errorf("unknown transaction: err = %v", err)
+	}
+	if err := repo.SetTransactionGoals(tx.ID, []string{uuid.NewString()}); !errors.Is(err, ErrGoalsNotFound) {
+		t.Errorf("unknown goals: err = %v", err)
+	}
+}

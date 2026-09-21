@@ -187,6 +187,11 @@ export const ptBr = {
   "goals.toast.updated": "Meta atualizada com sucesso",
   "goals.toast.deleted": "Meta excluída com sucesso",
   "goals.toast.unlinked": "Registro removido da meta",
+  "goals.form.field": "Metas (opcional)",
+  "goals.toast.linkFailed":
+    "Salvo, mas não foi possível atualizar as metas. Edite para tentar novamente.",
+  "goals.toast.linkFailedBulk":
+    "Criados, mas não foi possível vincular as metas. Selecione os registros e use Adicionar a metas para tentar novamente.",
   "goals.summary.paid": "Pago",
   "goals.summary.committed": "Comprometido",
   "goals.summary.committedHint":

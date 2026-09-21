@@ -28,6 +28,12 @@ type LinkTransactionsRequest struct {
 	TransactionIDs []string `json:"transaction_ids"`
 }
 
+// SetTransactionGoalsRequest is the request payload for replacing the set of
+// goals a single transaction is linked to. An empty list unlinks it from all.
+type SetTransactionGoalsRequest struct {
+	GoalIDs []string `json:"goal_ids"`
+}
+
 // GoalResponse is the public response payload for a goal, including its
 // progress computed from the linked transactions. All amounts are in cents.
 type GoalResponse struct {

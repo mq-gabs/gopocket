@@ -13,6 +13,7 @@ var (
 	validateDescription = vstring.String("description", vstring.MaxLen(1024))
 	validateTotalAmount = vnumber.Number("totalAmount", vnumber.IsPositive[int]())
 	validateGoalIDs     = vslices.Slice("goalIds", vslices.Required[string](), vslices.Each(vstring.String("goalId", vstring.UUIDv4())))
+	validateGoalIDItems = vslices.Slice("goalIds", vslices.Each(vstring.String("goalId", vstring.UUIDv4())))
 	validateTxIDs       = vslices.Slice("transactionIds", vslices.Required[string](), vslices.Each(vstring.String("transactionId", vstring.UUIDv4())))
 )
 
@@ -41,4 +42,10 @@ func ValidateLinkTransactions(dto LinkTransactionsRequest) error {
 		validateGoalIDs(dto.GoalIDs),
 		validateTxIDs(dto.TransactionIDs),
 	)
+}
+
+// ValidateSetTransactionGoals validates a request to replace a transaction's
+// goals. Unlike linking, an empty list is valid (it unlinks everything).
+func ValidateSetTransactionGoals(dto SetTransactionGoalsRequest) error {
+	return validateGoalIDItems(dto.GoalIDs)
 }

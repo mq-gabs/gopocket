@@ -14,11 +14,13 @@ import type {
 import { Button } from "./button";
 import { SelectLabel } from "./select/select-label";
 import { CategoryMultiSelect } from "./category-multi-select";
+import { GoalSelectField } from "./goal-select-field";
 import { CurrencyInput } from "./inputs/currency-input";
 import { DatePicker } from "./inputs/date-picker";
 import { InputLabel } from "./inputs/input-label";
 import { TextareaLabel } from "./textarea/textarea-label";
 import { TransactionType } from "@/types/transaction-type";
+import { useGoalSelection } from "@/hooks/use-goal-selection";
 
 export const buildTypeOptions = (t: TranslateFunction) => [
   {
@@ -39,6 +41,12 @@ interface TransactionFormProps {
       | CreateActualTransactionPayload
       | CreatePlannedTransactionPayload
       | UpdateTransactionPayload,
+    /**
+     * The goals to link the saved transaction to, replacing its current ones.
+     * Undefined when the goals need no saving (unchanged, or none picked for a
+     * new transaction).
+     */
+    goalIds?: string[],
   ) => void;
   onCancel?: () => void;
   submitLabel: string;
@@ -68,6 +76,10 @@ export function TransactionForm({
   loading = false,
 }: TransactionFormProps) {
   const { t } = useI18n();
+  // Only an edit has links to load; a copy prefills fields but starts with no goals.
+  const goalSelection = useGoalSelection(
+    isEditing ? initialValues?.id : undefined,
+  );
   const [title, setTitle] = useState(initialValues?.title ?? "");
   const [description, setDescription] = useState(
     initialValues?.description ?? "",
@@ -127,6 +139,7 @@ export function TransactionForm({
         | CreateActualTransactionPayload
         | CreatePlannedTransactionPayload
         | UpdateTransactionPayload,
+      goalSelection.changedIds,
     );
   };
 
@@ -191,6 +204,8 @@ export function TransactionForm({
         onChange={handleCategoryChange}
         error={categoryError ?? undefined}
       />
+
+      <GoalSelectField selection={goalSelection} />
 
       <div className="flex justify-end gap-2">
         {onCancel && (
