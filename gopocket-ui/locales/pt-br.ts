@@ -43,6 +43,7 @@ export const ptBr = {
   "actions.startImport": "Iniciar importação",
   "actions.importing": "Importando...",
   "actions.refresh": "Atualizar",
+  "actions.addToGoals": "Adicionar a metas",
   "categories.title": "Categorias",
   "categories.description": "Organize seus gastos e receitas por categoria.",
   "categories.empty": "Ainda não há categorias.",

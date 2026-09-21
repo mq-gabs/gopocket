@@ -70,7 +70,12 @@ function PlannedPageContent() {
   const [isBulkMarkPaidOpen, setIsBulkMarkPaidOpen] = useState(false);
   const [isBulkSetCategoriesOpen, setIsBulkSetCategoriesOpen] =
     useState(false);
-  const [isBulkLinkGoalsOpen, setIsBulkLinkGoalsOpen] = useState(false);
+  // Transactions the goals dialog will link to; set by the row action (one
+  // row) or the bulk action (the selection). Null while the dialog is closed.
+  const [linkGoalsTarget, setLinkGoalsTarget] = useState<{
+    ids: string[];
+    fromBulk: boolean;
+  } | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(
     new Set(),
   );
@@ -279,13 +284,19 @@ function PlannedPageContent() {
     }
   };
 
-  const handleBulkLinkGoals = async (goalIds: string[]) => {
+  const handleLinkGoals = async (goalIds: string[]) => {
+    if (!linkGoalsTarget) {
+      return;
+    }
+
     setSubmitting(true);
     try {
-      await goalService.linkTransactions(goalIds, selectedIds);
+      await goalService.linkTransactions(goalIds, linkGoalsTarget.ids);
       toast.success(t("bulkActions.linkGoals.toast"));
-      setIsBulkLinkGoalsOpen(false);
-      setSelectedKeys(new Set());
+      if (linkGoalsTarget.fromBulk) {
+        setSelectedKeys(new Set());
+      }
+      setLinkGoalsTarget(null);
     } catch (err) {
       const message = getErrorMessage(err, t);
       setError(message);
@@ -355,6 +366,11 @@ function PlannedPageContent() {
               icon: DocumentDuplicateIcon,
               label: t("actions.copy"),
               onClick: () => openCopy(row),
+            },
+            {
+              icon: FlagIcon,
+              label: t("actions.addToGoals"),
+              onClick: () => setLinkGoalsTarget({ ids: [row.id], fromBulk: false }),
             },
             {
               icon: TrashIcon,
@@ -435,7 +451,7 @@ function PlannedPageContent() {
           {
             icon: FlagIcon,
             label: t("bulkActions.linkGoals"),
-            onClick: () => setIsBulkLinkGoalsOpen(true),
+            onClick: () => setLinkGoalsTarget({ ids: selectedIds, fromBulk: true }),
           },
           {
             icon: TrashIcon,
@@ -537,14 +553,14 @@ function PlannedPageContent() {
 
       <Modal
         title={t("bulkActions.linkGoals.title")}
-        open={isBulkLinkGoalsOpen}
-        onClose={() => setIsBulkLinkGoalsOpen(false)}
+        open={linkGoalsTarget !== null}
+        onClose={() => setLinkGoalsTarget(null)}
       >
         <BulkLinkGoalsForm
-          count={selectedIds.length}
+          count={linkGoalsTarget?.ids.length ?? 0}
           submitLabel={t("actions.save")}
-          onSubmit={handleBulkLinkGoals}
-          onCancel={() => setIsBulkLinkGoalsOpen(false)}
+          onSubmit={handleLinkGoals}
+          onCancel={() => setLinkGoalsTarget(null)}
           loading={submitting}
         />
       </Modal>

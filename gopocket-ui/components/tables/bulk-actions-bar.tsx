@@ -19,7 +19,8 @@ interface BulkActionsBarProps {
 
 /**
  * Floating overlay pinned to the bottom center of the viewport, shown while
- * one or more table rows are selected. Renders only while count > 0.
+ * one or more table rows are selected. Renders only while count > 0. Actions
+ * are icon-only; their label shows as a tooltip on hover.
  */
 export function BulkActionsBar({
   count,
@@ -39,14 +40,20 @@ export function BulkActionsBar({
       </span>
       <div className="flex gap-2">
         {actions.map((action) => (
-          <Button
+          <div
             key={action.label}
-            variation={action.variation ?? "neutral"}
-            onClick={action.onClick}
+            className="tooltip tooltip-top"
+            data-tip={action.label}
           >
-            <action.icon className="h-4 w-4" />
-            {action.label}
-          </Button>
+            <Button
+              variation={action.variation ?? "neutral"}
+              onClick={action.onClick}
+              className="p-2!"
+              aria-label={action.label}
+            >
+              <action.icon className="h-4 w-4" />
+            </Button>
+          </div>
         ))}
       </div>
       <Button
