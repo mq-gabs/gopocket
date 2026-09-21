@@ -7,6 +7,7 @@ import {
   ChartBarIcon,
   ClipboardDocumentListIcon,
   FlagIcon,
+  HomeIcon,
   TagIcon,
 } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
@@ -24,7 +25,12 @@ export function Sidebar() {
   const { t } = useI18n();
 
   const items: NavItem[] = [
-    { href: "/", label: t("navigation.dashboard"), icon: ChartBarIcon },
+    { href: "/", label: t("navigation.home"), icon: HomeIcon },
+    {
+      href: "/dashboard",
+      label: t("navigation.dashboard"),
+      icon: ChartBarIcon,
+    },
     {
       href: "/transactions",
       label: t("navigation.transactions"),

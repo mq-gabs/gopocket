@@ -6,18 +6,10 @@ import {
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
-import type { TranslateFunction } from "@/contexts/i18n-context";
 import type { Goal } from "@/types/models";
 import { cls } from "@/utils/cls";
 import { formatCurrencyString } from "@/utils/currency";
-
-const daysLabel = (days: number, t: TranslateFunction): string => {
-  if (days === 0) return t("goals.summary.dueToday");
-  if (days > 0) {
-    return `${days} ${t(days === 1 ? "goals.summary.dayLeft" : "goals.summary.daysLeft")}`;
-  }
-  return `${-days} ${t(days === -1 ? "goals.summary.dayOverdue" : "goals.summary.daysOverdue")}`;
-};
+import { daysLabel } from "@/utils/days-label";
 
 interface StatProps {
   label: string;

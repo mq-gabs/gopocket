@@ -27,6 +27,7 @@ import Table, { TableColumn } from "@/components/tables/table";
 import { AmountCell } from "@/components/amount-cell";
 import EmptyChart from "@/components/charts/empty-chart";
 import { Skeleton } from "@/components/skeleton";
+import { SummaryCard, SummaryCardSkeleton } from "@/components/summary-card";
 
 const currentMonth = new Date().toISOString().slice(0, 7);
 const currentYear = currentMonth.slice(0, 4);
@@ -215,21 +216,21 @@ export default function DashboardPage() {
           <section className="grid gap-4 md:grid-cols-3">
             <SummaryCard
               label={t("dashboard.balance")}
-              value={data.summary.total_balance}
+              value={formatCurrencyString(data.summary.total_balance)}
               icon={<BanknotesIcon className="h-5 w-5" />}
               accent="text-primary"
               className="bg-primary-20 border border-success"
             />
             <SummaryCard
               label={t("dashboard.income")}
-              value={data.summary.total_income}
+              value={formatCurrencyString(data.summary.total_income)}
               icon={<ArrowTrendingUpIcon className="h-5 w-5" />}
               accent="text-secondary"
               className="bg-secondary/20 border border-secondary"
             />
             <SummaryCard
               label={t("dashboard.expenses")}
-              value={data.summary.total_expenses}
+              value={formatCurrencyString(data.summary.total_expenses)}
               icon={<ArrowTrendingDownIcon className="h-5 w-5" />}
               accent="text-destructive"
               className="bg-destructive/20 border border-destructive"
@@ -320,50 +321,4 @@ function buildRecentTransactionsColumns(
       render: (row) => formatDate(row.paid_at, locale),
     },
   ];
-}
-
-function SummaryCard({
-  label,
-  value,
-  icon,
-  accent,
-  className,
-}: {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-  accent: string;
-  className?: string;
-}) {
-  return (
-    <article
-      className={`rounded-2xl border border-foreground/10 bg-background p-5 ${className}`}
-    >
-      <div className="flex gap-2 items-center mb-6">
-        <div
-          className={`flex h-10 w-10 items-center justify-center rounded-xl bg-background ${accent}`}
-        >
-          {icon}
-        </div>
-        <p className={`text-sm ${accent}`}>{label}</p>
-      </div>
-      <p className={`mt-1 text-2xl font-semibold text-right ${accent}`}>
-        {formatCurrencyString(value)}
-      </p>
-    </article>
-  );
-}
-
-function SummaryCardSkeleton() {
-  return (
-    <article className="rounded-2xl border border-foreground/10 bg-background p-5">
-      <div className="flex gap-2 items-center mb-6">
-        <Skeleton className="h-10 w-10 rounded-xl" />
-        <Skeleton className="h-4 w-20 rounded" />
-      </div>
-      <div className="flex justify-end">
-        <Skeleton className="h-6 w-24 rounded" />
-      </div>
-    </article>
-  );
 }
