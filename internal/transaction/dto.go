@@ -22,17 +22,18 @@ type CreatePlannedTransactionRequest struct {
 }
 
 // CreateBulkPlannedTransactionsRequest is the request payload for creating a
-// batch of planned transactions, one per month in [StartMonth, EndMonth],
-// all due on DueDay. StartMonth/EndMonth use the "YYYY-MM" format.
+// batch of planned transactions as installments. Amount is the total, split
+// equally across Installments (the last one absorbs any remainder). The first
+// installment is due on FirstDueAt ("YYYY-MM-DD") and each following one on the
+// same day of the next months.
 type CreateBulkPlannedTransactionsRequest struct {
-	Title       string   `json:"title"`
-	Description string   `json:"description,omitempty"`
-	Amount      int      `json:"amount"`
-	Type        string   `json:"type"`
-	CategoryIDs []string `json:"category_ids"`
-	DueDay      int      `json:"due_day"`
-	StartMonth  string   `json:"start_month"`
-	EndMonth    string   `json:"end_month"`
+	Title        string   `json:"title"`
+	Description  string   `json:"description,omitempty"`
+	Amount       int      `json:"amount"`
+	Type         string   `json:"type"`
+	CategoryIDs  []string `json:"category_ids"`
+	Installments int      `json:"installments"`
+	FirstDueAt   string   `json:"first_due_at"`
 }
 
 // DeleteBulkTransactionsRequest is the request payload for deleting a batch

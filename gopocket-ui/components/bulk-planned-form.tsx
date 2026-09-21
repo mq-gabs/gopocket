@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { format } from "date-fns";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useI18n } from "@/contexts/i18n-context";
 import type {
@@ -15,6 +16,7 @@ import { DatePicker } from "./inputs/date-picker";
 import { InputLabel } from "./inputs/input-label";
 import { SelectLabel } from "./select/select-label";
 import { TextareaLabel } from "./textarea/textarea-label";
+import { formatCurrencyString } from "@/utils/currency";
 import { TransactionType } from "@/types/transaction-type";
 
 interface BulkPlannedFormProps {
@@ -25,16 +27,9 @@ interface BulkPlannedFormProps {
   loading?: boolean;
 }
 
-const currentMonth = new Date().toISOString().slice(0, 7);
-const currentDay = new Date().getDate();
+const MAX_INSTALLMENTS = 360;
 
-function countMonthsInclusive(startMonth: string, endMonth: string): number {
-  const [startYear, startMonthNum] = startMonth.split("-").map(Number);
-  const [endYear, endMonthNum] = endMonth.split("-").map(Number);
-  if (!startYear || !startMonthNum || !endYear || !endMonthNum) return 0;
-
-  return (endYear - startYear) * 12 + (endMonthNum - startMonthNum) + 1;
-}
+const today = format(new Date(), "yyyy-MM-dd");
 
 export function BulkPlannedForm({
   categories,
@@ -50,15 +45,20 @@ export function BulkPlannedForm({
   const [type, setType] = useState(TransactionType.EXPENSE);
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [categoryError, setCategoryError] = useState<string | null>(null);
-  const [dueDay, setDueDay] = useState(currentDay);
-  const [startMonth, setStartMonth] = useState(currentMonth);
-  const [endMonth, setEndMonth] = useState(currentMonth);
+  const [installments, setInstallments] = useState(2);
+  const [firstDueAt, setFirstDueAt] = useState(today);
 
-  const count = useMemo(
-    () => countMonthsInclusive(startMonth, endMonth),
-    [startMonth, endMonth],
-  );
-  const isRangeValid = count > 0;
+  const areInstallmentsValid =
+    Number.isInteger(installments) &&
+    installments >= 1 &&
+    installments <= MAX_INSTALLMENTS;
+  const installmentAmount = areInstallmentsValid
+    ? Math.floor(amount / installments)
+    : 0;
+  // The last installment absorbs whatever the equal split leaves over.
+  const lastInstallmentAmount = areInstallmentsValid
+    ? amount - installmentAmount * (installments - 1)
+    : 0;
 
   const handleCategoryChange = (ids: string[]) => {
     setCategoryIds(ids);
@@ -75,7 +75,7 @@ export function BulkPlannedForm({
       return;
     }
 
-    if (!isRangeValid) {
+    if (!areInstallmentsValid || !firstDueAt) {
       return;
     }
 
@@ -85,9 +85,8 @@ export function BulkPlannedForm({
       amount,
       type,
       category_ids: categoryIds,
-      due_day: dueDay,
-      start_month: startMonth,
-      end_month: endMonth,
+      installments,
+      first_due_at: firstDueAt,
     });
   };
 
@@ -110,7 +109,7 @@ export function BulkPlannedForm({
 
       <CurrencyInput
         id="bulk-amount"
-        label={t("transactions.form.amount")}
+        label={t("planned.bulk.totalAmount")}
         value={amount}
         onChange={setAmount}
         required
@@ -124,42 +123,35 @@ export function BulkPlannedForm({
         options={buildTypeOptions(t)}
       />
 
-      <InputLabel
-        id="bulk-due-day"
-        label={t("planned.bulk.dueDay")}
-        type="number"
-        min={1}
-        max={31}
-        value={dueDay}
-        onChange={(event) => setDueDay(Number(event.target.value))}
-        required
-      />
-
       <div className="grid grid-cols-2 gap-4">
-        <DatePicker
-          id="bulk-start-month"
-          label={t("planned.bulk.startMonth")}
-          granularity="month"
-          value={startMonth}
-          onChange={setStartMonth}
+        <InputLabel
+          id="bulk-installments"
+          label={t("planned.bulk.installments")}
+          type="number"
+          min={1}
+          max={MAX_INSTALLMENTS}
+          value={installments}
+          onChange={(event) => setInstallments(Number(event.target.value))}
           required
         />
         <DatePicker
-          id="bulk-end-month"
-          label={t("planned.bulk.endMonth")}
-          granularity="month"
-          value={endMonth}
-          onChange={setEndMonth}
+          id="bulk-first-due-at"
+          label={t("planned.bulk.firstDueAt")}
+          value={firstDueAt}
+          onChange={setFirstDueAt}
           required
         />
       </div>
 
       <p
-        className={`text-xs ${isRangeValid ? "text-foreground/60" : "text-destructive"}`}
+        className={`text-xs ${areInstallmentsValid ? "text-foreground/60" : "text-destructive"}`}
       >
-        {isRangeValid
-          ? `${count} ${t("planned.bulk.preview")}`
-          : t("planned.bulk.invalidRange")}
+        {areInstallmentsValid
+          ? `${installments} ${t("planned.bulk.preview")} ${formatCurrencyString(installmentAmount)}` +
+            (lastInstallmentAmount !== installmentAmount
+              ? ` (${t("planned.bulk.previewLast")} ${formatCurrencyString(lastInstallmentAmount)})`
+              : "")
+          : t("planned.bulk.invalidInstallments")}
       </p>
 
       <CategoryMultiSelect

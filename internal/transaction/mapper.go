@@ -60,42 +60,45 @@ func CreatePlannedRequestToModel(dto CreatePlannedTransactionRequest) Transactio
 }
 
 // CreateBulkPlannedRequestToModels expands a bulk request into one planned
-// transaction per month in [StartMonth, EndMonth] (inclusive), each due on
-// DueDay (clamped to the last day of shorter months) and titled with an
-// "(index/total)" suffix, e.g. "Installment (2/5)".
+// transaction per installment. The total amount is split equally, with the
+// last installment absorbing any remainder. Installment i is due i months
+// after FirstDueAt on the same day (clamped to the last day of shorter months,
+// e.g. Jan 31 -> Feb 28) and titled with an "(index/total)" suffix, e.g.
+// "Installment (2/5)".
 func CreateBulkPlannedRequestToModels(dto CreateBulkPlannedTransactionsRequest) ([]Transaction, error) {
-	start, err := time.Parse("2006-01", dto.StartMonth)
+	first, err := time.Parse("2006-01-02", dto.FirstDueAt)
 	if err != nil {
-		return nil, fmt.Errorf("start_month must be in YYYY-MM format")
+		return nil, fmt.Errorf("first_due_at must be a valid date in YYYY-MM-DD format")
 	}
-	end, err := time.Parse("2006-01", dto.EndMonth)
-	if err != nil {
-		return nil, fmt.Errorf("end_month must be in YYYY-MM format")
-	}
-	if end.Before(start) {
-		return nil, fmt.Errorf("end_month must not be before start_month")
+	if dto.Installments < 1 {
+		return nil, fmt.Errorf("installments must be at least 1")
 	}
 
-	total := monthsBetweenInclusive(start, end)
-	models := make([]Transaction, 0, total)
-	cursor := start
-	for index := 1; index <= total; index++ {
+	base := dto.Amount / dto.Installments
+	remainder := dto.Amount - base*dto.Installments
+
+	models := make([]Transaction, 0, dto.Installments)
+	for index := 1; index <= dto.Installments; index++ {
+		amount := base
+		if index == dto.Installments {
+			amount += remainder
+		}
+
+		// Always offset from the first month (not the previous installment) so
+		// a clamped day (Feb 28) doesn't drag later months down with it.
+		monthStart := time.Date(first.Year(), first.Month()+time.Month(index-1), 1, 0, 0, 0, 0, time.UTC)
+
 		models = append(models, Transaction{
-			Title:       fmt.Sprintf("%s (%d/%d)", dto.Title, index, total),
+			Title:       fmt.Sprintf("%s (%d/%d)", dto.Title, index, dto.Installments),
 			Description: dto.Description,
-			Amount:      dto.Amount,
+			Amount:      amount,
 			Type:        transactiontype.TransactionType(dto.Type),
 			PaidAt:      nil,
-			DueAt:       dueDateInMonth(cursor.Year(), cursor.Month(), dto.DueDay),
+			DueAt:       dueDateInMonth(monthStart.Year(), monthStart.Month(), first.Day()),
 		})
-		cursor = cursor.AddDate(0, 1, 0)
 	}
 
 	return models, nil
-}
-
-func monthsBetweenInclusive(start, end time.Time) int {
-	return (end.Year()-start.Year())*12 + int(end.Month()-start.Month()) + 1
 }
 
 // dueDateInMonth builds a noon-UTC timestamp for the given day within

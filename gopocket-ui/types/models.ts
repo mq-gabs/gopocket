@@ -58,14 +58,13 @@ export interface CreatePlannedTransactionPayload {
 export interface CreateBulkPlannedTransactionsPayload {
   title: string;
   description: string;
+  /** Total amount in cents, split equally across the installments. */
   amount: number;
   type: TransactionType;
   category_ids: string[];
-  due_day: number;
-  /** "YYYY-MM" */
-  start_month: string;
-  /** "YYYY-MM" */
-  end_month: string;
+  installments: number;
+  /** "YYYY-MM-DD" */
+  first_due_at: string;
 }
 
 export type UpdateTransactionPayload = {
